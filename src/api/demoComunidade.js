@@ -5,17 +5,12 @@ const horasAtras = (h) => new Date(Date.now() - h * 3600e3).toISOString();
 
 // [id, nome, grupo, horas, origem, ativo (WIN/WDO para futuro), lado, qtd, preço (null = do mercado), tese, reações]
 const COLEGAS = [
-  [1, 'Bruno Lima', 'ADM 3º período', 30, 'acao', 'VALE3', 'compra', 200, 55.4,
-    'O minério subiu na China e a Vale paga bons dividendos. Pretendo ficar alguns meses.', { curtir: 3, palmas: 2 }],
-  [2, 'Diego Rocha', 'ADM 5º período', 26, 'futuro', 'WIN', 'compra', 2, -0.006,
-    'Ibovespa caiu demais depois da eleição. Aposta curta em recuperação.', { surpresa: 2, curtir: 1 }],
-  [3, 'Gabriela Tavares', 'ADM 3º período', 20, 'acao', 'MGLU3', 'venda_descoberto', 300, 9.8,
-    'Varejo sofrendo com juros altos. Se passar de R$ 10,50 eu recompro.', { risada: 2, duvida: 1 }],
+  [1, 'Bruno Lima', 'ADM 3º período', 30, 'acao', 'VALE3', 'compra', 200, 55.4, null, { curtir: 3, palmas: 2 }],
+  [2, 'Diego Rocha', 'ADM 5º período', 26, 'futuro', 'WIN', 'compra', 2, -0.006, null, { surpresa: 2, curtir: 1 }],
+  [3, 'Gabriela Tavares', 'ADM 3º período', 20, 'acao', 'MGLU3', 'venda_descoberto', 300, 9.8, null, { risada: 2, duvida: 1 }],
   [4, 'Helena Castro', 'Finanças UFF', 12, 'acao', 'ITUB4', 'compra', 100, 37.9, null, { curtir: 1 }],
-  [5, 'Carla Menezes', 'ADM 3º período', 8, 'acao', 'WEGE3', 'venda', 50, 44.8,
-    'Realizei o lucro: subiu 6% em duas semanas.', { palmas: 4 }],
-  [6, 'Felipe Arruda', 'ADM 5º período', 5, 'futuro', 'WDO', 'compra', 1, -0.004,
-    'Dólar deve subir com a incerteza fiscal.', {}],
+  [5, 'Carla Menezes', 'ADM 3º período', 8, 'acao', 'WEGE3', 'venda', 50, 44.8, null, { palmas: 4 }],
+  [6, 'Felipe Arruda', 'ADM 5º período', 5, 'futuro', 'WDO', 'compra', 1, -0.004, null, {}],
 ];
 
 export function criarComunidadeDemo({ ordens, futurosOrdens, perfil, contratos, precoDe, ehGestor }) {
@@ -98,9 +93,6 @@ export function criarComunidadeDemo({ ordens, futurosOrdens, perfil, contratos, 
       r.minha = !tipo || tipo === r.minha ? null : tipo;
       if (r.minha) r.contagem[r.minha] = (r.contagem[r.minha] ?? 0) + 1;
       return r.minha;
-    },
-    async definirTese(origem, ordemId, tese) {
-      teses[(origem === 'futuro' ? 5000 : 1000) + ordemId] = tese?.trim() || null;
     },
     async mostrarOperacoes(mostrar) { perfil().mostrar_operacoes = mostrar; return mostrar; },
     async denunciar(alvo, id, motivo = null) { denuncias.push({ alvo, id, motivo }); },

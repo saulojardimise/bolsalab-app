@@ -6,7 +6,7 @@ const ESCOPOS = [['todos', 'Todos os grupos'], ['grupo', 'Meu grupo']];
 const LIMITE = 20;
 
 // Comunidade: mural com as operações dos alunos de todos os grupos,
-// reações, comentários e a tese de cada operação.
+// reações e comentários.
 export default function Comunidade({ dados, versao, aoEscolher, aoAbrirFuturo, aoMudarPerfil, avisar, moderar = false }) {
   const [escopo, setEscopo] = useState(() => {
     try { return localStorage.getItem('bolsalab:comunidade') || 'todos'; } catch { return 'todos'; }
@@ -57,7 +57,7 @@ export default function Comunidade({ dados, versao, aoEscolher, aoAbrirFuturo, a
             <h1>Comunidade</h1>
           </div>
           <p className="suave">
-            As operações dos alunos de todos os grupos. Reaja, comente e conte por que você fez cada operação.
+            As operações dos alunos de todos os grupos. Reaja e comente.
           </p>
           <div className="chips" role="group" aria-label="Mostrar">
             {ESCOPOS.map(([id, rotulo]) => (

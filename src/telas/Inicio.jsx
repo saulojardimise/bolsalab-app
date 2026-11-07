@@ -204,7 +204,7 @@ function ResumoComunidade({ versao, irPara }) {
       </div>
       {lista.length === 0 ? (
         <div className="cartao vazio">
-          <p>As operações dos alunos aparecem aqui. Faça a sua e conte por que fez.</p>
+          <p>As operações dos alunos aparecem aqui. Faça a sua e veja a dos colegas.</p>
           <button className="botao" onClick={() => irPara('comunidade')}>Abrir a comunidade</button>
         </div>
       ) : (
@@ -217,7 +217,6 @@ function ResumoComunidade({ versao, irPara }) {
                   <Avatar foto={p.foto_url} tamanho={36} />
                   <span className="resumo-texto">
                     <strong>{p.eu ? 'Você' : nomeCurto(p.nome)}</strong> {fraseOperacao(p)}
-                    {p.tese && <small className="resumo-tese">“{p.tese}”</small>}
                     <small className="suave">
                       {quando(p.criado_em)}
                       {total > 0 && ` · ${total} ${total === 1 ? 'reação' : 'reações'}`}

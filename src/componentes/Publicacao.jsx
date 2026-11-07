@@ -6,7 +6,7 @@ import { REACOES, desdeOperacao, nomeCurto, partesOperacao, resumoReacoes } from
 import Avatar from './Avatar.jsx';
 import Icone from './Icone.jsx';
 
-// Uma operação no mural: quem fez, o que fez, a tese, como está desde então,
+// Uma operação no mural: quem fez, o que fez, como está desde então,
 // reações e comentários. moderar = visão do gestor (ocultar/mostrar).
 export default function Publicacao({ p, aoEscolher, aoMudar, moderar = false, avisar }) {
   const [abertos, setAbertos] = useState(false);
@@ -104,8 +104,6 @@ export default function Publicacao({ p, aoEscolher, aoMudar, moderar = false, av
         <button className="link-ativo" onClick={() => aoEscolher?.(p)} disabled={!aoEscolher}>{frase.ativo}</button>{' '}
         {frase.depois}
       </p>
-
-      {p.tese && <blockquote className="publicacao-tese">“{p.tese}”</blockquote>}
 
       {desde != null && (
         <p className="publicacao-desde suave">

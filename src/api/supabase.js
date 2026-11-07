@@ -252,9 +252,6 @@ export function criarApi(supabase, { urlRetorno } = {}) {
     async reagir(publicacao, tipo) {
       return checar(await supabase.rpc('reagir', { p_publicacao: publicacao, p_tipo: tipo }));
     },
-    async definirTese(origem, ordemId, tese) {
-      return checar(await supabase.rpc('definir_tese', { p_origem: origem, p_ordem: ordemId, p_tese: tese }));
-    },
     async mostrarOperacoes(mostrar) {
       return checar(await supabase.rpc('definir_mostrar_operacoes', { p_mostrar: mostrar }));
     },

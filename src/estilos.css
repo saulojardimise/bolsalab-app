@@ -893,10 +893,6 @@ input:focus-visible, select:focus-visible { outline: none; border-color: var(--f
   cursor: pointer; text-decoration: underline; text-underline-offset: 3px;
 }
 .link-ativo:disabled { color: var(--marinho); text-decoration: none; cursor: default; }
-.publicacao-tese {
-  margin: 0; padding: 8px 12px; border-left: 3px solid var(--verde); background: var(--fundo);
-  border-radius: 0 10px 10px 0; color: var(--texto); font-style: italic; overflow-wrap: anywhere;
-}
 .publicacao-desde { margin: 0; font-size: 0.9rem; }
 .publicacao-reacoes { display: flex; flex-wrap: wrap; gap: 6px; }
 .reacao {
@@ -937,13 +933,6 @@ input:focus-visible, select:focus-visible { outline: none; border-color: var(--f
 }
 .resumo-texto { display: grid; gap: 2px; min-width: 0; }
 .resumo-texto strong { color: var(--marinho); }
-.resumo-tese { color: var(--texto); font-style: italic; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.campo-tese-abrir { justify-self: start; }
-.campo-tese textarea {
-  resize: vertical; padding: 10px 12px; border: 1px solid var(--linha); border-radius: var(--raio);
-  background: var(--cartao); color: var(--texto); font: inherit;
-}
-.campo-tese-conta { justify-self: end; }
 .denuncias li { display: grid; gap: 6px; }
 .denuncias p { margin: 0; }
 .denuncia-conteudo { overflow-wrap: anywhere; }
