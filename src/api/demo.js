@@ -95,6 +95,7 @@ function criarEstado() {
     futuros: [], futurosOrdens: [],
     cobrancas: [],
     proximoId: 1,
+    grupos: [1],   // ids dos grupos em que está
   };
   // histórico inicial da Ana
   const ordem = (ticker, tipo, qtd, preco, h) => executar(s, ticker, tipo, qtd, preco, horasAtras(h));
@@ -188,6 +189,7 @@ function criarGestao() {
       aluno('Diego Rocha', 2, 10251.0, 5, undefined, 'moderado', 'arrojado', 0, 92),
       aluno('Felipe Arruda', 2, 9711.2, 3),
       aluno('Helena Castro', 3, 10044.0, 2, 'id.uff.br', 'arrojado', 'moderado', 0, 48),
+      aluno('Igor Nunes', null, 10120.5, 3, 'gmail.com', 'moderado', 'moderado', 0, 50),
     ],
     alertas: [
       { id: 2, tipo: 'variacao_brusca', ticker: 'BBDC4', criado_em: horasAtras(3), alunos: 2,
@@ -215,6 +217,12 @@ export function criarApiDemo() {
     gestao.alertas = gestao.alertas.filter((a) => a.ticker !== ticker);
   };
   const precoDe = (t) => estado.precos[t].preco;
+  // grupo principal = o primeiro em que ainda está
+  const acertarPrincipal = () => {
+    const t = gestao.turmas.find((x) => x.id === estado.grupos[0]);
+    estado.perfil.turma_id = t?.id ?? null;
+    estado.perfil.turma = t?.nome ?? '';
+  };
 
   const carteira = () => Object.entries(estado.posicoes).map(([ticker, p]) => {
     const atual = precoDe(ticker);
@@ -243,6 +251,7 @@ export function criarApiDemo() {
     perfil: () => estado.perfil,
     precoDe: (t) => estado.precos[t]?.preco ?? null,
     ehGestor: () => gestor,
+    meusGrupos: () => estado.grupos.map((id) => gestao.turmas.find((t) => t.id === id)?.nome).filter(Boolean),
     contratos: () => api.futurosMercado(),
   });
 
@@ -262,14 +271,45 @@ export function criarApiDemo() {
       const t = gestao.turmas.find((x) => x.token.replace('-', '') === limpo && x.ativa);
       return t ? { turma: t.nome, dominio_email: t.dominio_email } : null;
     },
-    async cadastrar({ email, token }) {
+    async cadastrar({ email, token = '' }) {
       await atraso(300);
+      if (!token.trim()) return { precisaConfirmar: true, turma: null };
       const t = await this.verificarToken(token);
-      if (!t) throw new Error('Token inválido ou grupo fechado. Peça o token ao professor.');
+      if (!t) throw new Error('Token inválido ou grupo fechado. Confira o código ou cadastre-se sem token.');
       if (t.dominio_email && email.trim().toLowerCase().split('@')[1] !== t.dominio_email) {
-        throw new Error(`A turma ${t.turma} só aceita e-mails @${t.dominio_email}.`);
+        throw new Error(`O grupo ${t.turma} só aceita e-mails @${t.dominio_email}.`);
       }
       return { precisaConfirmar: true, turma: t.turma };
+    },
+    async meusGrupos() {
+      return estado.grupos.map((id, i) => {
+        const t = gestao.turmas.find((x) => x.id === id);
+        return { id, nome: t.nome, entrou_em: horasAtras(300 - i), principal: i === 0,
+                 pessoas: gestao.alunos.filter((a) => a.turma_id === id).length + 1 };
+      });
+    },
+    async entrarNoGrupo(token) {
+      await atraso(300);
+      const limpo = token.toUpperCase().replace(/[^A-Z0-9]/g, '');
+      const t = gestao.turmas.find((x) => x.token.replace('-', '') === limpo);
+      if (!t) throw new Error('Token de grupo inválido. Confira o código com o professor.');
+      if (!t.ativa) throw new Error(`O grupo ${t.nome} não está aceitando novos participantes.`);
+      if (t.dominio_email && estado.perfil.email.split('@')[1] !== t.dominio_email) {
+        throw new Error(`O grupo ${t.nome} só aceita e-mails @${t.dominio_email}.`);
+      }
+      if (estado.grupos.includes(t.id)) throw new Error(`Você já está no grupo ${t.nome}.`);
+      estado.grupos.push(t.id);
+      acertarPrincipal();
+      return { id: t.id, nome: t.nome };
+    },
+    async sairDoGrupo(id) {
+      if (!estado.grupos.includes(id)) throw new Error('Você não está nesse grupo.');
+      estado.grupos = estado.grupos.filter((g) => g !== id);
+      acertarPrincipal();
+    },
+    async semGrupo() {
+      const sem = gestao.alunos.filter((a) => a.turma_id == null);
+      return { pessoas: sem.length, rentabilidade_media: sem.length ? r2(sem.reduce((s, a) => s + (a.patrimonio / 10000 - 1) * 100, 0) / sem.length) : null };
     },
     async sair() { logado = false; gestor = false; estado = criarEstado(); gestao = criarGestao(); avisar('SIGNED_OUT'); },
     async recuperarSenha() { await atraso(300); },
@@ -435,11 +475,11 @@ export function criarApiDemo() {
       const v = vendidas().reduce((s, x) => s + x.resultado, 0);
       const meu = estado.perfil.saldo + carteira().reduce((s, x) => s + x.valor_atual, 0) + v;
       const lista = [
-        ...gestao.alunos.filter((a) => a.nome !== estado.perfil.nome).map((a) => [a.nome, a.turma_id, a.patrimonio, false]),
-        [estado.perfil.nome, estado.perfil.turma_id, r2(meu), true],
-      ].filter(([, t]) => !turmaId || t === turmaId).sort((a, b) => b[2] - a[2]);
-      return lista.map(([nome, t, patrimonio, eu], i) => ({
-        posicao: i + 1, nome, turma: gestao.turmas.find((x) => x.id === t)?.nome ?? '', patrimonio,
+        ...gestao.alunos.filter((a) => a.nome !== estado.perfil.nome).map((a) => [a.nome, a.turma_id == null ? [] : [a.turma_id], a.patrimonio, false]),
+        [estado.perfil.nome, estado.grupos, r2(meu), true],
+      ].filter(([, ts]) => !turmaId || ts.includes(turmaId)).sort((a, b) => b[2] - a[2]);
+      return lista.map(([nome, ts, patrimonio, eu], i) => ({
+        posicao: i + 1, nome, turma: ts.map((t) => gestao.turmas.find((x) => x.id === t)?.nome).filter(Boolean).join(', '), patrimonio,
         rentabilidade_pct: r2((patrimonio / 10000 - 1) * 100), eu, foto_url: eu ? estado.perfil.foto_url ?? null : null,
       }));
     },
@@ -496,7 +536,7 @@ export function criarApiDemo() {
     },
     async alunosTurma(id) {
       await atraso();
-      return gestao.alunos.filter((a) => a.turma_id === id).sort((a, b) => b.patrimonio - a.patrimonio)
+      return gestao.alunos.filter((a) => (id === 0 ? a.turma_id == null : a.turma_id === id)).sort((a, b) => b.patrimonio - a.patrimonio)
         .map((a, i) => ({ ...a, posicao: i + 1, rentabilidade_pct: r2((a.patrimonio / 10000 - 1) * 100) }));
     },
     async excluirTurma(id, apagarAlunos = false) {

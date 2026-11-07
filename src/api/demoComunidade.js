@@ -13,7 +13,7 @@ const COLEGAS = [
   [6, 'Felipe Arruda', 'ADM 5º período', 5, 'futuro', 'WDO', 'compra', 1, -0.004, null, {}],
 ];
 
-export function criarComunidadeDemo({ ordens, futurosOrdens, perfil, contratos, precoDe, ehGestor }) {
+export function criarComunidadeDemo({ ordens, futurosOrdens, perfil, contratos, precoDe, ehGestor, meusGrupos = () => [perfil().turma] }) {
   const teses = {};        // id da publicação -> tese
   const reacoes = {};      // id -> { contagem, minha }
   const ocultas = new Set();
@@ -64,7 +64,7 @@ export function criarComunidadeDemo({ ordens, futurosOrdens, perfil, contratos, 
       };
     });
     const p = perfil();
-    const eu = { nome: p.nome, foto_url: p.foto_url ?? null, grupo: p.turma, eu: true };
+    const eu = { nome: p.nome, foto_url: p.foto_url ?? null, grupo: meusGrupos().join(', '), eu: true };
     const minhas = [
       ...ordens().filter((o) => !o.automatica).map((o) => ({
         id: 1000 + o.id, criado_em: o.criado_em, ...eu, origem: 'acao', ativo: o.ticker, base: null,
@@ -94,7 +94,7 @@ export function criarComunidadeDemo({ ordens, futurosOrdens, perfil, contratos, 
     async marcarNotificacoesLidas() { vistas = new Date().toISOString(); },
     async comunidade(escopo = 'todos', antes = null, limite = 20) {
       let lista = await todas();
-      if (escopo === 'grupo') lista = lista.filter((x) => x.grupo === perfil().turma);
+      if (escopo === 'grupo') lista = lista.filter((x) => x.eu || meusGrupos().some((g) => x.grupo.split(', ').includes(g)));
       if (antes != null) {
         const i = lista.findIndex((x) => x.id === antes);
         lista = i >= 0 ? lista.slice(i + 1) : [];

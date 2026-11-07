@@ -6,7 +6,7 @@ const MENSAGENS_AUTH = [
   [/email not confirmed/i, 'Confirme seu e-mail: abra o link que enviamos para a sua caixa de entrada.'],
   [/already registered|already been registered|user_already_exists/i, 'Este e-mail já tem conta. Use "Entrar" ou recupere a senha.'],
   // o Supabase esconde o motivo quando o banco recusa o cadastro
-  [/database error saving new user/i, 'Não foi possível criar a conta. Confira o token da turma e se o seu e-mail é do tipo aceito por ela.'],
+  [/database error saving new user/i, 'Não foi possível criar a conta. Se informou um token, confira o código e se o seu e-mail é aceito pelo grupo.'],
   [/password should be at least|weak_password|weak password/i, 'A senha precisa ter pelo menos 6 caracteres.'],
   [/rate limit|too many requests|over_email_send_rate_limit/i, 'Muitas tentativas seguidas. Espere alguns minutos e tente de novo.'],
   [/same as the old|same_password/i, 'A nova senha precisa ser diferente da anterior.'],
@@ -62,25 +62,29 @@ export function criarApi(supabase, { urlRetorno } = {}) {
       return linhas[0] ?? null;
     },
 
-    async cadastrar({ email, senha, nome, token }) {
-      const turma = await this.verificarToken(token);
-      if (!turma) throw new Error('Token inválido ou grupo fechado. Peça o token ao professor.');
-      if (!emailAceito(email, turma.dominio_email)) {
-        throw new Error(turma.dominio_email
-          ? `A turma ${turma.turma} só aceita e-mails @${turma.dominio_email}.`
+    // token é opcional: sem ele a pessoa simula sem grupo e pode entrar num grupo depois
+    async cadastrar({ email, senha, nome, token = '' }) {
+      let turma = null;
+      if (token.trim()) {
+        turma = await this.verificarToken(token);
+        if (!turma) throw new Error('Token inválido ou grupo fechado. Confira o código ou cadastre-se sem token.');
+      }
+      if (!emailAceito(email, turma?.dominio_email)) {
+        throw new Error(turma?.dominio_email
+          ? `O grupo ${turma.turma} só aceita e-mails @${turma.dominio_email}.`
           : 'Digite um e-mail válido.');
       }
       const { data, error } = await supabase.auth.signUp({
         email: email.trim(),
         password: senha,
-        options: { data: { nome: nome.trim(), token: token.trim() }, emailRedirectTo: urlRetorno },
+        options: { data: { nome: nome.trim(), ...(turma ? { token: token.trim() } : {}) }, emailRedirectTo: urlRetorno },
       });
       if (error) throw traduzir(error);
       // Supabase devolve usuário sem identidades quando o e-mail já existe
       if (data.user && data.user.identities?.length === 0) {
         throw new Error('Este e-mail já tem conta. Use "Entrar" ou recupere a senha.');
       }
-      return { precisaConfirmar: !data.session, turma: turma.turma };
+      return { precisaConfirmar: !data.session, turma: turma?.turma ?? null };
     },
 
     // Confere a senha atual (entrando de novo) antes de gravar a nova
@@ -162,6 +166,17 @@ export function criarApi(supabase, { urlRetorno } = {}) {
         .order('data').limit(1000));
     },
 
+    // grupos da pessoa: [{ id, nome, entrou_em, pessoas, principal }]
+    async meusGrupos() {
+      return checar(await supabase.rpc('meus_grupos'));
+    },
+    async entrarNoGrupo(token) {
+      const r = checar(await supabase.rpc('entrar_no_grupo', { p_token: token }));
+      return r[0];
+    },
+    async sairDoGrupo(id) {
+      return checar(await supabase.rpc('sair_do_grupo', { p_turma_id: id }));
+    },
     async ranking(turmaId = null) {
       return checar(await supabase.rpc('ranking', { p_turma_id: turmaId }));
     },
@@ -299,6 +314,10 @@ export function criarApi(supabase, { urlRetorno } = {}) {
     },
     async novoToken(id) {
       return checar(await supabase.rpc('novo_token_turma', { p_id: id }));
+    },
+    async semGrupo() {
+      const r = checar(await supabase.rpc('resumo_sem_grupo'));
+      return r[0] ?? null;
     },
     async alunosTurma(id) {
       return checar(await supabase.rpc('alunos_turma', { p_turma_id: id }));

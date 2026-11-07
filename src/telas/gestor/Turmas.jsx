@@ -12,8 +12,11 @@ export default function Turmas({ aoAbrir, avisar }) {
   const [criando, setCriando] = useState(false);
   const [versao, setVersao] = useState(0);
 
+  const [semGrupo, setSemGrupo] = useState(null);
+
   useEffect(() => {
     api.turmas().then(setTurmas).catch((e) => setErro(e.message));
+    api.semGrupo().then(setSemGrupo).catch(() => setSemGrupo(null));
   }, [versao]);
 
   return (
@@ -21,7 +24,7 @@ export default function Turmas({ aoAbrir, avisar }) {
       <div className="secao-topo">
         <div>
           <h1>Turmas</h1>
-          <p className="suave">Cada turma tem um token. O aluno digita o token ao criar a conta.</p>
+          <p className="suave">Cada turma tem um token. A pessoa informa o token ao criar a conta ou depois, na tela Grupos. Dá para estar em mais de uma turma.</p>
         </div>
         {!criando && (
           <button className="botao botao-compacto" onClick={() => setCriando(true)}>
@@ -44,6 +47,19 @@ export default function Turmas({ aoAbrir, avisar }) {
           <p>Nenhuma turma ainda. Crie a primeira e passe o token para os alunos.</p>
           <button className="botao botao-principal" onClick={() => setCriando(true)}>Criar turma</button>
         </div>
+      )}
+
+      {semGrupo && Number(semGrupo.pessoas) > 0 && (
+        <button className="cartao sem-grupo" onClick={() => aoAbrir(0)}>
+          <span>
+            <strong>Sem grupo</strong>
+            <small className="suave">
+              {semGrupo.pessoas} {Number(semGrupo.pessoas) === 1 ? 'pessoa cadastrada' : 'pessoas cadastradas'} sem token
+              {semGrupo.rentabilidade_media != null && <> · média <span className={tendencia(semGrupo.rentabilidade_media)}>{pct(semGrupo.rentabilidade_media)}</span></>}
+            </small>
+          </span>
+          <Icone nome="seta" tamanho={18} />
+        </button>
       )}
 
       {turmas?.map((t) => (

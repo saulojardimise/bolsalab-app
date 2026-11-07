@@ -18,8 +18,9 @@ export default function TurmaDetalhe({ id, aoVoltar, avisar }) {
   const [versao, setVersao] = useState(0);
 
   useEffect(() => {
-    Promise.all([api.turmas(), api.alunosTurma(id)])
-      .then(([ts, as]) => { setTurma(ts.find((t) => t.id === id)); setAlunos(as); })
+    // id 0 = pessoas cadastradas sem nenhum grupo
+    Promise.all([id === 0 ? Promise.resolve(null) : api.turmas(), api.alunosTurma(id)])
+      .then(([ts, as]) => { setTurma(id === 0 ? { id: 0, nome: 'Sem grupo', virtual: true } : ts.find((t) => t.id === id)); setAlunos(as); })
       .catch((e) => setErro(e.message));
   }, [id, versao]);
 
@@ -63,7 +64,11 @@ export default function TurmaDetalhe({ id, aoVoltar, avisar }) {
       {erro && <p className="aviso aviso-erro" role="alert">{erro}</p>}
       {!turma && !erro && <p className="carregando" aria-busy="true">Carregando…</p>}
 
-      {turma && !editando && (
+      {turma?.virtual && (
+        <p className="suave">Pessoas que se cadastraram sem token e não entraram em nenhum grupo. Elas simulam normalmente e aparecem no ranking geral.</p>
+      )}
+
+      {turma && !turma.virtual && !editando && (
         <section className="cartao" aria-label="Dados da turma">
           <p className="suave">Token para o cadastro</p>
           <div className="token-linha">
@@ -110,7 +115,7 @@ export default function TurmaDetalhe({ id, aoVoltar, avisar }) {
             Alunos <span className="suave">{alunos.length ? 'por patrimônio' : ''}</span>
           </h2>
           {alunos.length === 0 ? (
-            <p className="cartao vazio">Nenhum aluno ainda. Passe o token {turma?.token} para a turma.</p>
+            <p className="cartao vazio">{turma?.virtual ? 'Ninguém sem grupo no momento.' : `Nenhum aluno ainda. Passe o token ${turma?.token} para a turma.`}</p>
           ) : (
             <ol className="cartao cartao-lista ranking ranking-gestor">
               {alunos.map((a) => (
@@ -190,11 +195,11 @@ function ExcluirTurma({ turma, aoCancelar, aoExcluir }) {
           <legend>O que fazer com {n === 1 ? 'a conta do aluno' : `as contas dos ${alunos}`}?</legend>
           <label className="opcao-radio">
             <input type="radio" name="excluir-alunos" checked={!apagar} onChange={() => setApagar(false)} />
-            <span>Manter. {n === 1 ? 'Ele continua' : 'Eles continuam'} jogando, com carteira e histórico, mas sem turma.</span>
+            <span>Manter. {n === 1 ? 'Ele continua' : 'Eles continuam'} jogando, com carteira e histórico; só saem desta turma.</span>
           </label>
           <label className="opcao-radio">
             <input type="radio" name="excluir-alunos" checked={apagar} onChange={() => setApagar(true)} />
-            <span>Apagar também. Some tudo: carteira, ordens e histórico. Não tem volta.</span>
+            <span>Apagar também. Some tudo: carteira, ordens e histórico. Não tem volta. Quem está em outro grupo não é apagado, só sai desta turma.</span>
           </label>
         </fieldset>
       )}

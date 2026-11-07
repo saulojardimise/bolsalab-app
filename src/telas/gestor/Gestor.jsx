@@ -49,7 +49,7 @@ export default function Gestor({ email }) {
     window.scrollTo({ top: 0 });
   };
   const trocarAba = (id) => {
-    if (turmaAberta) window.history.back();
+    if (turmaAberta != null) window.history.back();
     setAba(id);
     if (id !== 'eventos') setPreenchido(null);
     window.scrollTo({ top: 0 });
@@ -62,7 +62,7 @@ export default function Gestor({ email }) {
   const avisar = (texto) => { setRecado(texto); contarAlertas(); };
 
   let conteudo;
-  if (turmaAberta) conteudo = <TurmaDetalhe id={turmaAberta} aoVoltar={() => window.history.back()} avisar={avisar} />;
+  if (turmaAberta != null) conteudo = <TurmaDetalhe id={turmaAberta} aoVoltar={() => window.history.back()} avisar={avisar} />;
   else if (aba === 'turmas') conteudo = <Turmas aoAbrir={abrirTurma} avisar={avisar} />;
   else if (aba === 'alertas') conteudo = <Alertas aoAgir={resolverComEvento} avisar={avisar} />;
   else if (aba === 'eventos') conteudo = <Eventos key={JSON.stringify(preenchido)} inicial={preenchido} avisar={avisar} />;
@@ -71,7 +71,7 @@ export default function Gestor({ email }) {
 
   return (
     <div className="painel gestor">
-      {!turmaAberta && (
+      {turmaAberta == null && (
         <header className="topo">
           <Marca />
           <span className="chip-simulacao chip-gestor">GESTOR</span>
@@ -85,7 +85,7 @@ export default function Gestor({ email }) {
 
       <nav className="navegacao" aria-label="Seções do gestor">
         {ABAS.map(([id, rotulo, icone]) => (
-          <button key={id} className="nav-item" aria-current={!turmaAberta && aba === id ? 'page' : undefined}
+          <button key={id} className="nav-item" aria-current={turmaAberta == null && aba === id ? 'page' : undefined}
                   onClick={() => trocarAba(id)}>
             <span className="nav-icone">
               <Icone nome={icone} tamanho={24} />

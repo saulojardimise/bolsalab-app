@@ -964,8 +964,28 @@ input:focus-visible, select:focus-visible { outline: none; border-color: var(--f
 .notificacao-citacao { font-style: italic; overflow-wrap: anywhere; }
 .ponto-novo { flex: none; width: 10px; height: 10px; margin-top: 6px; border-radius: 50%; background: var(--azul); }
 @media (max-width: 420px) {
-  .topo .chip-simulacao { padding: 7px 9px; font-size: 0; gap: 0; }
+  .topo .chip-simulacao:not(.chip-gestor) { padding: 7px 9px; font-size: 0; gap: 0; }
 }
+
+/* ---------------------------------------------------------------- grupos */
+.opcao-check {
+  display: flex; gap: 12px; align-items: flex-start; padding: 12px 14px; cursor: pointer;
+  border: 1.5px solid var(--linha); border-radius: var(--raio);
+}
+.opcao-check input { width: 22px; height: 22px; min-height: 0; margin: 1px 0 0; flex: none; accent-color: var(--verde-forte); }
+.opcao-check span { display: grid; gap: 2px; }
+.opcao-check strong { color: var(--marinho); font-size: 0.95rem; }
+.opcao-check small { color: var(--suave); font-size: 0.85rem; line-height: 1.4; }
+.opcao-check:has(input:checked) { border-color: var(--verde-medio); background: var(--verde-fundo); }
+.entrar-grupo { display: grid; gap: 10px; }
+.entrar-grupo p { margin: 0; }
+.sair-grupo { justify-self: start; }
+.sem-grupo {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%;
+  border: 1px dashed var(--linha); text-align: left; font: inherit; color: var(--texto); cursor: pointer;
+}
+.sem-grupo span { display: grid; gap: 2px; }
+.sem-grupo strong { color: var(--marinho); }
 
 @media (min-width: 1024px) {
   .painel { padding-left: 232px; padding-bottom: 40px; }

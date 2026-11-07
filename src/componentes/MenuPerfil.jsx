@@ -24,7 +24,7 @@ export function acaoFavorita(ordens) {
 
 // Folha do perfil: foto, desempenho, perfil de investidor, senha e sair.
 // O botão de câmera abre o seletor do próprio celular (fototeca, câmera ou arquivo).
-export default function MenuPerfil({ perfil, resumo, aoFechar, aoSair, aoMudarFoto, aoRefazerPerfil, avisar }) {
+export default function MenuPerfil({ perfil, grupos = [], resumo, aoFechar, aoSair, aoMudarFoto, aoRefazerPerfil, avisar }) {
   const dialogo = useRef(null);
   const seletor = useRef(null);
   const [enviando, setEnviando] = useState(false);
@@ -42,7 +42,7 @@ export default function MenuPerfil({ perfil, resumo, aoFechar, aoSair, aoMudarFo
     let vivo = true;
     Promise.all([
       api.ordens(perfil.user_id, 5000),
-      perfil.turma_id ? api.ranking(perfil.turma_id) : Promise.resolve(null),
+      api.ranking(perfil.turma_id || null),
     ]).then(([ordens, ranking]) => {
       if (!vivo) return;
       const eu = ranking?.find((r) => r.eu);
@@ -50,7 +50,7 @@ export default function MenuPerfil({ perfil, resumo, aoFechar, aoSair, aoMudarFo
         ordens: ordens.filter((o) => !o.automatica).length,
         corretagens: ordens.reduce((s, o) => s + Number(o.corretagem), 0),
         favorita: acaoFavorita(ordens),
-        posicao: eu ? { lugar: eu.posicao, de: ranking.length } : null,
+        posicao: eu ? { lugar: eu.posicao, de: ranking.length, grupo: perfil.turma_id ? perfil.turma : null } : null,
       });
     }).catch(() => {});
     return () => { vivo = false; };
@@ -101,7 +101,7 @@ export default function MenuPerfil({ perfil, resumo, aoFechar, aoSair, aoMudarFo
           <div className="perfil-id">
             <h2 id="perfil-nome">{perfil.nome || 'Sem nome'}</h2>
             <p className="suave">{perfil.email}</p>
-            {perfil.turma && <p className="suave">Grupo {perfil.turma}</p>}
+            {grupos.length > 0 && <p className="suave">{grupos.length === 1 ? 'Grupo' : 'Grupos'} {grupos.map((g) => g.nome).join(', ')}</p>}
             {perfil.criado_em && <p className="suave">Membro desde {dataBR(perfil.criado_em)}</p>}
           </div>
         </div>
@@ -118,7 +118,7 @@ export default function MenuPerfil({ perfil, resumo, aoFechar, aoSair, aoMudarFo
           <dl className="perfil-numeros">
             {numeros?.posicao && (
               <div className="perfil-destaque">
-                <dt>Posição no grupo</dt>
+                <dt>{numeros.posicao.grupo ? `Posição no grupo ${numeros.posicao.grupo}` : 'Posição geral'}</dt>
                 <dd><span className="num">{numeros.posicao.lugar}º</span> <small>de {numeros.posicao.de}</small></dd>
               </div>
             )}

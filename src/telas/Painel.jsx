@@ -44,7 +44,7 @@ export default function Painel({ uid }) {
 
   const carregar = useCallback(async () => {
     try {
-      const [perfil, config, mercado, carteira, vendidas, liberada, futurosMercado, futuros, intradia, naoLidas] = await Promise.all([
+      const [perfil, config, mercado, carteira, vendidas, liberada, futurosMercado, futuros, intradia, naoLidas, gruposBanco] = await Promise.all([
         api.perfil(uid), api.config(), api.mercado(), api.carteira(uid), api.vendidas(uid),
         api.negociacaoLiberada(),
         // minicontratos: se o banco ainda não tiver o SQL 014, o app segue sem eles
@@ -52,8 +52,11 @@ export default function Painel({ uid }) {
         api.intradia().catch(() => []),
         // notificações: sem o SQL 020, fica em zero
         api.notificacoesNaoLidas().catch(() => 0),
+        // grupos: sem o SQL 021, vale o grupo único do perfil
+        api.meusGrupos().catch(() => null),
       ]);
-      setDados({ perfil, config, mercado, carteira, vendidas, liberada, futurosMercado, futuros, intradia, naoLidas });
+      const grupos = gruposBanco ?? (perfil.turma_id ? [{ id: perfil.turma_id, nome: perfil.turma }] : []);
+      setDados({ perfil, config, mercado, carteira, vendidas, liberada, futurosMercado, futuros, intradia, naoLidas, grupos });
       setErro('');
       return mercado;
     } catch (e) {
@@ -205,7 +208,7 @@ export default function Painel({ uid }) {
     conteudo = <Carteira uid={uid} dados={dados} resumo={resumo} versao={versao}
                          aoEscolher={abrirAcao} irPara={trocarAba} aoAbrirExtrato={abrirExtrato} aoAbrirFuturo={abrirFuturo} />;
   } else {
-    conteudo = <Turma turmaId={dados.perfil.turma_id} turmaNome={dados.perfil.turma} versao={versao} />;
+    conteudo = <Turma grupos={dados.grupos} versao={versao} aoMudarGrupos={carregar} avisar={setRecado} />;
   }
 
   return (
@@ -222,6 +225,7 @@ export default function Painel({ uid }) {
       {perfilAberto && (
         <MenuPerfil
           perfil={dados.perfil}
+          grupos={dados.grupos}
           resumo={resumo}
           avisar={setRecado}
           aoRefazerPerfil={() => { setPerfilAberto(false); abrir({ tipo: 'questionario' }); }}

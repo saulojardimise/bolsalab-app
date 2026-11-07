@@ -12,7 +12,7 @@ const ABAS = [
 // no celular ficam dentro do "Mais"; no PC aparecem no menu lateral
 const EXTRAS = [
   ['noticias', 'Notícias', 'Manchetes do dia e fatos relevantes'],
-  ['turma', 'Grupo', 'Ranking e colegas do seu grupo'],
+  ['turma', 'Grupos', 'Ranking, entrar ou sair de grupos'],
 ];
 
 export default function Navegacao({ aba, aoTrocar, aoAbrirExtrato, aoAbrirPerfil, aoAbrirNotificacoes, naoLidas = 0 }) {

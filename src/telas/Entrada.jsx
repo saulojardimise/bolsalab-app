@@ -3,10 +3,11 @@ import { api } from '../api/index.js';
 import { emailAceito } from '../api/supabase.js';
 import Marca from '../componentes/Marca.jsx';
 
-// Entrar, criar conta (com o token da turma) e recuperar senha
+// Entrar, criar conta (com ou sem token de grupo) e recuperar senha
 export default function Entrada() {
   const [modo, setModo] = useState('entrar');   // entrar | cadastrar | recuperar
   const [campos, setCampos] = useState({ email: '', senha: '', nome: '', token: '' });
+  const [temToken, setTemToken] = useState(false);
   const [turma, setTurma] = useState(null);     // { turma, dominio_email } | false (inválido) | null (não conferido)
   const [erro, setErro] = useState('');
   const [aviso, setAviso] = useState('');
@@ -17,23 +18,26 @@ export default function Entrada() {
 
   // confere o token assim que ele parece completo (8 letras/números)
   useEffect(() => {
-    if (modo !== 'cadastrar') return;
+    if (modo !== 'cadastrar' || !temToken) { setTurma(null); return; }
     const limpo = campos.token.replace(/[^A-Za-z0-9]/g, '');
     if (limpo.length < 8) { setTurma(null); return; }
     let vivo = true;
     api.verificarToken(campos.token).then((t) => vivo && setTurma(t || false)).catch(() => vivo && setTurma(null));
     return () => { vivo = false; };
-  }, [campos.token, modo]);
+  }, [campos.token, modo, temToken]);
 
   async function enviar(e) {
     e.preventDefault();
     setErro(''); setAviso('');
     if (modo === 'cadastrar') {
       if (!campos.nome.trim()) { setErro('Digite seu nome.'); return; }
-      if (turma === false) { setErro('Token inválido ou grupo fechado. Peça o token ao professor.'); return; }
-      if (turma && !emailAceito(campos.email, turma.dominio_email)) {
-        setErro(turma.dominio_email ? `A turma ${turma.turma} só aceita e-mails @${turma.dominio_email}.` : 'Digite um e-mail válido.');
-        return;
+      if (temToken) {
+        if (!campos.token.trim()) { setErro('Digite o token do grupo ou desmarque a opção "Tenho um token".'); return; }
+        if (turma === false) { setErro('Token inválido ou grupo fechado. Confira o código com o professor.'); return; }
+        if (turma && !emailAceito(campos.email, turma.dominio_email)) {
+          setErro(turma.dominio_email ? `O grupo ${turma.turma} só aceita e-mails @${turma.dominio_email}.` : 'Digite um e-mail válido.');
+          return;
+        }
       }
     }
     setEnviando(true);
@@ -41,9 +45,9 @@ export default function Entrada() {
       if (modo === 'entrar') {
         await api.entrar(campos.email, campos.senha);
       } else if (modo === 'cadastrar') {
-        const r = await api.cadastrar(campos);
+        const r = await api.cadastrar({ ...campos, token: temToken ? campos.token : '' });
         if (r.precisaConfirmar) {
-          setAviso(`Conta criada no grupo ${r.turma}. Enviamos um link para ${campos.email.trim()}: abra-o para ativar e depois entre aqui.`);
+          setAviso(`Conta criada${r.turma ? ` no grupo ${r.turma}` : ''}. Enviamos um link para ${campos.email.trim()}: abra-o para ativar e depois entre aqui.`);
           setModo('entrar');
         }
       } else {
@@ -78,6 +82,14 @@ export default function Entrada() {
 
         {modo === 'cadastrar' && (
           <>
+            <label className="opcao-check">
+              <input type="checkbox" checked={temToken} onChange={(e) => setTemToken(e.target.checked)} />
+              <span>
+                <strong>Tenho um token de grupo</strong>
+                <small>Marque se o professor passou um código para entrar no grupo. Sem token você simula do mesmo jeito e pode entrar num grupo depois.</small>
+              </span>
+            </label>
+            {temToken && (
             <label className="campo">
               <span>Token do grupo</span>
               <input name="token" value={campos.token} onChange={mudar} placeholder="Ex.: K7QM-P2XA"
@@ -90,6 +102,7 @@ export default function Entrada() {
               {turma === false && <small className="token-erro">Token não encontrado ou grupo fechado.</small>}
               {turma === null && <small>O professor passa este código para o grupo.</small>}
             </label>
+            )}
             <label className="campo">
               <span>Nome</span>
               <input name="nome" value={campos.nome} onChange={mudar} autoComplete="name" required />
@@ -132,8 +145,8 @@ export default function Entrada() {
 
         {modo === 'entrar' && (
           <p className="nota">
-            Primeiro acesso? Toque em <strong>Criar conta</strong> e informe o token do seu grupo,
-            que o professor passa para a turma. Sem o token não é possível entrar no grupo.
+            Primeiro acesso? Toque em <strong>Criar conta</strong>. Qualquer pessoa pode simular.
+            Se o professor passou um token, informe-o para entrar no grupo; dá para entrar em outros grupos depois.
           </p>
         )}
       </form>

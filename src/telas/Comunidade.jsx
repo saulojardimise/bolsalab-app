@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { api } from '../api/index.js';
 import Publicacao from '../componentes/Publicacao.jsx';
 
-const ESCOPOS = [['todos', 'Todos os grupos'], ['grupo', 'Meu grupo']];
+const ESCOPOS = [['todos', 'Todos'], ['grupo', 'Meus grupos']];
 const LIMITE = 20;
 
 // Comunidade: mural com as operações dos alunos de todos os grupos,
@@ -20,7 +20,8 @@ export default function Comunidade({ dados, versao, aoEscolher, aoAbrirFuturo, a
   const carregar = useCallback(async (antes = null) => {
     setCarregando(true); setErro('');
     try {
-      const novos = await api.comunidade(moderar ? 'todos' : escopo, antes, LIMITE);
+      const e = moderar || !dados?.grupos?.length ? 'todos' : escopo;
+      const novos = await api.comunidade(e, antes, LIMITE);
       setLista((l) => (antes ? [...(l ?? []), ...novos] : novos));
       setTemMais(novos.length === LIMITE);
     } catch (e) {
@@ -29,7 +30,8 @@ export default function Comunidade({ dados, versao, aoEscolher, aoAbrirFuturo, a
     } finally {
       setCarregando(false);
     }
-  }, [escopo, moderar]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [escopo, moderar, dados?.grupos?.length]);
 
   useEffect(() => { setLista(null); carregar(); }, [carregar, versao]);
 
@@ -57,10 +59,10 @@ export default function Comunidade({ dados, versao, aoEscolher, aoAbrirFuturo, a
             <h1>Comunidade</h1>
           </div>
           <p className="suave">
-            As operações dos alunos de todos os grupos. Reaja e comente.
+            As operações de todos que simulam no BolsaLab. Reaja e comente.
           </p>
           <div className="chips" role="group" aria-label="Mostrar">
-            {ESCOPOS.map(([id, rotulo]) => (
+            {ESCOPOS.filter(([id]) => id !== 'grupo' || dados?.grupos?.length > 0).map(([id, rotulo]) => (
               <button key={id} aria-pressed={escopo === id} onClick={() => trocarEscopo(id)}>{rotulo}</button>
             ))}
           </div>
@@ -80,7 +82,7 @@ export default function Comunidade({ dados, versao, aoEscolher, aoAbrirFuturo, a
       {lista?.length === 0 && !erro && (
         <p className="cartao vazio">
           {escopo === 'grupo' && !moderar
-            ? 'Ninguém do seu grupo operou ainda. Que tal ser o primeiro?'
+            ? 'Ninguém dos seus grupos operou ainda. Que tal ser o primeiro?'
             : 'Nenhuma operação ainda. As ordens dos alunos aparecem aqui assim que são feitas.'}
         </p>
       )}
