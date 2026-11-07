@@ -235,6 +235,17 @@ export function criarApi(supabase, { urlRetorno } = {}) {
       return checar(await supabase.rpc('executar_ordem_futuro', { p_ativo: ativo, p_lado: lado, p_quantidade: quantidade }));
     },
 
+    // ---------------- notificações ----------------
+    async notificacoes(limite = 50) {
+      return checar(await supabase.rpc('notificacoes', { p_limite: limite }));
+    },
+    async notificacoesNaoLidas() {
+      return checar(await supabase.rpc('notificacoes_nao_lidas'));
+    },
+    async marcarNotificacoesLidas() {
+      return checar(await supabase.rpc('marcar_notificacoes_lidas'));
+    },
+
     // ---------------- comunidade ----------------
     async comunidade(escopo = 'todos', antes = null, limite = 20) {
       return checar(await supabase.rpc('comunidade_feed', { p_escopo: escopo, p_antes: antes, p_limite: limite }));

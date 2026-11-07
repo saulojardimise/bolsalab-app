@@ -938,6 +938,35 @@ input:focus-visible, select:focus-visible { outline: none; border-color: var(--f
 .denuncia-conteudo { overflow-wrap: anywhere; }
 .denuncia-acoes { display: flex; gap: 8px; }
 
+/* ---------------------------------------------------------------- notificações */
+.botao-sino { flex: none; }
+.contador-inline {
+  display: inline-block; margin-left: 8px; min-width: 20px; padding: 0 6px; border-radius: 999px;
+  background: var(--vermelho-botao); color: #fff; font-size: 0.75rem; line-height: 20px; text-align: center;
+}
+.notificacoes li + li { border-top: 1px solid var(--linha); }
+.notificacoes li button {
+  display: flex; gap: 12px; align-items: flex-start; width: 100%; padding: 14px 0; border: 0;
+  background: none; text-align: left; font: inherit; color: var(--texto); cursor: pointer;
+}
+.notificacoes li.nao-lida button { font-weight: 500; }
+.notificacao-foto { position: relative; flex: none; }
+.notificacao-selo {
+  position: absolute; right: -6px; bottom: -4px; width: 22px; height: 22px; display: grid; place-items: center;
+  border-radius: 50%; background: var(--cartao); box-shadow: var(--sombra); font-size: 0.8rem;
+}
+.notificacao-icone {
+  flex: none; width: 40px; height: 40px; display: grid; place-items: center; border-radius: 50%;
+  background: var(--ambar-fundo); color: var(--ambar-texto);
+}
+.notificacao-texto { flex: 1; min-width: 0; display: grid; gap: 3px; line-height: 1.4; }
+.notificacao-texto strong { color: var(--marinho); }
+.notificacao-citacao { font-style: italic; overflow-wrap: anywhere; }
+.ponto-novo { flex: none; width: 10px; height: 10px; margin-top: 6px; border-radius: 50%; background: var(--azul); }
+@media (max-width: 420px) {
+  .topo .chip-simulacao { padding: 7px 9px; font-size: 0; gap: 0; }
+}
+
 @media (min-width: 1024px) {
   .painel { padding-left: 232px; padding-bottom: 40px; }
   .topo, .faixa-demo, .conteudo { max-width: 1180px; }
@@ -957,7 +986,8 @@ input:focus-visible, select:focus-visible { outline: none; border-color: var(--f
   .nav-item:hover { background: var(--fundo); color: var(--marinho); }
   .nav-item { order: 0; }
   .nav-extra { display: grid; }
-  .nav-separado { margin-top: 12px; position: relative; }
+  .nav-separado { margin-top: 12px; position: relative; gap: 16px; }
+  .navegacao .nav-icone .contador { top: -6px; right: -7px; min-width: 16px; height: 16px; padding: 0 4px; line-height: 16px; font-size: 0.65rem; }
   .nav-separado::before { content: ''; position: absolute; top: -8px; left: 14px; right: 14px; border-top: 1px solid var(--linha); }
   .nav-mais { display: none; }
   .nav-item[aria-current=page] { background: var(--verde-fundo); }

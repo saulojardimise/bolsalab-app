@@ -5,6 +5,7 @@ import { diasAtras } from '../lib/formato.js';
 import Topo from '../componentes/Topo.jsx';
 import Navegacao from '../componentes/Navegacao.jsx';
 import Comunidade from './Comunidade.jsx';
+import Notificacoes from './Notificacoes.jsx';
 import MenuPerfil from '../componentes/MenuPerfil.jsx';
 import Inicio from './Inicio.jsx';
 import Mercado from './Mercado.jsx';
@@ -43,14 +44,16 @@ export default function Painel({ uid }) {
 
   const carregar = useCallback(async () => {
     try {
-      const [perfil, config, mercado, carteira, vendidas, liberada, futurosMercado, futuros, intradia] = await Promise.all([
+      const [perfil, config, mercado, carteira, vendidas, liberada, futurosMercado, futuros, intradia, naoLidas] = await Promise.all([
         api.perfil(uid), api.config(), api.mercado(), api.carteira(uid), api.vendidas(uid),
         api.negociacaoLiberada(),
         // minicontratos: se o banco ainda não tiver o SQL 014, o app segue sem eles
         api.futurosMercado().catch(() => []), api.futurosPosicoes(uid).catch(() => []),
         api.intradia().catch(() => []),
+        // notificações: sem o SQL 020, fica em zero
+        api.notificacoesNaoLidas().catch(() => 0),
       ]);
-      setDados({ perfil, config, mercado, carteira, vendidas, liberada, futurosMercado, futuros, intradia });
+      setDados({ perfil, config, mercado, carteira, vendidas, liberada, futurosMercado, futuros, intradia, naoLidas });
       setErro('');
       return mercado;
     } catch (e) {
@@ -135,9 +138,17 @@ export default function Painel({ uid }) {
     window.scrollTo({ top: 0 });
   };
   const fechar = () => window.history.back();
+  // troca a tela de cima sem empilhar outra (o voltar leva para onde estava antes)
+  const trocarSobreposta = (s) => {
+    window.history.replaceState({ sobreposta: s }, '');
+    setSobreposta(s);
+    window.scrollTo({ top: 0 });
+  };
   const abrirAcao = (ticker, operacao) => abrir({ tipo: 'acao', ticker, operacao });
   const abrirExtrato = () => abrir({ tipo: 'extrato' });
   const abrirFuturo = (ativo) => abrir({ tipo: 'futuro', ativo });
+  const abrirNotificacoes = () => abrir({ tipo: 'notificacoes' });
+  const zerarNaoLidas = () => setDados((d) => ({ ...d, naoLidas: 0 }));
   const trocarAba = (id) => {
     if (sobreposta) window.history.back();
     setAba(id);
@@ -175,6 +186,9 @@ export default function Painel({ uid }) {
   } else if (sobreposta?.tipo === 'questionario') {
     conteudo = <Questionario perfilAtual={dados.perfil.perfil_investidor} aoVoltar={fechar}
                              aoConcluir={async () => { await carregar(); fechar(); setRecado('Perfil de investidor atualizado.'); }} />;
+  } else if (sobreposta?.tipo === 'notificacoes') {
+    conteudo = <Notificacoes versao={versao} aoVoltar={fechar} aoLer={zerarNaoLidas}
+                             aoAbrirComunidade={() => trocarAba('comunidade')} aoAbrirExtrato={() => trocarSobreposta({ tipo: 'extrato' })} />;
   } else if (sobreposta?.tipo === 'extrato') {
     conteudo = <Extrato uid={uid} dados={dados} resumo={resumo} versao={versao} aoVoltar={fechar} />;
   } else if (aba === 'inicio') {
@@ -196,12 +210,14 @@ export default function Painel({ uid }) {
 
   return (
     <div className="painel">
-      {!sobreposta && <Topo foto={dados.perfil.foto_url} aoAbrirPerfil={() => setPerfilAberto(true)} />}
+      {!sobreposta && <Topo foto={dados.perfil.foto_url} aoAbrirPerfil={() => setPerfilAberto(true)}
+                             naoLidas={dados.naoLidas ?? 0} aoAbrirNotificacoes={abrirNotificacoes} />}
       {api.modoDemo && <p className="faixa-demo">Demonstração com preços fictícios</p>}
       {erro && <p className="aviso aviso-erro conteudo" role="alert">{erro}</p>}
       <main className="conteudo">{conteudo}</main>
-      <Navegacao aba={sobreposta?.tipo === 'acao' || sobreposta?.tipo === 'futuro' ? 'mercado' : sobreposta?.tipo === 'extrato' ? 'extrato' : aba} aoTrocar={trocarAba}
-                 aoAbrirExtrato={abrirExtrato} aoAbrirPerfil={() => setPerfilAberto(true)} />
+      <Navegacao aba={sobreposta?.tipo === 'acao' || sobreposta?.tipo === 'futuro' ? 'mercado' : sobreposta?.tipo === 'extrato' || sobreposta?.tipo === 'notificacoes' ? sobreposta.tipo : aba} aoTrocar={trocarAba}
+                 aoAbrirExtrato={abrirExtrato} aoAbrirPerfil={() => setPerfilAberto(true)}
+                 aoAbrirNotificacoes={abrirNotificacoes} naoLidas={dados.naoLidas ?? 0} />
 
       {perfilAberto && (
         <MenuPerfil

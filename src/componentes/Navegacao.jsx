@@ -15,7 +15,7 @@ const EXTRAS = [
   ['turma', 'Grupo', 'Ranking e colegas do seu grupo'],
 ];
 
-export default function Navegacao({ aba, aoTrocar, aoAbrirExtrato, aoAbrirPerfil }) {
+export default function Navegacao({ aba, aoTrocar, aoAbrirExtrato, aoAbrirPerfil, aoAbrirNotificacoes, naoLidas = 0 }) {
   const [maisAberto, setMaisAberto] = useState(false);
   const noMais = EXTRAS.some(([id]) => id === aba);
 
@@ -30,7 +30,14 @@ export default function Navegacao({ aba, aoTrocar, aoAbrirExtrato, aoAbrirPerfil
           </button>
         ))}
         {/* só no PC: o que no celular fica no "Mais" */}
-        <button className="nav-item nav-extra nav-separado" aria-current={aba === 'extrato' ? 'page' : undefined} onClick={aoAbrirExtrato}>
+        <button className="nav-item nav-extra nav-separado" aria-current={aba === 'notificacoes' ? 'page' : undefined} onClick={aoAbrirNotificacoes}>
+          <span className="nav-icone">
+            <Icone nome="sino" tamanho={24} />
+            {naoLidas > 0 && <span className="contador" aria-hidden="true">{naoLidas > 99 ? '99+' : naoLidas}</span>}
+          </span>
+          <span>Notificações{naoLidas > 0 && <span className="sr-only">, {naoLidas} novas</span>}</span>
+        </button>
+        <button className="nav-item nav-extra" aria-current={aba === 'extrato' ? 'page' : undefined} onClick={aoAbrirExtrato}>
           <Icone nome="extrato" tamanho={24} />
           <span>Extrato</span>
         </button>
@@ -40,14 +47,19 @@ export default function Navegacao({ aba, aoTrocar, aoAbrirExtrato, aoAbrirPerfil
         </button>
         <button className="nav-item nav-mais" aria-current={noMais ? 'page' : undefined}
                 aria-haspopup="dialog" onClick={() => setMaisAberto(true)}>
-          <Icone nome="menu" tamanho={24} />
-          <span>Mais</span>
+          <span className="nav-icone">
+            <Icone nome="menu" tamanho={24} />
+            {naoLidas > 0 && <span className="contador" aria-hidden="true">{naoLidas > 99 ? '99+' : naoLidas}</span>}
+          </span>
+          <span>Mais{naoLidas > 0 && <span className="sr-only">, {naoLidas} notificações novas</span>}</span>
         </button>
       </nav>
       {maisAberto && (
         <FolhaMais aba={aba} aoFechar={() => setMaisAberto(false)}
                    aoEscolher={(acao) => { setMaisAberto(false); acao(); }}
                    itens={[
+                     { id: 'notificacoes', icone: 'sino', rotulo: 'Notificações', contador: naoLidas,
+                       detalhe: 'Reações, comentários e operações automáticas', acao: aoAbrirNotificacoes },
                      ...EXTRAS.map(([id, rotulo, detalhe]) => ({ id, icone: id, rotulo, detalhe, acao: () => aoTrocar(id) })),
                      { id: 'extrato', icone: 'extrato', rotulo: 'Extrato', detalhe: 'Todo o dinheiro que entrou e saiu', acao: aoAbrirExtrato },
                      { id: 'perfil', icone: 'usuario', rotulo: 'Meu perfil', detalhe: 'Foto, desempenho, perfil de investidor e senha', acao: aoAbrirPerfil },
@@ -79,7 +91,7 @@ function FolhaMais({ aba, itens, aoFechar, aoEscolher }) {
             <li key={i.id}>
               <button className="atalho" aria-current={aba === i.id ? 'page' : undefined} onClick={() => aoEscolher(i.acao)}>
                 <Icone nome={i.icone} />
-                <span><strong>{i.rotulo}</strong><small>{i.detalhe}</small></span>
+                <span><strong>{i.rotulo}{i.contador > 0 && <span className="contador-inline">{i.contador}</span>}</strong><small>{i.detalhe}</small></span>
                 <Icone nome="seta" tamanho={18} />
               </button>
             </li>

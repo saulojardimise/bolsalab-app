@@ -24,9 +24,35 @@ export function criarComunidadeDemo({ ordens, futurosOrdens, perfil, contratos, 
     { id: 3, pub: 3, nome: 'Bruno Lima', grupo: 'ADM 3º período', texto: 'Corajosa! O aluguel não pesa?', criado_em: horasAtras(18), oculto: false },
   ];
   const denuncias = [];
+  let vistas = null;   // última vez que abriu as notificações
+
+  // notificações de exemplo sobre as ordens iniciais da Ana
+  const opDe = (ticker, tipo) => {
+    const o = ordens().find((x) => x.ticker === ticker && x.tipo === tipo);
+    return o && { id: 1000 + o.id, operacao: { origem: 'acao', ativo: o.ticker, lado: o.tipo, quantidade: o.quantidade, preco: o.preco } };
+  };
+  function exemplos() {
+    const itub = opDe('ITUB4', 'compra'); const petr = opDe('PETR4', 'venda'); const mglu = opDe('MGLU3', 'venda_descoberto');
+    return [
+      itub && { id: 'r1', tipo: 'reacao', criado_em: horasAtras(3), autor: 'Bruno Lima', reacao: 'palmas', publicacao_id: itub.id, operacao: itub.operacao },
+      petr && { id: 'c1', tipo: 'comentario', criado_em: horasAtras(6), autor: 'Carla Menezes', texto: 'Boa hora para realizar o lucro!', publicacao_id: petr.id, operacao: petr.operacao },
+      { id: 'a1', tipo: 'automatica', criado_em: horasAtras(15), titulo: 'Minicontrato zerado: WINZ26',
+        texto: 'Exemplo: seu saldo ficou negativo (chamada de margem) e 1 contrato foi zerado a 131.005 pontos. Efeito no saldo: −R$ 120,00.' },
+      mglu && { id: 'r2', tipo: 'reacao', criado_em: horasAtras(30), autor: 'Diego Rocha', reacao: 'surpresa', publicacao_id: mglu.id, operacao: mglu.operacao },
+    ].filter(Boolean).map((n) => ({ foto_url: null, texto: null, titulo: null, reacao: null, ...n }));
+  }
+  let semeado = false;
+  function semear() {
+    if (semeado) return; semeado = true;
+    for (const n of exemplos()) {
+      if (n.tipo === 'reacao') reacoes[n.publicacao_id] = { contagem: { [n.reacao]: 1 }, minha: null };
+      if (n.tipo === 'comentario') comentarios.push({ id: proxComentario++, pub: n.publicacao_id, nome: n.autor, grupo: 'ADM 3º período', texto: n.texto, criado_em: n.criado_em, oculto: false });
+    }
+  }
   for (const c of COLEGAS) reacoes[c[0]] = { contagem: { ...c[10] }, minha: null };
 
   async function todas() {
+    semear();
     const fut = await contratos();
     const colegas = COLEGAS.map(([id, nome, grupo, h, origem, ativo, lado, quantidade, preco, tese]) => {
       const c = origem === 'futuro' ? fut.find((f) => f.ativo === ativo) : null;
@@ -60,7 +86,12 @@ export function criarComunidadeDemo({ ordens, futurosOrdens, perfil, contratos, 
     }).filter((x) => ehGestor() || !x.oculta).sort((a, b) => b.criado_em.localeCompare(a.criado_em));
   }
 
+  const notificacoes = () => { semear(); return exemplos().map((n) => ({ ...n, lida: vistas != null && n.criado_em <= vistas })); };
+
   return {
+    async notificacoes() { return notificacoes(); },
+    async notificacoesNaoLidas() { return notificacoes().filter((n) => !n.lida).length; },
+    async marcarNotificacoesLidas() { vistas = new Date().toISOString(); },
     async comunidade(escopo = 'todos', antes = null, limite = 20) {
       let lista = await todas();
       if (escopo === 'grupo') lista = lista.filter((x) => x.grupo === perfil().turma);
