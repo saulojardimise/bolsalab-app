@@ -29,6 +29,15 @@ export default function Navegacao({ aba, aoTrocar, aoAbrirExtrato, aoAbrirPerfil
             <span>{rotulo}</span>
           </button>
         ))}
+        {/* só no PC: o que no celular fica no "Mais" */}
+        <button className="nav-item nav-extra nav-separado" aria-current={aba === 'extrato' ? 'page' : undefined} onClick={aoAbrirExtrato}>
+          <Icone nome="extrato" tamanho={24} />
+          <span>Extrato</span>
+        </button>
+        <button className="nav-item nav-extra" onClick={aoAbrirPerfil}>
+          <Icone nome="usuario" tamanho={24} />
+          <span>Meu perfil</span>
+        </button>
         <button className="nav-item nav-mais" aria-current={noMais ? 'page' : undefined}
                 aria-haspopup="dialog" onClick={() => setMaisAberto(true)}>
           <Icone nome="menu" tamanho={24} />

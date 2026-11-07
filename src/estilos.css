@@ -968,6 +968,8 @@ input:focus-visible, select:focus-visible { outline: none; border-color: var(--f
   .nav-item:hover { background: var(--fundo); color: var(--marinho); }
   .nav-item { order: 0; }
   .nav-extra { display: grid; }
+  .nav-separado { margin-top: 12px; position: relative; }
+  .nav-separado::before { content: ''; position: absolute; top: -8px; left: 14px; right: 14px; border-top: 1px solid var(--linha); }
   .nav-mais { display: none; }
   .nav-item[aria-current=page] { background: var(--verde-fundo); }
   .recado { left: 232px; bottom: 24px; }
