@@ -539,6 +539,18 @@ input:focus-visible, select:focus-visible { outline: none; border-color: var(--f
 }
 .nav-item[aria-current=page] { color: var(--verde-forte); font-weight: 750; }
 .nav-item[aria-current=page] .icone { stroke-width: 2.4; }
+/* celular: Início, Mercado, Carteira, Notícias e Mais; o resto fica no "Mais" */
+.nav-carteira { order: 1; }
+.nav-noticias { order: 2; }
+.nav-mais { order: 3; }
+.nav-extra { display: none; }
+
+.mais { display: grid; gap: 4px; padding: 18px 20px calc(24px + env(safe-area-inset-bottom)); }
+.mais-topo { display: flex; align-items: center; justify-content: space-between; }
+.mais-lista { list-style: none; margin: 0; padding: 0; }
+.mais-lista .atalho { padding: 14px 0; margin: 0; }
+.mais-lista li:first-child .atalho { border-top: 0; }
+.mais-lista .atalho[aria-current=page] strong { color: var(--verde-forte); }
 
 /* ---------------------------------------------------------------- folha (perfil) */
 .folha {
@@ -775,6 +787,8 @@ input:focus-visible, select:focus-visible { outline: none; border-color: var(--f
 .serie-aluno { stroke: var(--verde-forte); background: var(--verde-forte); }
 .serie-ibov { stroke: var(--azul); background: var(--azul); }
 .serie-cdi { stroke: var(--ambar); background: var(--ambar); stroke-dasharray: 5 4; }
+.grafico-extra { fill: none; stroke-width: 1.8; stroke-linejoin: round; stroke-linecap: round; opacity: 0.9; }
+.legenda-traco.serie-aluno-baixa { background: var(--vermelho); }
 .linha-zero { stroke: var(--linha); stroke-width: 1; stroke-dasharray: 2 3; }
 .comparativo-legenda { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
 .comparativo-legenda li { display: grid; gap: 2px; justify-items: start; font-size: 0.86rem; color: var(--suave); }
@@ -876,6 +890,9 @@ input:focus-visible, select:focus-visible { outline: none; border-color: var(--f
     font-size: 0.98rem; cursor: pointer;
   }
   .nav-item:hover { background: var(--fundo); color: var(--marinho); }
+  .nav-item { order: 0; }
+  .nav-extra { display: grid; }
+  .nav-mais { display: none; }
   .nav-item[aria-current=page] { background: var(--verde-fundo); }
   .recado { left: 232px; bottom: 24px; }
 

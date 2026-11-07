@@ -1,4 +1,3 @@
-import { useEffect, useRef, useState } from 'react';
 import { pct, tendencia } from '../lib/formato.js';
 import Termo from './Termo.jsx';
 
@@ -8,53 +7,16 @@ const SERIES = [
   { id: 'cdi', rotulo: 'CDI', classe: 'serie-cdi', termo: 'cdi' },
 ];
 
-// Linhas do aluno, do Ibovespa e do CDI, em % desde o início do período
-export default function Comparativo({ comparacao, altura = 150 }) {
-  const caixa = useRef(null);
-  const [largura, setLargura] = useState(320);
-
-  useEffect(() => {
-    const el = caixa.current;
-    if (!el) return undefined;
-    const obs = new ResizeObserver(([e]) => setLargura(Math.max(200, Math.round(e.contentRect.width))));
-    obs.observe(el);
-    return () => obs.disconnect();
-  }, []);
-
-  const { pontos, final } = comparacao;
+// Legenda do gráfico de patrimônio: quanto rendeu você, o Ibovespa e o CDI no período
+export default function Comparativo({ comparacao }) {
+  const { final } = comparacao;
   const visiveis = SERIES.filter((s) => final[s.id] != null);
-  const valores = pontos.flatMap((p) => visiveis.map((s) => p[s.id]).filter((v) => v != null));
-  let min = Math.min(0, ...valores);
-  let max = Math.max(0, ...valores);
-  if (max - min < 0.5) { max += 0.25; min -= 0.25; }
-  const folga = (max - min) * 0.1;
-  min -= folga; max += folga;
-
-  const margem = 6;
-  const w = largura - margem * 2;
-  const h = altura - margem * 2;
-  const x = (i) => margem + (i / Math.max(1, pontos.length - 1)) * w;
-  const y = (v) => margem + h - ((v - min) / (max - min)) * h;
-  const caminho = (id) => pontos
-    .map((p, i) => (p[id] == null ? null : `${x(i).toFixed(1)},${y(p[id]).toFixed(1)}`))
-    .filter(Boolean).map((c, i) => `${i ? 'L' : 'M'}${c}`).join('');
-
-  const resumo = visiveis.map((s) => `${s.rotulo} ${pct(final[s.id])}`).join(', ');
-
   return (
     <div className="comparativo">
-      <div ref={caixa} className="comparativo-grafico">
-        <svg width={largura} height={altura} role="img" aria-label={`Comparação no período: ${resumo}`}>
-          <line x1={margem} x2={largura - margem} y1={y(0)} y2={y(0)} className="linha-zero" />
-          {[...visiveis].reverse().map((s) => (
-            <path key={s.id} d={caminho(s.id)} className={`serie ${s.classe}`} />
-          ))}
-        </svg>
-      </div>
       <ul className="comparativo-legenda">
         {visiveis.map((s) => (
           <li key={s.id}>
-            <span className={`legenda-traco ${s.classe}`} aria-hidden="true" />
+            <span className={`legenda-traco ${s.classe} ${s.id === 'aluno' && final.aluno < 0 ? 'serie-aluno-baixa' : ''}`} aria-hidden="true" />
             <span>{s.termo ? <Termo id={s.termo}>{s.rotulo}</Termo> : s.rotulo}</span>
             <strong className={`num ${tendencia(final[s.id])}`}>{pct(final[s.id])}</strong>
           </li>
@@ -63,6 +25,16 @@ export default function Comparativo({ comparacao, altura = 150 }) {
       {visiveis.length > 1 && <p className="comparativo-frase">{frase(visiveis, final)}</p>}
     </div>
   );
+}
+
+/** Ibovespa e CDI convertidos para reais: quanto valeria o patrimônio do início do período. */
+export function extrasComparacao(comparacao, base) {
+  if (!comparacao) return [];
+  return SERIES.filter((s) => s.id !== 'aluno' && comparacao.final[s.id] != null).map((s) => ({
+    id: s.id,
+    classe: s.classe,
+    valores: comparacao.pontos.map((p) => (p[s.id] == null ? null : base * (1 + p[s.id] / 100))),
+  }));
 }
 
 // "Você ficou à frente do CDI, mas atrás do Ibovespa." etc.

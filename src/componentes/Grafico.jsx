@@ -4,7 +4,7 @@ import { diaMes, reais } from '../lib/formato.js';
 // Gráfico de área com eixo de preços à direita e datas embaixo.
 // Toque/arraste para ver o valor de cada dia.
 // pontos: [{ data: 'AAAA-MM-DD', valor: number }]
-export default function Grafico({ pontos, altura = 180, eixos = true, rotulo = 'Gráfico', formatar = reais, casasEixo = 2 }) {
+export default function Grafico({ pontos, altura = 180, eixos = true, rotulo = 'Gráfico', formatar = reais, casasEixo = 2, extras = [] }) {
   const caixa = useRef(null);
   const [largura, setLargura] = useState(320);
   const [foco, setFoco] = useState(null);   // índice do ponto em destaque
@@ -34,8 +34,10 @@ export default function Grafico({ pontos, altura = 180, eixos = true, rotulo = '
   const h = altura - margemBaixo - margemTopo;
 
   const valores = pontos.map((p) => Number(p.valor));
-  let min = Math.min(...valores);
-  let max = Math.max(...valores);
+  // séries extras (ex.: Ibovespa e CDI) desenhadas por cima, na mesma escala
+  const valoresExtras = extras.flatMap((e) => e.valores.filter((v) => v != null));
+  let min = Math.min(...valores, ...valoresExtras);
+  let max = Math.max(...valores, ...valoresExtras);
   if (max === min) { max += 1; min -= 1; }
   const folga = (max - min) * 0.08;
   min -= folga; max += folga;
@@ -91,6 +93,11 @@ export default function Grafico({ pontos, altura = 180, eixos = true, rotulo = '
           </g>
         ))}
         <path d={area} fill={`url(#${idGradiente})`} />
+        {extras.map((e) => (
+          <path key={e.id} className={`grafico-extra ${e.classe}`}
+                d={e.valores.map((v, i) => (v == null ? null : `${x(i).toFixed(1)},${y(v).toFixed(1)}`))
+                  .filter(Boolean).map((c, i) => `${i ? 'L' : 'M'}${c}`).join('')} />
+        ))}
         <path d={linha} className="grafico-linha" />
         {foco !== null && <line x1={x(iFoco)} x2={x(iFoco)} y1={margemTopo} y2={margemTopo + h} className="grafico-cursor" />}
         <circle cx={x(iFoco)} cy={y(pFoco.valor)} r="5" className="grafico-ponto" />

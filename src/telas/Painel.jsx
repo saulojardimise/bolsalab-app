@@ -195,7 +195,8 @@ export default function Painel({ uid }) {
       {api.modoDemo && <p className="faixa-demo">Demonstração com preços fictícios</p>}
       {erro && <p className="aviso aviso-erro conteudo" role="alert">{erro}</p>}
       <main className="conteudo">{conteudo}</main>
-      <Navegacao aba={sobreposta?.tipo === 'acao' || sobreposta?.tipo === 'futuro' ? 'mercado' : aba} aoTrocar={trocarAba} />
+      <Navegacao aba={sobreposta?.tipo === 'acao' || sobreposta?.tipo === 'futuro' ? 'mercado' : aba} aoTrocar={trocarAba}
+                 aoAbrirExtrato={abrirExtrato} aoAbrirPerfil={() => setPerfilAberto(true)} />
 
       {perfilAberto && (
         <MenuPerfil

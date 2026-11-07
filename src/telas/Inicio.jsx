@@ -13,9 +13,10 @@ import { montarCapa, quando } from '../lib/noticias.js';
 import { comparar } from '../lib/comparacao.js';
 import { mercadoAgora, oscilacaoHoje } from '../lib/intradia.js';
 import { LinhaHoje } from '../componentes/Hoje.jsx';
-import Comparativo from '../componentes/Comparativo.jsx';
+import Comparativo, { extrasComparacao } from '../componentes/Comparativo.jsx';
 
-// Tela inicial: patrimônio com gráfico, saldo, dica do dia e os ativos do aluno
+// Tela inicial: patrimônio (com Ibovespa e CDI no mesmo gráfico), saldo e extrato,
+// meus ativos, destaques do dia e dica de hoje
 export default function Inicio({ uid, dados, resumo, linhas, versao, aoEscolher, irPara, aoAbrirExtrato }) {
   const [serie, setSerie] = useState(null);
   const [periodo, setPeriodo] = useState('1M');
@@ -53,6 +54,7 @@ export default function Inicio({ uid, dados, resumo, linhas, versao, aoEscolher,
   const variacao = pontos ? variacaoSerie(pontos) : 0;
   const comparacao = useMemo(() => pontos && comparar(pontos, indices), [pontos, indices]);
   const temIndices = comparacao && (comparacao.final.ibov != null || comparacao.final.cdi != null);
+  const extras = useMemo(() => (temIndices ? extrasComparacao(comparacao, pontos[0].valor) : []), [temIndices, comparacao, pontos]);
   const nome = dados.perfil.nome.split(' ')[0] || 'aluno';
   const mercadoHoje = mercadoAgora(dados.mercado, dados.intradia);
   const hoje = oscilacaoHoje({ ...dados });
@@ -84,8 +86,10 @@ export default function Inicio({ uid, dados, resumo, linhas, versao, aoEscolher,
             <strong className={`num ${tendencia(resumo.rentabilidade)}`}>{pct(resumo.rentabilidade)}</strong>
           </p>
         )}
-        {pontos ? <Grafico pontos={pontos} altura={150} eixos={false} rotulo="Patrimônio" /> : <div className="grafico" style={{ height: 150 }} />}
+        {pontos ? <Grafico pontos={pontos} altura={170} eixos={false} rotulo="Patrimônio" extras={extras} />
+          : <div className="grafico" style={{ height: 170 }} />}
         <Periodos valor={periodo} aoTrocar={setPeriodo} />
+        {temIndices && <Comparativo comparacao={comparacao} />}
         <div className="linha-saldo">
           <Icone nome="saldo" />
           <span><Termo id="saldo">Saldo disponível</Termo></span>
@@ -101,17 +105,26 @@ export default function Inicio({ uid, dados, resumo, linhas, versao, aoEscolher,
         </button>
       </section>
 
-      {temIndices && (
-        <section className="cartao" aria-labelledby="titulo-comparacao">
-          <h2 id="titulo-comparacao">Você x Ibovespa x CDI</h2>
-          <p className="suave">Quanto cada um rendeu no mesmo período do gráfico acima ({periodo === 'TUDO' ? 'desde o início' : periodo}).</p>
-          <Comparativo comparacao={comparacao} />
-        </section>
-      )}
-
+      <section aria-labelledby="titulo-meus">
+        <div className="secao-topo">
+          <h2 id="titulo-meus">Meus ativos</h2>
+          <button className="link-acao" onClick={() => irPara('carteira')}>Ver todos <Icone nome="seta" tamanho={16} /></button>
+        </div>
+        {meus.length ? (
+          <div className="cartao cartao-lista"><ListaAtivos itens={meus} linhas={linhas} aoEscolher={aoEscolher} /></div>
+        ) : (
+          <div className="cartao vazio">
+            <p>Você ainda não tem ações. Escolha uma empresa no mercado para fazer sua primeira compra.</p>
+            <button className="botao botao-principal" onClick={() => irPara('mercado')}>Ver o mercado</button>
+          </div>
+        )}
+      </section>
       </div>
 
       <div className="coluna coluna-b">
+
+      <Destaques mercado={dados.mercado} aoEscolher={aoEscolher} irPara={irPara} />
+
       <section className="cartao dica" aria-labelledby="titulo-dica" aria-live="polite">
         <span className="dica-icone"><Icone nome="lampada" tamanho={26} /></span>
         <div className="dica-texto">
@@ -127,22 +140,6 @@ export default function Inicio({ uid, dados, resumo, linhas, versao, aoEscolher,
         </button>
       </section>
 
-      <Destaques mercado={dados.mercado} aoEscolher={aoEscolher} irPara={irPara} />
-
-      <section aria-labelledby="titulo-meus">
-        <div className="secao-topo">
-          <h2 id="titulo-meus">Meus ativos</h2>
-          <button className="link-acao" onClick={() => irPara('carteira')}>Ver todos <Icone nome="seta" tamanho={16} /></button>
-        </div>
-        {meus.length ? (
-          <div className="cartao cartao-lista"><ListaAtivos itens={meus} linhas={linhas} aoEscolher={aoEscolher} /></div>
-        ) : (
-          <div className="cartao vazio">
-            <p>Você ainda não tem ações. Escolha uma empresa no mercado para fazer sua primeira compra.</p>
-            <button className="botao botao-principal" onClick={() => irPara('mercado')}>Ver o mercado</button>
-          </div>
-        )}
-      </section>
       </div>
     </div>
   );
