@@ -9,6 +9,7 @@ import { PrecoAgora } from '../componentes/Hoje.jsx';
 import { futuroAgora } from '../lib/intradia.js';
 import Periodos from '../componentes/Periodos.jsx';
 import Icone from '../componentes/Icone.jsx';
+import CampoTese, { gravarTese } from '../componentes/CampoTese.jsx';
 import Termo from '../componentes/Termo.jsx';
 
 const dataBR = (iso) => iso && new Date(`${iso}T12:00:00`).toLocaleDateString('pt-BR');
@@ -23,6 +24,7 @@ export default function Futuro({ ativo, dados, aoVoltar, aoExecutar }) {
 
   const [indices, setIndices] = useState(null);
   const [periodo, setPeriodo] = useState('1M');
+  const [tese, setTese] = useState('');
   const [tipoGrafico, setTipoGrafico] = useState(() => {
     try { return localStorage.getItem('bolsalab:grafico') || 'linha'; } catch { return 'linha'; }
   });
@@ -66,8 +68,9 @@ export default function Futuro({ ativo, dados, aoVoltar, aoExecutar }) {
     if (!podeEnviar) return;
     setEnviando(true); setErro('');
     try {
-      await api.executarFuturo(ativo, operacao, p.quantidade);
-      setQtd('');
+      const ordem = await api.executarFuturo(ativo, operacao, p.quantidade);
+      await gravarTese(api, 'futuro', ordem, tese);
+      setQtd(''); setTese('');
       await aoExecutar(`${operacao === 'compra' ? 'Compra' : 'Venda'} de ${p.quantidade} ${contrato.contrato} executada.`);
     } catch (err) {
       setErro(err.message);
@@ -216,6 +219,7 @@ export default function Futuro({ ativo, dados, aoVoltar, aoExecutar }) {
               : 'Negociação fechada agora. Você pode simular a ordem e enviá-la a partir das 19h.'}
           </p>
         )}
+        {dados.perfil.mostrar_operacoes !== false && <CampoTese valor={tese} aoMudar={setTese} id={`tese-${ativo}`} />}
         <button className={`botao botao-principal ${operacao === 'venda' ? 'botao-venda' : ''}`} disabled={!podeEnviar}>
           {enviando ? 'Enviando…' : `${operacao === 'compra' ? 'Comprar' : 'Vender'} ${p.quantidade || ''} ${contrato.contrato}`}
         </button>

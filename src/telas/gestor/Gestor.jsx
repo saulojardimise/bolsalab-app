@@ -7,11 +7,13 @@ import TurmaDetalhe from './TurmaDetalhe.jsx';
 import Alertas from './Alertas.jsx';
 import Eventos from './Eventos.jsx';
 import Sistema from './Sistema.jsx';
+import Moderacao from './Moderacao.jsx';
 
 const ABAS = [
   ['turmas', 'Turmas', 'turma'],
   ['alertas', 'Alertas', 'alerta'],
   ['eventos', 'Eventos', 'eventos'],
+  ['comunidade', 'Comunidade', 'comunidade'],
   ['sistema', 'Sistema', 'sistema'],
 ];
 
@@ -64,6 +66,7 @@ export default function Gestor({ email }) {
   else if (aba === 'turmas') conteudo = <Turmas aoAbrir={abrirTurma} avisar={avisar} />;
   else if (aba === 'alertas') conteudo = <Alertas aoAgir={resolverComEvento} avisar={avisar} />;
   else if (aba === 'eventos') conteudo = <Eventos key={JSON.stringify(preenchido)} inicial={preenchido} avisar={avisar} />;
+  else if (aba === 'comunidade') conteudo = <Moderacao avisar={avisar} />;
   else conteudo = <Sistema email={email} avisar={avisar} />;
 
   return (

@@ -2,6 +2,7 @@ import { previaFuturo } from '../lib/futuros.js';
 // Modo demonstração: mesma interface da api do Supabase, com dados fictícios
 // em memória e as mesmas regras do banco. Serve para ver as telas sem servidor.
 import { previa } from '../lib/regras.js';
+import { criarComunidadeDemo } from './demoComunidade.js';
 
 const CONFIG = {
   dominio_email: 'isecensa.edu.br', saldo_inicial: 10000, corretagem: 15,
@@ -236,8 +237,18 @@ export function criarApiDemo() {
     };
   });
 
-  return {
+  const comunidade = criarComunidadeDemo({
+    ordens: () => estado.ordens,
+    futurosOrdens: () => estado.futurosOrdens,
+    perfil: () => estado.perfil,
+    precoDe: (t) => estado.precos[t]?.preco ?? null,
+    ehGestor: () => gestor,
+    contratos: () => api.futurosMercado(),
+  });
+
+  const api = {
     modoDemo: true,
+    ...comunidade,
     async sessao() { return sessaoAtual(); },
     aoMudarSessao(cb) { ouvintes.add(cb); return () => ouvintes.delete(cb); },
     async entrar(email, senha) {
@@ -516,4 +527,5 @@ export function criarApiDemo() {
     async encerrar(t, preco) { evento('encerramento', t, `${t} saiu da bolsa. Posições encerradas a R$ ${String(preco).replace('.', ',')}.`, 2); },
     async suspender(t, s) { evento(s ? 'suspensao' : 'reativacao', t, s ? `Negociação de ${t} suspensa.` : `Negociação de ${t} liberada de novo.`); },
   };
+  return api;
 }

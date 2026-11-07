@@ -14,9 +14,11 @@ import { comparar } from '../lib/comparacao.js';
 import { mercadoAgora, oscilacaoHoje } from '../lib/intradia.js';
 import { LinhaHoje } from '../componentes/Hoje.jsx';
 import Comparativo, { extrasComparacao } from '../componentes/Comparativo.jsx';
+import Avatar from '../componentes/Avatar.jsx';
+import { fraseOperacao, nomeCurto, resumoReacoes } from '../lib/comunidade.js';
 
 // Tela inicial: patrimônio (com Ibovespa e CDI no mesmo gráfico), saldo e extrato,
-// meus ativos, destaques do dia e dica de hoje
+// meus ativos, últimas da comunidade, destaques do dia e dica de hoje
 export default function Inicio({ uid, dados, resumo, linhas, versao, aoEscolher, irPara, aoAbrirExtrato }) {
   const [serie, setSerie] = useState(null);
   const [periodo, setPeriodo] = useState('1M');
@@ -122,6 +124,7 @@ export default function Inicio({ uid, dados, resumo, linhas, versao, aoEscolher,
       </div>
 
       <div className="coluna coluna-b">
+      <ResumoComunidade versao={versao} irPara={irPara} />
 
       <Destaques mercado={dados.mercado} aoEscolher={aoEscolher} irPara={irPara} />
 
@@ -179,6 +182,54 @@ function Destaques({ mercado, aoEscolher, irPara }) {
           </li>
         ))}
       </ul>
+    </section>
+  );
+}
+
+// Últimas da comunidade: 3 operações recentes, com atalho para o mural
+function ResumoComunidade({ versao, irPara }) {
+  const [lista, setLista] = useState(null);
+  useEffect(() => {
+    let vivo = true;
+    api.comunidade('todos', null, 3).then((l) => vivo && setLista(l)).catch(() => vivo && setLista([]));
+    return () => { vivo = false; };
+  }, [versao]);
+  if (lista === null) return null;
+
+  return (
+    <section aria-labelledby="titulo-comunidade">
+      <div className="secao-topo">
+        <h2 id="titulo-comunidade">Comunidade</h2>
+        <button className="link-acao" onClick={() => irPara('comunidade')}>Ver tudo <Icone nome="seta" tamanho={16} /></button>
+      </div>
+      {lista.length === 0 ? (
+        <div className="cartao vazio">
+          <p>As operações dos alunos aparecem aqui. Faça a sua e conte por que fez.</p>
+          <button className="botao" onClick={() => irPara('comunidade')}>Abrir a comunidade</button>
+        </div>
+      ) : (
+        <ul className="cartao cartao-lista resumo-comunidade">
+          {lista.map((p) => {
+            const { total } = resumoReacoes(p.reacoes);
+            return (
+              <li key={p.id}>
+                <button onClick={() => irPara('comunidade')}>
+                  <Avatar foto={p.foto_url} tamanho={36} />
+                  <span className="resumo-texto">
+                    <strong>{p.eu ? 'Você' : nomeCurto(p.nome)}</strong> {fraseOperacao(p)}
+                    {p.tese && <small className="resumo-tese">“{p.tese}”</small>}
+                    <small className="suave">
+                      {quando(p.criado_em)}
+                      {total > 0 && ` · ${total} ${total === 1 ? 'reação' : 'reações'}`}
+                      {p.comentarios > 0 && ` · ${p.comentarios} ${p.comentarios === 1 ? 'comentário' : 'comentários'}`}
+                    </small>
+                  </span>
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      )}
     </section>
   );
 }

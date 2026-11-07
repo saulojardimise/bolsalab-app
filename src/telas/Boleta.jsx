@@ -3,6 +3,7 @@ import { api } from '../api/index.js';
 import { previa, TIPOS } from '../lib/regras.js';
 import { numero, reais, reaisComSinal } from '../lib/formato.js';
 import Icone from '../componentes/Icone.jsx';
+import CampoTese, { gravarTese } from '../componentes/CampoTese.jsx';
 import Termo from '../componentes/Termo.jsx';
 import { TERMO_DO_ROTULO } from '../lib/glossario.js';
 
@@ -16,6 +17,7 @@ export default function Boleta({ ticker, empresa, comprada, vendida, operacaoIni
   const [lado, setLado] = useState(inicial === 'compra' || inicial === 'recompra' ? 'comprar' : 'vender');
   const [tipo, setTipo] = useState(inicial);
   const [qtd, setQtd] = useState('');
+  const [tese, setTese] = useState('');
   const [enviando, setEnviando] = useState(false);
   const [erroServidor, setErroServidor] = useState('');
 
@@ -42,8 +44,9 @@ export default function Boleta({ ticker, empresa, comprada, vendida, operacaoIni
     if (!podeEnviar) return;
     setEnviando(true); setErroServidor('');
     try {
-      await api.executarOrdem(ticker, tipo, quantidade);
-      setQtd('');
+      const ordem = await api.executarOrdem(ticker, tipo, quantidade);
+      await gravarTese(api, 'acao', ordem, tese);
+      setQtd(''); setTese('');
       await aoExecutar(`${TIPOS[tipo].feito} de ${numero(quantidade)} ${ticker} executada.`);
     } catch (err) {
       setErroServidor(err.message);
@@ -131,6 +134,8 @@ export default function Boleta({ ticker, empresa, comprada, vendida, operacaoIni
             : 'Negociação fechada agora. Você pode simular a ordem e enviá-la a partir das 19h.'}
         </p>
       )}
+
+      {dados.perfil.mostrar_operacoes !== false && <CampoTese valor={tese} aoMudar={setTese} id={`tese-${ticker}`} />}
 
       <button className={`botao botao-principal ${vende ? 'botao-venda' : ''}`} disabled={!podeEnviar}>
         {enviando ? 'Enviando…' : `${verbo} ${quantidade > 0 ? numero(quantidade) + ' ' : ''}${ticker}`}

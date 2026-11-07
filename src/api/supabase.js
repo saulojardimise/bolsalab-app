@@ -235,6 +235,42 @@ export function criarApi(supabase, { urlRetorno } = {}) {
       return checar(await supabase.rpc('executar_ordem_futuro', { p_ativo: ativo, p_lado: lado, p_quantidade: quantidade }));
     },
 
+    // ---------------- comunidade ----------------
+    async comunidade(escopo = 'todos', antes = null, limite = 20) {
+      return checar(await supabase.rpc('comunidade_feed', { p_escopo: escopo, p_antes: antes, p_limite: limite }));
+    },
+    async comentarios(publicacao) {
+      return checar(await supabase.rpc('comunidade_comentarios', { p_publicacao: publicacao }));
+    },
+    async comentar(publicacao, texto) {
+      return checar(await supabase.rpc('comentar', { p_publicacao: publicacao, p_texto: texto }));
+    },
+    async apagarComentario(id) {
+      return checar(await supabase.rpc('apagar_comentario', { p_id: id }));
+    },
+    // mesma reação de novo (ou null) tira a reação; devolve a reação que ficou
+    async reagir(publicacao, tipo) {
+      return checar(await supabase.rpc('reagir', { p_publicacao: publicacao, p_tipo: tipo }));
+    },
+    async definirTese(origem, ordemId, tese) {
+      return checar(await supabase.rpc('definir_tese', { p_origem: origem, p_ordem: ordemId, p_tese: tese }));
+    },
+    async mostrarOperacoes(mostrar) {
+      return checar(await supabase.rpc('definir_mostrar_operacoes', { p_mostrar: mostrar }));
+    },
+    async denunciar(alvo, id, motivo = null) {
+      return checar(await supabase.rpc('denunciar', { p_alvo: alvo, p_id: id, p_motivo: motivo }));
+    },
+    async ocultarNaComunidade(alvo, id, ocultar = true) {
+      return checar(await supabase.rpc('ocultar_na_comunidade', { p_alvo: alvo, p_id: id, p_ocultar: ocultar }));
+    },
+    async descartarDenuncias(alvo, id) {
+      return checar(await supabase.rpc('descartar_denuncias', { p_alvo: alvo, p_id: id }));
+    },
+    async denunciasAbertas() {
+      return checar(await supabase.rpc('denuncias_abertas'));
+    },
+
     async executarOrdem(ticker, tipo, quantidade) {
       return checar(await supabase.rpc('executar_ordem', {
         p_ticker: ticker, p_tipo: tipo, p_quantidade: quantidade,

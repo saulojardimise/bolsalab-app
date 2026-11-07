@@ -4,6 +4,7 @@ import { resumoCarteira } from '../lib/regras.js';
 import { diasAtras } from '../lib/formato.js';
 import Topo from '../componentes/Topo.jsx';
 import Navegacao from '../componentes/Navegacao.jsx';
+import Comunidade from './Comunidade.jsx';
 import MenuPerfil from '../componentes/MenuPerfil.jsx';
 import Inicio from './Inicio.jsx';
 import Mercado from './Mercado.jsx';
@@ -115,6 +116,7 @@ export default function Painel({ uid }) {
     );
   }
 
+  const mudarPerfil = (campos) => setDados((d) => ({ ...d, perfil: { ...d.perfil, ...campos } }));
   const mudarFoto = (foto_url) => setDados((d) => ({ ...d, perfil: { ...d.perfil, foto_url } }));
 
   // Depois do questionário: convite para pôr a foto (pode deixar para depois)
@@ -180,6 +182,9 @@ export default function Painel({ uid }) {
                        aoEscolher={abrirAcao} irPara={trocarAba} aoAbrirExtrato={abrirExtrato} />;
   } else if (aba === 'mercado') {
     conteudo = <Mercado dados={dados} linhas={linhas} aoEscolher={abrirAcao} aoAbrirFuturo={abrirFuturo} />;
+  } else if (aba === 'comunidade') {
+    conteudo = <Comunidade dados={dados} versao={versao} aoEscolher={abrirAcao} aoAbrirFuturo={abrirFuturo}
+                           aoMudarPerfil={mudarPerfil} avisar={setRecado} />;
   } else if (aba === 'noticias') {
     conteudo = <Noticias dados={dados} aoEscolher={abrirAcao} />;
   } else if (aba === 'carteira') {

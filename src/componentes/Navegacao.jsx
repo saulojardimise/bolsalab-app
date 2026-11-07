@@ -6,11 +6,12 @@ import Icone from './Icone.jsx';
 const ABAS = [
   ['inicio', 'Início'],
   ['mercado', 'Mercado'],
-  ['noticias', 'Notícias'],
+  ['comunidade', 'Comunidade'],
   ['carteira', 'Carteira'],
 ];
 // no celular ficam dentro do "Mais"; no PC aparecem no menu lateral
 const EXTRAS = [
+  ['noticias', 'Notícias', 'Manchetes do dia e fatos relevantes'],
   ['turma', 'Grupo', 'Ranking e colegas do seu grupo'],
 ];
 
