@@ -7,7 +7,7 @@ const LIMITE = 20;
 
 // Comunidade: mural com as operações dos alunos de todos os grupos,
 // reações e comentários.
-export default function Comunidade({ dados, versao, aoEscolher, aoAbrirFuturo, aoMudarPerfil, avisar, moderar = false }) {
+export default function Comunidade({ dados, versao, aoEscolher, aoAbrirFuturo, avisar, moderar = false }) {
   const [escopo, setEscopo] = useState(() => {
     try { return localStorage.getItem('bolsalab:comunidade') || 'todos'; } catch { return 'todos'; }
   });
@@ -15,7 +15,6 @@ export default function Comunidade({ dados, versao, aoEscolher, aoAbrirFuturo, a
   const [temMais, setTemMais] = useState(false);
   const [carregando, setCarregando] = useState(false);
   const [erro, setErro] = useState('');
-  const mostrando = dados?.perfil?.mostrar_operacoes !== false;
 
   const carregar = useCallback(async (antes = null) => {
     setCarregando(true); setErro('');
@@ -42,15 +41,6 @@ export default function Comunidade({ dados, versao, aoEscolher, aoAbrirFuturo, a
   const mudar = (p) => setLista((l) => l.map((x) => (x.id === p.id ? p : x)));
   const escolher = (p) => (p.origem === 'futuro' ? aoAbrirFuturo?.(p.base) : aoEscolher?.(p.ativo));
 
-  async function alternarVisibilidade() {
-    try {
-      const v = await api.mostrarOperacoes(!mostrando);
-      aoMudarPerfil?.({ mostrar_operacoes: v });
-      avisar?.(v ? 'Suas operações voltaram a aparecer na comunidade.' : 'Suas operações agora estão escondidas da comunidade.');
-      carregar();
-    } catch (e) { setErro(e.message); }
-  }
-
   return (
     <div className="pilha comunidade">
       {!moderar && (
@@ -65,14 +55,6 @@ export default function Comunidade({ dados, versao, aoEscolher, aoAbrirFuturo, a
             {ESCOPOS.filter(([id]) => id !== 'grupo' || dados?.grupos?.length > 0).map(([id, rotulo]) => (
               <button key={id} aria-pressed={escopo === id} onClick={() => trocarEscopo(id)}>{rotulo}</button>
             ))}
-          </div>
-          <div className={`cartao privacidade ${mostrando ? '' : 'privacidade-oculta'}`}>
-            <p>
-              {mostrando
-                ? <>Suas operações <strong>aparecem</strong> aqui (ativo, quantidade e preço; nunca seu saldo).</>
-                : <>Suas operações estão <strong>escondidas</strong>. Só você as vê aqui.</>}
-            </p>
-            <button className="link" onClick={alternarVisibilidade}>{mostrando ? 'Esconder' : 'Mostrar'}</button>
           </div>
         </>
       )}

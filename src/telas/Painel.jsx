@@ -122,7 +122,6 @@ export default function Painel({ uid }) {
     );
   }
 
-  const mudarPerfil = (campos) => setDados((d) => ({ ...d, perfil: { ...d.perfil, ...campos } }));
   const mudarFoto = (foto_url) => setDados((d) => ({ ...d, perfil: { ...d.perfil, foto_url } }));
 
   // Depois do questionário: convite para pôr a foto (pode deixar para depois)
@@ -200,8 +199,7 @@ export default function Painel({ uid }) {
   } else if (aba === 'mercado') {
     conteudo = <Mercado dados={dados} linhas={linhas} aoEscolher={abrirAcao} aoAbrirFuturo={abrirFuturo} />;
   } else if (aba === 'comunidade') {
-    conteudo = <Comunidade dados={dados} versao={versao} aoEscolher={abrirAcao} aoAbrirFuturo={abrirFuturo}
-                           aoMudarPerfil={mudarPerfil} avisar={setRecado} />;
+    conteudo = <Comunidade dados={dados} versao={versao} aoEscolher={abrirAcao} aoAbrirFuturo={abrirFuturo} avisar={setRecado} />;
   } else if (aba === 'noticias') {
     conteudo = <Noticias dados={dados} aoEscolher={abrirAcao} />;
   } else if (aba === 'carteira') {

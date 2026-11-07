@@ -23,12 +23,12 @@ export default function Turmas({ aoAbrir, avisar }) {
     <div className="pilha">
       <div className="secao-topo">
         <div>
-          <h1>Turmas</h1>
-          <p className="suave">Cada turma tem um token. A pessoa informa o token ao criar a conta ou depois, na tela Grupos. Dá para estar em mais de uma turma.</p>
+          <h1>Grupos</h1>
+          <p className="suave">Cada grupo tem um token. A pessoa informa o token ao criar a conta ou depois, na tela Grupos. Dá para estar em mais de um grupo, e você também pode adicionar ou remover pessoas de cada grupo.</p>
         </div>
         {!criando && (
           <button className="botao botao-compacto" onClick={() => setCriando(true)}>
-            <Icone nome="mais" tamanho={18} />Nova turma
+            <Icone nome="mais" tamanho={18} />Novo grupo
           </button>
         )}
       </div>
@@ -36,7 +36,7 @@ export default function Turmas({ aoAbrir, avisar }) {
       {criando && (
         <NovaTurma
           aoCancelar={() => setCriando(false)}
-          aoCriar={(t) => { setCriando(false); setVersao((v) => v + 1); avisar(`Turma ${t.nome} criada. Token: ${t.token}`); }}
+          aoCriar={(t) => { setCriando(false); setVersao((v) => v + 1); avisar(`Grupo ${t.nome} criado. Token: ${t.token}`); }}
         />
       )}
 
@@ -44,8 +44,8 @@ export default function Turmas({ aoAbrir, avisar }) {
       {!turmas && !erro && <p className="carregando" aria-busy="true">Carregando…</p>}
       {turmas?.length === 0 && !criando && (
         <div className="cartao vazio">
-          <p>Nenhuma turma ainda. Crie a primeira e passe o token para os alunos.</p>
-          <button className="botao botao-principal" onClick={() => setCriando(true)}>Criar turma</button>
+          <p>Nenhum grupo ainda. Crie a primeira e passe o token para os alunos.</p>
+          <button className="botao botao-principal" onClick={() => setCriando(true)}>Criar grupo</button>
         </div>
       )}
 
@@ -76,7 +76,7 @@ export default function Turmas({ aoAbrir, avisar }) {
           </div>
           <dl className="turma-numeros">
             <div><dt>E-mails</dt><dd>{textoRegra(t.dominio_email)}</dd></div>
-            <div><dt>Alunos</dt><dd className="num">{t.alunos}</dd></div>
+            <div><dt>Pessoas</dt><dd className="num">{t.alunos}</dd></div>
             <div>
               <dt>Rentabilidade média</dt>
               <dd className={`num ${tendencia(t.rentabilidade_media)}`}>
@@ -101,7 +101,7 @@ function NovaTurma({ aoCancelar, aoCriar }) {
 
   async function criar(e) {
     e.preventDefault();
-    if (!nome.trim()) { setErro('Dê um nome para a turma.'); return; }
+    if (!nome.trim()) { setErro('Dê um nome para o grupo.'); return; }
     if (dominio && !dominio.trim()) { setErro('Digite o domínio aceito, por exemplo exemplo.edu.br.'); return; }
     setEnviando(true); setErro('');
     try {
@@ -114,9 +114,9 @@ function NovaTurma({ aoCancelar, aoCriar }) {
 
   return (
     <form className="cartao" onSubmit={criar} aria-labelledby="titulo-nova-turma">
-      <h2 id="titulo-nova-turma">Nova turma</h2>
+      <h2 id="titulo-nova-turma">Novo grupo</h2>
       <label className="campo">
-        <span>Nome da turma</span>
+        <span>Nome do grupo</span>
         <input id="nova-turma-nome" value={nome} onChange={(e) => setNome(e.target.value)} placeholder="Ex.: ADM 3º período 2026.2" autoFocus />
       </label>
       <RegraEmail valor={dominio} aoMudar={setDominio} nome="regra-nova" />
@@ -124,7 +124,7 @@ function NovaTurma({ aoCancelar, aoCriar }) {
       {erro && <p className="aviso aviso-erro" role="alert">{erro}</p>}
       <div className="botoes-linha">
         <button type="button" className="botao" onClick={aoCancelar}>Cancelar</button>
-        <button className="botao botao-principal" disabled={enviando}>{enviando ? 'Criando…' : 'Criar turma'}</button>
+        <button className="botao botao-principal" disabled={enviando}>{enviando ? 'Criando…' : 'Criar grupo'}</button>
       </div>
     </form>
   );

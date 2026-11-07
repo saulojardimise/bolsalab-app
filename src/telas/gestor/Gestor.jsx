@@ -10,7 +10,7 @@ import Sistema from './Sistema.jsx';
 import Moderacao from './Moderacao.jsx';
 
 const ABAS = [
-  ['turmas', 'Turmas', 'turma'],
+  ['turmas', 'Grupos', 'turma'],
   ['alertas', 'Alertas', 'alerta'],
   ['eventos', 'Eventos', 'eventos'],
   ['comunidade', 'Comunidade', 'comunidade'],

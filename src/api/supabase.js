@@ -278,9 +278,6 @@ export function criarApi(supabase, { urlRetorno } = {}) {
     async reagir(publicacao, tipo) {
       return checar(await supabase.rpc('reagir', { p_publicacao: publicacao, p_tipo: tipo }));
     },
-    async mostrarOperacoes(mostrar) {
-      return checar(await supabase.rpc('definir_mostrar_operacoes', { p_mostrar: mostrar }));
-    },
     async denunciar(alvo, id, motivo = null) {
       return checar(await supabase.rpc('denunciar', { p_alvo: alvo, p_id: id, p_motivo: motivo }));
     },
@@ -318,6 +315,15 @@ export function criarApi(supabase, { urlRetorno } = {}) {
     async semGrupo() {
       const r = checar(await supabase.rpc('resumo_sem_grupo'));
       return r[0] ?? null;
+    },
+    async buscarUsuarios(busca, foraDoGrupo = null) {
+      return checar(await supabase.rpc('buscar_usuarios', { p_busca: busca, p_fora_do_grupo: foraDoGrupo }));
+    },
+    async adicionarAoGrupo(grupoId, userId) {
+      return checar(await supabase.rpc('gestor_adicionar_ao_grupo', { p_turma_id: grupoId, p_user: userId }));
+    },
+    async removerDoGrupo(grupoId, userId) {
+      return checar(await supabase.rpc('gestor_remover_do_grupo', { p_turma_id: grupoId, p_user: userId }));
     },
     async alunosTurma(id) {
       return checar(await supabase.rpc('alunos_turma', { p_turma_id: id }));

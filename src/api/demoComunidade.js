@@ -125,13 +125,6 @@ export function criarComunidadeDemo({ ordens, futurosOrdens, perfil, contratos, 
       if (r.minha) r.contagem[r.minha] = (r.contagem[r.minha] ?? 0) + 1;
       return r.minha;
     },
-    async mostrarOperacoes(mostrar) { perfil().mostrar_operacoes = mostrar; return mostrar; },
-    async denunciar(alvo, id, motivo = null) { denuncias.push({ alvo, id, motivo }); },
-    async ocultarNaComunidade(alvo, id, ocultar = true) {
-      if (alvo === 'publicacao') { if (ocultar) ocultas.add(id); else ocultas.delete(id); }
-      else { const c = comentarios.find((x) => x.id === id); if (c) c.oculto = ocultar; }
-      for (let i = denuncias.length - 1; i >= 0; i--) if (denuncias[i].alvo === alvo && denuncias[i].id === id) denuncias.splice(i, 1);
-    },
     async descartarDenuncias(alvo, id) {
       for (let i = denuncias.length - 1; i >= 0; i--) if (denuncias[i].alvo === alvo && denuncias[i].id === id) denuncias.splice(i, 1);
     },

@@ -29,7 +29,7 @@ export default function TurmaDetalhe({ id, aoVoltar, avisar }) {
       await api.atualizarTurma(id, campos);
       setEditando(false);
       setVersao((v) => v + 1);
-      avisar('Turma atualizada.');
+      avisar('Grupo atualizado.');
     } catch (e) { setErro(e.message); }
   }
 
@@ -47,8 +47,8 @@ export default function TurmaDetalhe({ id, aoVoltar, avisar }) {
       const r = await api.excluirTurma(id, apagarAlunos);
       const extra = r.alunos_apagados > 0
         ? ` ${r.alunos_apagados} ${r.alunos_apagados === 1 ? 'conta apagada' : 'contas apagadas'}.`
-        : r.alunos_sem_turma > 0 ? ` ${r.alunos_sem_turma} ${r.alunos_sem_turma === 1 ? 'aluno ficou' : 'alunos ficaram'} sem turma.` : '';
-      avisar(`Turma ${r.turma} excluída.${extra}`);
+        : r.alunos_sem_turma > 0 ? ` ${r.alunos_sem_turma} ${r.alunos_sem_turma === 1 ? 'pessoa saiu' : 'pessoas saíram'} do grupo e continuam com a conta.` : '';
+      avisar(`Grupo ${r.turma} excluído.${extra}`);
       aoVoltar();
     } catch (e) { setErro(e.message); setExcluindo(false); }
   }
@@ -57,7 +57,7 @@ export default function TurmaDetalhe({ id, aoVoltar, avisar }) {
     <div className="pilha">
       <header className="barra-acao">
         <button className="botao-icone" onClick={aoVoltar} aria-label="Voltar"><Icone nome="voltar" /></button>
-        <h1>{turma?.nome ?? 'Turma'}</h1>
+        <h1>{turma?.nome ?? 'Grupo'}</h1>
         <span style={{ width: 40 }} />
       </header>
 
@@ -69,7 +69,7 @@ export default function TurmaDetalhe({ id, aoVoltar, avisar }) {
       )}
 
       {turma && !turma.virtual && !editando && (
-        <section className="cartao" aria-label="Dados da turma">
+        <section className="cartao" aria-label="Dados do grupo">
           <p className="suave">Token para o cadastro</p>
           <div className="token-linha">
             <span className="token token-grande num">{turma.token}</span>
@@ -78,7 +78,7 @@ export default function TurmaDetalhe({ id, aoVoltar, avisar }) {
           <dl className="turma-numeros">
             <div><dt>E-mails</dt><dd>{textoRegra(turma.dominio_email)}</dd></div>
             <div><dt>Cadastros</dt><dd>{turma.ativa ? 'Abertos' : 'Fechados'}</dd></div>
-            <div><dt>Alunos</dt><dd className="num">{turma.alunos}</dd></div>
+            <div><dt>Pessoas</dt><dd className="num">{turma.alunos}</dd></div>
           </dl>
           <div className="botoes-linha">
             <button className="botao" onClick={() => setEditando(true)}><Icone nome="editar" tamanho={18} />Editar</button>
@@ -89,7 +89,7 @@ export default function TurmaDetalhe({ id, aoVoltar, avisar }) {
           {!confirmarToken && !excluindo && (
             <div className="links-linha">
               <button className="link" onClick={() => setConfirmarToken(true)}>Gerar token novo</button>
-              <button className="link link-perigo" onClick={() => setExcluindo(true)}>Excluir turma</button>
+              <button className="link link-perigo" onClick={() => setExcluindo(true)}>Excluir grupo</button>
             </div>
           )}
           {excluindo && (
@@ -97,7 +97,7 @@ export default function TurmaDetalhe({ id, aoVoltar, avisar }) {
           )}
           {confirmarToken && (
             <div className="confirmacao" role="alert">
-              <p>O token atual deixa de funcionar para novos cadastros. Quem já entrou continua na turma.</p>
+              <p>O token atual deixa de funcionar para novos cadastros. Quem já entrou continua no grupo.</p>
               <div className="botoes-linha">
                 <button className="botao" onClick={() => setConfirmarToken(false)}>Cancelar</button>
                 <button className="botao botao-principal" onClick={trocarToken}>Gerar token novo</button>
@@ -109,13 +109,17 @@ export default function TurmaDetalhe({ id, aoVoltar, avisar }) {
 
       {turma && editando && <EditarTurma turma={turma} aoCancelar={() => setEditando(false)} aoSalvar={salvar} />}
 
+      {turma && !turma.virtual && !editando && (
+        <AdicionarPessoa grupo={turma} avisar={avisar} aoAdicionar={() => setVersao((v) => v + 1)} />
+      )}
+
       {alunos && (
         <section aria-labelledby="titulo-alunos-turma">
           <h2 id="titulo-alunos-turma" className="secao-titulo">
-            Alunos <span className="suave">{alunos.length ? 'por patrimônio' : ''}</span>
+            Pessoas <span className="suave">{alunos.length ? 'por patrimônio' : ''}</span>
           </h2>
           {alunos.length === 0 ? (
-            <p className="cartao vazio">{turma?.virtual ? 'Ninguém sem grupo no momento.' : `Nenhum aluno ainda. Passe o token ${turma?.token} para a turma.`}</p>
+            <p className="cartao vazio">{turma?.virtual ? 'Ninguém sem grupo no momento.' : `Ninguém ainda. Passe o token ${turma?.token} ou adicione pessoas abaixo.`}</p>
           ) : (
             <ol className="cartao cartao-lista ranking ranking-gestor">
               {alunos.map((a) => (
@@ -134,6 +138,8 @@ export default function TurmaDetalhe({ id, aoVoltar, avisar }) {
                       {a.ultima_ordem ? `, a última em ${dataHora(a.ultima_ordem)}` : ''}
                     </small>
                     <PerfilAluno a={a} />
+                    <AcoesMembro grupoId={id} grupoNome={turma?.nome} pessoa={a} avisar={avisar}
+                                 aoMudar={() => setVersao((v) => v + 1)} />
                   </span>
                 </li>
               ))}
@@ -189,30 +195,30 @@ function ExcluirTurma({ turma, aoCancelar, aoExcluir }) {
 
   return (
     <div className="confirmacao confirmacao-perigo" role="alert">
-      <p><strong>Excluir a turma {turma.nome}?</strong> O token {turma.token} deixa de funcionar.</p>
+      <p><strong>Excluir o grupo {turma.nome}?</strong> O token {turma.token} deixa de funcionar.</p>
       {n > 0 && (
         <fieldset className="regra-email">
           <legend>O que fazer com {n === 1 ? 'a conta do aluno' : `as contas dos ${alunos}`}?</legend>
           <label className="opcao-radio">
             <input type="radio" name="excluir-alunos" checked={!apagar} onChange={() => setApagar(false)} />
-            <span>Manter. {n === 1 ? 'Ele continua' : 'Eles continuam'} jogando, com carteira e histórico; só saem desta turma.</span>
+            <span>Manter. {n === 1 ? 'Ele continua' : 'Eles continuam'} jogando, com carteira e histórico; só saem deste grupo.</span>
           </label>
           <label className="opcao-radio">
             <input type="radio" name="excluir-alunos" checked={apagar} onChange={() => setApagar(true)} />
-            <span>Apagar também. Some tudo: carteira, ordens e histórico. Não tem volta. Quem está em outro grupo não é apagado, só sai desta turma.</span>
+            <span>Apagar também. Some tudo: carteira, ordens e histórico. Não tem volta. Quem está em outro grupo não é apagado, só sai deste grupo.</span>
           </label>
         </fieldset>
       )}
       {apagar && (
         <label className="campo">
-          <span>Para confirmar, digite o nome da turma</span>
+          <span>Para confirmar, digite o nome do grupo</span>
           <input value={nome} onChange={(e) => setNome(e.target.value)} placeholder={turma.nome} autoComplete="off" />
         </label>
       )}
       <div className="botoes-linha">
         <button className="botao" onClick={aoCancelar} disabled={enviando}>Cancelar</button>
         <button className="botao botao-perigo" onClick={confirmar} disabled={!liberado || enviando}>
-          {enviando ? 'Excluindo…' : apagar ? `Excluir e apagar ${alunos}` : 'Excluir turma'}
+          {enviando ? 'Excluindo…' : apagar ? `Excluir e apagar ${alunos}` : 'Excluir grupo'}
         </button>
       </div>
     </div>
@@ -233,13 +239,13 @@ function EditarTurma({ turma, aoCancelar, aoSalvar }) {
   }
 
   return (
-    <form className="cartao" onSubmit={salvar} aria-label="Editar turma">
+    <form className="cartao" onSubmit={salvar} aria-label="Editar grupo">
       <label className="campo">
-        <span>Nome da turma</span>
+        <span>Nome do grupo</span>
         <input id="editar-turma-nome" value={nome} onChange={(e) => setNome(e.target.value)} />
       </label>
       <RegraEmail valor={dominio} aoMudar={setDominio} nome="regra-editar" />
-      <p className="nota">A regra vale para novos cadastros e para trocas de e-mail. Quem já está na turma continua.</p>
+      <p className="nota">A regra vale para novos cadastros e para trocas de e-mail. Quem já está no grupo continua.</p>
       <label className="opcao-radio">
         <input type="checkbox" checked={ativa} onChange={(e) => setAtiva(e.target.checked)} />
         Aceitando cadastros
@@ -250,5 +256,128 @@ function EditarTurma({ turma, aoCancelar, aoSalvar }) {
         <button className="botao botao-principal">Salvar</button>
       </div>
     </form>
+  );
+}
+
+// Remover a pessoa deste grupo (com confirmação) ou, na lista "Sem grupo", pôr num grupo
+function AcoesMembro({ grupoId, grupoNome, pessoa, avisar, aoMudar }) {
+  const [confirmando, setConfirmando] = useState(false);
+  const [grupos, setGrupos] = useState(null);
+  const [destino, setDestino] = useState('');
+  const [erro, setErro] = useState('');
+
+  useEffect(() => {
+    if (grupoId === 0) api.turmas().then(setGrupos).catch((e) => setErro(e.message));
+  }, [grupoId]);
+
+  async function remover() {
+    try {
+      await api.removerDoGrupo(grupoId, pessoa.user_id);
+      avisar(`${pessoa.nome || pessoa.email} saiu do grupo ${grupoNome}. A conta continua.`);
+      aoMudar();
+    } catch (e) { setErro(e.message); setConfirmando(false); }
+  }
+
+  async function adicionar() {
+    if (!destino) return;
+    try {
+      const nome = await api.adicionarAoGrupo(Number(destino), pessoa.user_id);
+      avisar(`${pessoa.nome || pessoa.email} entrou no grupo ${nome}.`);
+      aoMudar();
+    } catch (e) { setErro(e.message); }
+  }
+
+  if (grupoId === 0) {
+    return (
+      <span className="acoes-membro">
+        <label className="sr-only" htmlFor={`destino-${pessoa.user_id}`}>Grupo</label>
+        <select id={`destino-${pessoa.user_id}`} value={destino} onChange={(e) => setDestino(e.target.value)}>
+          <option value="">Pôr no grupo…</option>
+          {grupos?.map((g) => <option key={g.id} value={g.id}>{g.nome}</option>)}
+        </select>
+        <button className="botao botao-compacto" onClick={adicionar} disabled={!destino}>Adicionar</button>
+        {erro && <small className="token-erro">{erro}</small>}
+      </span>
+    );
+  }
+  return (
+    <span className="acoes-membro">
+      {confirmando ? (
+        <>
+          <small>Tirar do grupo {grupoNome}? A conta e a carteira continuam.</small>
+          <button className="link link-perigo" onClick={remover}>Sim, remover</button>
+          <button className="link" onClick={() => setConfirmando(false)}>Cancelar</button>
+        </>
+      ) : (
+        <button className="link link-discreto" onClick={() => setConfirmando(true)}>Remover do grupo</button>
+      )}
+      {erro && <small className="token-erro">{erro}</small>}
+    </span>
+  );
+}
+
+// Procura qualquer pessoa cadastrada (nome ou e-mail) e põe no grupo
+function AdicionarPessoa({ grupo, avisar, aoAdicionar }) {
+  const [aberto, setAberto] = useState(false);
+  const [busca, setBusca] = useState('');
+  const [lista, setLista] = useState(null);
+  const [erro, setErro] = useState('');
+
+  useEffect(() => {
+    if (!aberto || busca.trim().length < 2) { setLista(null); return undefined; }
+    let vivo = true;
+    const t = setTimeout(() => {
+      api.buscarUsuarios(busca.trim(), grupo.id).then((l) => vivo && setLista(l)).catch((e) => vivo && setErro(e.message));
+    }, 300);
+    return () => { vivo = false; clearTimeout(t); };
+  }, [busca, aberto, grupo.id]);
+
+  async function adicionar(p) {
+    setErro('');
+    try {
+      await api.adicionarAoGrupo(grupo.id, p.user_id);
+      avisar(`${p.nome || p.email} entrou no grupo ${grupo.nome}.`);
+      setLista((l) => l.filter((x) => x.user_id !== p.user_id));
+      aoAdicionar();
+    } catch (e) { setErro(e.message); }
+  }
+
+  if (!aberto) {
+    return (
+      <button className="botao" onClick={() => setAberto(true)}>
+        <Icone nome="mais" tamanho={18} />Adicionar pessoa ao grupo
+      </button>
+    );
+  }
+  return (
+    <section className="cartao adicionar-pessoa" aria-labelledby="titulo-adicionar-pessoa">
+      <div className="secao-topo">
+        <h2 id="titulo-adicionar-pessoa">Adicionar pessoa</h2>
+        <button className="botao-icone" onClick={() => { setAberto(false); setBusca(''); }} aria-label="Fechar"><Icone nome="fechar" /></button>
+      </div>
+      <p className="suave">Procure qualquer pessoa cadastrada no BolsaLab. Você pode adicionar mesmo quem tem e-mail fora da regra do grupo.</p>
+      <label className="busca">
+        <Icone nome="busca" tamanho={20} />
+        <input type="search" placeholder="Nome ou e-mail" aria-label="Buscar pessoa por nome ou e-mail"
+               value={busca} onChange={(e) => setBusca(e.target.value)} autoFocus />
+      </label>
+      {erro && <p className="aviso aviso-erro" role="alert">{erro}</p>}
+      {busca.trim().length > 0 && busca.trim().length < 2 && <p className="suave">Digite pelo menos 2 letras.</p>}
+      {lista?.length === 0 && <p className="suave">Ninguém encontrado fora deste grupo.</p>}
+      {lista?.length > 0 && (
+        <ul className="lista-busca">
+          {lista.map((p) => (
+            <li key={p.user_id}>
+              <span>
+                <strong>{p.nome || 'Sem nome'}</strong>
+                <small>{p.email}</small>
+                <small className="suave">{p.grupos ? `Grupos: ${p.grupos}` : 'Sem grupo'}</small>
+              </span>
+              <button className="botao botao-compacto" onClick={() => adicionar(p)}>Adicionar</button>
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
   );
 }

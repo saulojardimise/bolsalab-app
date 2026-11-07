@@ -534,6 +534,27 @@ export function criarApiDemo() {
       t.token = tokenAleatorio();
       return t.token;
     },
+    // demonstração: cada pessoa fictícia fica em um grupo só
+    async buscarUsuarios(busca, foraDoGrupo = null) {
+      await atraso();
+      const b = busca.trim().toLowerCase();
+      if (b.length < 2) return [];
+      return gestao.alunos.filter((a) => (a.nome.toLowerCase().includes(b) || a.email.includes(b)) && a.turma_id !== foraDoGrupo)
+        .map((a) => ({ user_id: a.user_id, nome: a.nome, email: a.email, criado_em: a.criado_em,
+                       grupos: gestao.turmas.find((t) => t.id === a.turma_id)?.nome ?? '' }));
+    },
+    async adicionarAoGrupo(grupoId, userId) {
+      const a = gestao.alunos.find((x) => x.user_id === userId);
+      const t = gestao.turmas.find((x) => x.id === grupoId);
+      if (a.turma_id === grupoId) throw new Error(`Essa pessoa já está no grupo ${t.nome}.`);
+      a.turma_id = grupoId;
+      return t.nome;
+    },
+    async removerDoGrupo(grupoId, userId) {
+      const a = gestao.alunos.find((x) => x.user_id === userId);
+      if (!a || a.turma_id !== grupoId) throw new Error('Essa pessoa não está no grupo.');
+      a.turma_id = null;
+    },
     async alunosTurma(id) {
       await atraso();
       return gestao.alunos.filter((a) => (id === 0 ? a.turma_id == null : a.turma_id === id)).sort((a, b) => b.patrimonio - a.patrimonio)
