@@ -330,6 +330,8 @@ input:focus-visible, select:focus-visible { outline: none; border-color: var(--f
   border-radius: 10px; background: #fff; border: 1px solid var(--linha);
 }
 .logo img { width: 100%; height: 100%; object-fit: contain; }
+.logo-etf { border: 0; }
+.logo-etf svg { display: block; }
 .logo-sigla { background: var(--verde-fundo); color: var(--verde-texto); font-weight: 800; border: 0; }
 
 .ativos { list-style: none; margin: 0; padding: 0; }
