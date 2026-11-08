@@ -49,6 +49,12 @@ export function plataforma(ua = navigator.userAgent, toques = navigator.maxTouch
   return 'pc';
 }
 
+/** Safari do iOS 26 em diante: o Compartilhar fica dentro do menu ☰ ao lado do endereço. */
+export function safariNovo(ua = navigator.userAgent) {
+  const v = ua.match(/Version\/(\d+)/);
+  return Boolean(v && Number(v[1]) >= 26);
+}
+
 /** Navegador de dentro de outro app (Instagram, Facebook, WhatsApp...): não instala. */
 export function navegadorDeApp(ua = navigator.userAgent) {
   return /FBAN|FBAV|FB_IAB|Instagram|Line\/|WhatsApp|Twitter|TikTok|musical_ly|Snapchat|GSA\//i.test(ua);

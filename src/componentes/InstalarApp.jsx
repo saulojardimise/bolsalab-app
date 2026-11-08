@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import Icone from './Icone.jsx';
 import iconeApp from '../marca/icone-app.png';
 import {
-  deixarParaDepois, instalar, navegadorDeApp, ouvirInstalacao, plataforma, podeInstalarDireto,
+  deixarParaDepois, instalar, navegadorDeApp, safariNovo, ouvirInstalacao, plataforma, podeInstalarDireto,
 } from '../lib/instalar.js';
 
 // Tela "Instalar o app": no Android/PC um botão abre a instalação do navegador;
@@ -41,9 +41,12 @@ export default function InstalarApp({ aoFechar, avisar }) {
   } else if (p === 'ios') {
     passos = (
       <ol className="instalar-passos">
+        {safariNovo() && (
+          <li>Toque no menu <span className="instalar-icone" aria-hidden="true"><Icone nome="linhas" tamanho={18} /></span> ao lado do endereço.</li>
+        )}
         <li>
           Toque em <strong>Compartilhar</strong> <span className="instalar-icone" aria-hidden="true"><Icone nome="compartilhar" tamanho={18} /></span>
-          {' '}no Safari.
+          {safariNovo() ? '.' : ' no Safari.'}
         </li>
         <li>Toque em <strong>Adicionar à Tela de Início</strong> <span className="instalar-icone" aria-hidden="true"><Icone nome="mais" tamanho={18} /></span>.</li>
         <li>Toque em <strong>Adicionar</strong>.</li>
