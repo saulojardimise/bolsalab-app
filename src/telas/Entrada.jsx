@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react';
+import InstalarApp from '../componentes/InstalarApp.jsx';
+import { deveSugerirInstalar, ouvirInstalacao } from '../lib/instalar.js';
 import { api } from '../api/index.js';
 import { emailAceito } from '../api/supabase.js';
 import Marca from '../componentes/Marca.jsx';
@@ -12,6 +14,10 @@ export default function Entrada() {
   const [erro, setErro] = useState('');
   const [aviso, setAviso] = useState('');
   const [enviando, setEnviando] = useState(false);
+  // convite para instalar o app logo que a pessoa abre o site (celular, fora do app instalado)
+  const [instalarVisto, setInstalarVisto] = useState(false);
+  const [, setTique] = useState(0);
+  useEffect(() => ouvirInstalacao(() => setTique((n) => n + 1)), []);
 
   const mudar = (e) => setCampos({ ...campos, [e.target.name]: e.target.value });
   const trocar = (m) => { setModo(m); setErro(''); setAviso(''); };
@@ -150,6 +156,7 @@ export default function Entrada() {
           </p>
         )}
       </form>
+      {!instalarVisto && deveSugerirInstalar() && <InstalarApp aoFechar={() => setInstalarVisto(true)} />}
     </main>
   );
 }

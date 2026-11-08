@@ -34,8 +34,8 @@ export default function InstalarApp({ aoFechar, avisar }) {
   if (deApp) {
     passos = (
       <ol className="instalar-passos">
-        <li>Você abriu o link dentro de outro app (Instagram, WhatsApp...). Toque nos <strong>três pontinhos</strong> ou no ícone de navegador e escolha <strong>Abrir no {p === 'ios' ? 'Safari' : 'Chrome'}</strong>.</li>
-        <li>No {p === 'ios' ? 'Safari' : 'Chrome'}, entre em <strong>bolsalab.app</strong> e toque em <strong>Instalar app</strong> no menu Mais.</li>
+        <li>Toque nos <strong>três pontinhos</strong> e escolha <strong>Abrir no {p === 'ios' ? 'Safari' : 'Chrome'}</strong>.</li>
+        <li>Lá, instale o app.</li>
       </ol>
     );
   } else if (p === 'ios') {
@@ -43,10 +43,10 @@ export default function InstalarApp({ aoFechar, avisar }) {
       <ol className="instalar-passos">
         <li>
           Toque em <strong>Compartilhar</strong> <span className="instalar-icone" aria-hidden="true"><Icone nome="compartilhar" tamanho={18} /></span>
-          {' '}na barra do Safari (embaixo, ou no alto no iPad). Se não aparecer, toque nos <strong>três pontinhos</strong> primeiro.
+          {' '}no Safari.
         </li>
-        <li>Role a lista e toque em <strong>Adicionar à Tela de Início</strong> <span className="instalar-icone" aria-hidden="true"><Icone nome="mais" tamanho={18} /></span>.</li>
-        <li>Toque em <strong>Adicionar</strong>. O ícone do BolsaLab aparece na tela de início.</li>
+        <li>Toque em <strong>Adicionar à Tela de Início</strong> <span className="instalar-icone" aria-hidden="true"><Icone nome="mais" tamanho={18} /></span>.</li>
+        <li>Toque em <strong>Adicionar</strong>.</li>
       </ol>
     );
   } else if (!direto) {
@@ -60,8 +60,8 @@ export default function InstalarApp({ aoFechar, avisar }) {
           </>
         ) : (
           <>
-            <li>No Chrome ou no Edge, clique no ícone de <strong>instalar</strong> no fim da barra de endereço (um monitor com uma seta).</li>
-            <li>Clique em <strong>Instalar</strong>. O BolsaLab abre numa janela própria e ganha um atalho.</li>
+            <li>Clique no ícone de <strong>instalar</strong> no fim da barra de endereço.</li>
+            <li>Clique em <strong>Instalar</strong>.</li>
           </>
         )}
       </ol>
@@ -74,10 +74,6 @@ export default function InstalarApp({ aoFechar, avisar }) {
       <div className="instalar-conteudo">
         <img className="instalar-logo" src={iconeApp} alt="" width="72" height="72" />
         <h2 id="titulo-instalar">Instale o BolsaLab</h2>
-        <p className="suave">
-          Fica com ícone na tela de início, abre em tela cheia, sem a barra do navegador, e você entra mais rápido.
-          Não ocupa quase nada de espaço.
-        </p>
 
         {direto && !deApp ? (
           <button className="botao botao-principal" onClick={instalarAgora} disabled={instalando}>
@@ -86,7 +82,6 @@ export default function InstalarApp({ aoFechar, avisar }) {
         ) : passos}
 
         <button className="botao" onClick={agoraNao}>Agora não</button>
-        <p className="nota">Você encontra esta opção depois em Mais › Instalar app.</p>
       </div>
     </dialog>
   );
