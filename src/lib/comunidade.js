@@ -58,8 +58,8 @@ export function resumoReacoes(reacoes = {}) {
 }
 
 /** Primeiro nome e inicial do sobrenome: "Bruno L." */
-export function nomeCurto(nome = '') {
-  const partes = nome.trim().split(/\s+/).filter(Boolean);
+export function nomeCurto(nome) {
+  const partes = String(nome ?? '').trim().split(/\s+/).filter(Boolean);
   if (!partes.length) return 'Aluno';
   return partes.length > 1 ? `${partes[0]} ${partes.at(-1)[0]}.` : partes[0];
 }

@@ -28,3 +28,8 @@ test('reações e nome curto', () => {
   assert.equal(nomeCurto('Ana'), 'Ana');
   assert.equal(nomeCurto(''), 'Aluno');
 });
+
+test('nomeCurto aguenta nome nulo (avisos do sistema não têm autor)', () => {
+  assert.equal(nomeCurto(null), 'Aluno');
+  assert.equal(nomeCurto(undefined), 'Aluno');
+});
