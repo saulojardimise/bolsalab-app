@@ -76,6 +76,11 @@ export default function Acao({ ticker, operacaoInicial, dados, aoVoltar, aoExecu
             : <span className="etiqueta-info">Fechamento de {diaMes(empresa.data)}</span>}
         </div>
 
+        {empresa.tipo === 'etf' && (
+          <p className="descricao-etf">
+            <strong><Termo id="etf">ETF</Termo> · {empresa.setor}.</strong> {empresa.descricao}
+          </p>
+        )}
         <p className="valor-grande num">{reais(empresa.preco)}</p>
         {mudanca !== null && (
           <p className={`variacao-periodo ${tendencia(mudanca)}`}>
@@ -138,7 +143,7 @@ export default function Acao({ ticker, operacaoInicial, dados, aoVoltar, aoExecu
         <section className="cartao posicao-resumo" aria-label="Sua posição">
           {comprada && (
             <p>
-              Você tem <strong>{numero(comprada.quantidade)}</strong> ações, <Termo id="preco_medio">preço médio</Termo> {reais(comprada.preco_medio)}.{' '}
+              Você tem <strong>{numero(comprada.quantidade)}</strong> {empresa.tipo === 'etf' ? 'cotas' : 'ações'}, <Termo id="preco_medio">preço médio</Termo> {reais(comprada.preco_medio)}.{' '}
               <span className={tendencia(comprada.resultado)}>{reaisComSinal(comprada.resultado)} ({pct(comprada.resultado_pct)})</span>
             </p>
           )}

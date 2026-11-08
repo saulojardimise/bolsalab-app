@@ -30,7 +30,7 @@ export default function Noticias({ dados, aoEscolher, aoDiscutir }) {
 
   const empresas = dados.mercado;
   const porTicker = useMemo(() => Object.fromEntries(empresas.map((e) => [e.ticker, e])), [empresas]);
-  const setores = useMemo(() => [...new Set(empresas.map((e) => e.setor))].sort(), [empresas]);
+  const setores = useMemo(() => [...new Set(empresas.filter((e) => (e.tipo ?? 'acao') === 'acao').map((e) => e.setor))].sort(), [empresas]);
   const minhas = [...dados.carteira.map((p) => p.ticker), ...dados.vendidas.map((v) => v.ticker)];
 
   const filtrando = filtro || setor || busca.trim();

@@ -27,6 +27,23 @@ const EMPRESAS = [
   ['TOTS3', 'Totvs', 'Tecnologia', 44.1, 43.2], ['UGPA3', 'Ultrapar', 'Petróleo e Gás', 19.95, 20.31],
   ['VALE3', 'Vale', 'Mineração', 57.8, 56.95], ['VBBR3', 'Vibra Energia', 'Petróleo e Gás', 22.4, 22.18],
   ['VIVT3', 'Telefônica Vivo', 'Telecomunicações', 30.25, 30.4], ['WEGE3', 'WEG', 'Bens Industriais', 43.6, 44.35],
+  // ETFs: [código, nome, categoria, preço, anterior, 'etf', descrição]
+  ['BOVA11', 'iShares Ibovespa', 'Índices do Brasil', 150.2, 149.1, 'etf', 'Acompanha o Ibovespa: as principais ações da B3 numa cota só.'],
+  ['SMAL11', 'iShares Small Cap', 'Índices do Brasil', 104.5, 105.3, 'etf', 'Empresas menores da B3, que costumam oscilar mais que as grandes.'],
+  ['DIVO11', 'It Now IDIV', 'Índices do Brasil', 96.8, 96.1, 'etf', 'Empresas que pagam bons dividendos (índice IDIV da B3).'],
+  ['IVVB11', 'iShares S&P 500', 'Exterior', 382.4, 378.9, 'etf', 'As 500 maiores empresas dos EUA, em reais: sobe e desce também com o dólar.'],
+  ['NASD11', 'Trend Nasdaq 100', 'Exterior', 16.12, 15.88, 'etf', 'As 100 maiores empresas da Nasdaq, a bolsa de tecnologia dos EUA.'],
+  ['XINA11', 'Trend China', 'Exterior', 10.35, 10.51, 'etf', 'Grandes empresas da China.'],
+  ['WRLD11', 'Investo FTSE Global Equities', 'Exterior', 121.3, 120.6, 'etf', 'Ações do mundo todo: EUA, Europa, Ásia e emergentes.'],
+  ['CHIP11', 'Investo Semicondutores', 'Exterior', 14.8, 14.2, 'etf', 'Fabricantes de chips e semicondutores do mundo.'],
+  ['JOGO11', 'Investo Games e eSports', 'Exterior', 9.12, 9.2, 'etf', 'Empresas de videogames e esportes eletrônicos.'],
+  ['IMAB11', 'It Now IMA-B', 'Renda fixa', 85.4, 85.31, 'etf', 'Títulos do Tesouro atrelados à inflação (IPCA), negociados na bolsa.'],
+  ['FIXA11', 'Mirae Renda Fixa Pré', 'Renda fixa', 11.02, 11.0, 'etf', 'Títulos prefixados: ganha quando os juros futuros caem.'],
+  ['GOLD11', 'Trend Ouro', 'Commodities', 18.4, 18.1, 'etf', 'Acompanha o preço do ouro, usado como proteção em crises.'],
+  ['BBOI11', 'Investo Boi Gordo', 'Commodities', 9.35, 9.4, 'etf', 'Acompanha o preço futuro do boi gordo.'],
+  ['BITC11', 'QR Bitcoin', 'Criptoativos', 96.5, 92.8, 'etf', 'Acompanha o bitcoin. Oscila muito: risco alto.'],
+  ['EETH11', 'BTG Pactual Ethereum', 'Criptoativos', 41.2, 43.0, 'etf', 'Acompanha o ethereum. Oscila muito: risco alto.'],
+  ['DOLA11', 'Investo Dólar', 'Câmbio', 11.3, 11.25, 'etf', 'Acompanha o dólar em relação ao real.'],
 ];
 
 const hojeISO = () => new Date().toLocaleDateString('en-CA', { timeZone: 'America/Sao_Paulo' });
@@ -331,12 +348,13 @@ export function criarApiDemo() {
     async config() { return { ...CONFIG, negociacao_pausada: gestao.pausada }; },
     async mercado() {
       await atraso();
-      return EMPRESAS.map(([ticker, nome, setor]) => {
+      return EMPRESAS.map(([ticker, nome, setor, , , tipo = 'acao', descricao = null]) => {
         const { preco, anterior } = estado.precos[ticker];
         const ultimo = historicoDe(ticker, preco, anterior).at(-1);
         return { ticker, nome, setor, preco, data: ultimo.data, preco_anterior: anterior,
           variacao_pct: r2((preco / anterior - 1) * 100), logo_url: null,
-          abertura: ultimo.abertura, maxima: ultimo.maxima, minima: ultimo.minima, volume: ultimo.volume, situacao: 'ativa' };
+          abertura: ultimo.abertura, maxima: ultimo.maxima, minima: ultimo.minima, volume: ultimo.volume, situacao: 'ativa',
+          tipo, descricao };
       });
     },
     async historico(ticker, desde = null) {

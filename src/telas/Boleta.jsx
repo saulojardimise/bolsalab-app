@@ -11,6 +11,9 @@ import { TERMO_DO_ROTULO } from '../lib/glossario.js';
 //   Comprar -> comprar ações | recomprar uma venda a descoberto
 //   Vender  -> das minhas ações | a descoberto
 export default function Boleta({ ticker, empresa, comprada, vendida, operacaoInicial, dados, aoExecutar }) {
+  // ETF: a unidade é a cota
+  const etf = empresa?.tipo === 'etf';
+  const un = etf ? 'cotas' : 'ações';
   const qtdComprada = comprada?.quantidade ?? 0;
   const inicial = operacaoInicial ?? (vendida ? 'recompra' : 'compra');
   const [lado, setLado] = useState(inicial === 'compra' || inicial === 'recompra' ? 'comprar' : 'vender');
@@ -54,8 +57,8 @@ export default function Boleta({ ticker, empresa, comprada, vendida, operacaoIni
 
   const ajustar = (delta) => setQtd(String(Math.max(0, quantidade + delta)));
   const opcoes = lado === 'comprar'
-    ? (vendida ? [['compra', 'Comprar ações'], ['recompra', `Recomprar vendidas (${numero(vendida.quantidade)})`]] : null)
-    : [['venda', `Das minhas ações (${numero(qtdComprada)})`, qtdComprada === 0], ['venda_descoberto', 'A descoberto']];
+    ? (vendida ? [['compra', `Comprar ${un}`], ['recompra', `Recomprar vendidas (${numero(vendida.quantidade)})`]] : null)
+    : [['venda', `Das minhas ${un} (${numero(qtdComprada)})`, qtdComprada === 0], ['venda_descoberto', 'A descoberto']];
   const total = p.linhas.find((l) => l.destaque);
   const vende = tipo === 'venda' || tipo === 'venda_descoberto';
   const verbo = { compra: 'Comprar', recompra: 'Recomprar', venda: 'Vender', venda_descoberto: 'Vender a descoberto' }[tipo];
@@ -84,7 +87,7 @@ export default function Boleta({ ticker, empresa, comprada, vendida, operacaoIni
       )}
 
       <div className="campo-quantidade">
-        <label htmlFor="boleta-qtd">Quantidade de ações</label>
+        <label htmlFor="boleta-qtd">Quantidade de {un}</label>
         <button type="button" className="link" onClick={() => setQtd(String(p.maximo))} disabled={!p.maximo}>
           Máximo: {numero(p.maximo)}
         </button>
@@ -96,7 +99,7 @@ export default function Boleta({ ticker, empresa, comprada, vendida, operacaoIni
 
       <div className="boleta-totais">
         <div>
-          <span className="suave">Preço por ação (<Termo id="fechamento">fechamento</Termo>)</span>
+          <span className="suave">Preço por {etf ? 'cota' : 'ação'} (<Termo id="fechamento">fechamento</Termo>)</span>
           <strong className="num">{reais(empresa.preco)}</strong>
         </div>
         <div className="boleta-total">
@@ -107,7 +110,7 @@ export default function Boleta({ ticker, empresa, comprada, vendida, operacaoIni
 
       <dl className="boleta-detalhes">
         {p.linhas.filter((l) => !l.destaque).map((l) => (
-          <div key={l.rotulo}><dt>{TERMO_DO_ROTULO[l.rotulo] ? <Termo id={TERMO_DO_ROTULO[l.rotulo]}>{l.rotulo}</Termo> : l.rotulo}</dt><dd className="num">{reais(l.valor)}</dd></div>
+          <div key={l.rotulo}><dt>{TERMO_DO_ROTULO[l.rotulo] ? <Termo id={TERMO_DO_ROTULO[l.rotulo]}>{l.rotulo}</Termo> : etf ? l.rotulo.replace('ações', 'cotas') : l.rotulo}</dt><dd className="num">{reais(l.valor)}</dd></div>
         ))}
       </dl>
 

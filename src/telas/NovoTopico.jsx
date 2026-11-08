@@ -56,7 +56,7 @@ export default function NovoTopico({ inicial = {}, mercado = [], aoVoltar, aoCri
         <fieldset className="campo">
           <legend>Sobre o quê?</legend>
           <div className="chips" role="group">
-            {[['geral', 'Geral'], ['acao', 'Uma ação'], ['futuro', 'Minicontrato'],
+            {[['geral', 'Geral'], ['acao', 'Ação ou ETF'], ['futuro', 'Minicontrato'],
               ...(inicial.noticia ? [['noticia', 'A notícia']] : [])].map(([id, rotulo]) => (
               <button type="button" key={id} aria-pressed={sobre === id}
                       onClick={() => { setSobre(id); if (id === 'futuro' && !['WIN', 'WDO'].includes(ativo)) setAtivo('WIN'); if (id === 'acao' && ['WIN', 'WDO'].includes(ativo)) setAtivo(''); }}>
@@ -68,9 +68,9 @@ export default function NovoTopico({ inicial = {}, mercado = [], aoVoltar, aoCri
 
         {sobre === 'acao' && (
           <label className="campo">
-            <span>Ação</span>
+            <span>Ação ou ETF</span>
             <select value={ativo} onChange={(e) => setAtivo(e.target.value)}>
-              <option value="">Escolha a ação</option>
+              <option value="">Escolha</option>
               {acoes.map((a) => <option key={a.ticker} value={a.ticker}>{a.ticker} · {a.nome}</option>)}
             </select>
           </label>

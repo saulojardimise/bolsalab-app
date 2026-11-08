@@ -1052,6 +1052,21 @@ span.chip-topico-noticia { color: var(--texto); }
 .formulario fieldset { border: 0; padding: 0; margin: 0; }
 .formulario legend { padding: 0; margin-bottom: 6px; font-weight: 650; }
 
+/* ---------------------------------------------------------------- mercado: ações, futuros, ETFs */
+.abas-mercado {
+  display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 4px; padding: 4px;
+  border-radius: 14px; background: var(--cartao); border: 1px solid var(--linha);
+}
+.abas-mercado button {
+  min-height: 42px; border: 0; border-radius: 10px; background: none; font: inherit; font-weight: 650;
+  color: var(--suave); cursor: pointer;
+}
+.abas-mercado button[aria-selected=true] { background: var(--verde-fundo); color: var(--verde-texto); }
+.secao-mercado { display: grid; gap: 12px; }
+.intro-etf { margin: -4px 0 0; font-size: 0.92rem; }
+.descricao-etf strong { color: var(--marinho); }
+.descricao-etf { margin: 0; padding: 10px 12px; border-radius: var(--raio); background: var(--fundo); font-size: 0.92rem; }
+
 @media (min-width: 1024px) {
   .painel { padding-left: 232px; padding-bottom: 40px; }
   .topo, .faixa-demo, .conteudo { max-width: 1180px; }
@@ -1092,6 +1107,7 @@ span.chip-topico-noticia { color: var(--texto); }
 
   /* listas em duas colunas: ações do mercado e notícias */
   .pilha-larga .ativos { display: grid; grid-template-columns: 1fr 1fr; column-gap: 40px; }
+  .abas-mercado { max-width: 520px; }
   .pilha-larga .ativos li:nth-child(2) { border-top: 0; }
   .pilha-larga .noticias { display: grid; grid-template-columns: 1fr 1fr; column-gap: 40px; }
   .pilha-larga .noticias > .noticia:nth-child(2) { border-top: 0; }

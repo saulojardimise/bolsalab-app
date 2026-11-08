@@ -76,7 +76,8 @@ test('aluno lê perfil, config e mercado', { skip: pular }, async () => {
   assert.equal(Number(config.limite_descoberto), 0.4);
 
   const mercado = await apis.ana.mercado();
-  assert.equal(mercado.length, 76);
+  assert.equal(mercado.filter((e) => e.tipo === 'acao').length, 76);
+  assert.equal(mercado.filter((e) => e.tipo === 'etf').length, 16);
   const petr = mercado.find((e) => e.ticker === 'PETR4');
   assert.equal(Number(petr.preco), 40);
   assert.equal(Number(petr.variacao_pct), 100);   // 20 -> 40
@@ -234,7 +235,7 @@ test('histórico diário, minigráficos e patrimônio do aluno', { skip: pular }
   assert.deepEqual((await apis.ana.historico('PETR4', h[1].data)).length, 1);
 
   const linhas = await apis.ana.linhasMercado(ontem);
-  assert.equal(Object.keys(linhas).length, 76);                  // todas as ações do Ibovespa
+  assert.equal(Object.keys(linhas).length, 92);                  // ações do Ibovespa e ETFs
   assert.deepEqual(linhas.PETR4, [20, 40]);                      // em ordem de data, como números
   assert.deepEqual(await apis.ana.linhasMercado('2099-01-01'), {});
 

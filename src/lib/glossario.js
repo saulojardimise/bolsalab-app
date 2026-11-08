@@ -128,6 +128,14 @@ export const GLOSSARIO = {
       + 'rende "100% do CDI" acompanha essa taxa sem o sobe e desce das ações. Render menos que o CDI significa que '
       + 'o risco da bolsa não compensou no período.',
   },
+  etf: {
+    titulo: 'ETF (fundo de índice)',
+    texto: 'Um fundo que copia um índice ou um ativo e é negociado na bolsa como uma ação. Comprando uma cota, você '
+      + 'leva de uma vez todos os ativos do índice: por exemplo, as ações do Ibovespa, as 500 maiores empresas dos EUA, '
+      + 'o ouro ou títulos do Tesouro. É um jeito simples de diversificar.',
+    exemplo: 'Com uma cota de BOVA11 você tem um pedacinho de todas as ações do Ibovespa. Se o Ibovespa sobe 2%, '
+      + 'o BOVA11 sobe perto de 2% (um pouco menos, por causa da taxa do fundo).',
+  },
   minicontrato: {
     titulo: 'Minicontrato futuro',
     texto: 'Um acordo de comprar ou vender um ativo numa data futura, por um preço combinado hoje. Você não paga o valor '
