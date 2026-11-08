@@ -15,6 +15,8 @@ import DiscussoesDoAtivo from '../componentes/DiscussoesDoAtivo.jsx';
 
 // Página de uma ação: preço, gráfico, informações do dia, últimos fechamentos e boleta.
 // Resultado da venda a descoberto em % do valor vendido (sem custos, como nas ações compradas)
+// "Muito alto." -> muito-alto (para a cor da etiqueta de risco)
+const nivelRisco = (r) => (/muito alto/i.test(r) ? 'muito-alto' : /^alto/i.test(r) ? 'alto' : /^baixo/i.test(r) ? 'baixo' : 'medio');
 const resultadoPct = (v) => (Number(v.garantia) > 0 ? (Number(v.resultado) / Number(v.garantia)) * 100 : 0);
 
 export default function Acao({ ticker, operacaoInicial, dados, aoVoltar, aoExecutar, discussoes = {} }) {
@@ -77,9 +79,15 @@ export default function Acao({ ticker, operacaoInicial, dados, aoVoltar, aoExecu
         </div>
 
         {empresa.tipo === 'etf' && (
-          <p className="descricao-etf">
-            <strong><Termo id="etf">ETF</Termo> · {empresa.setor}.</strong> {empresa.descricao}
-          </p>
+          <div className="descricao-etf">
+            <p className="descricao-etf-titulo">
+              <Termo id="etf">ETF</Termo> · {empresa.setor}{empresa.resumo ? ` · ${empresa.resumo}` : ''}
+            </p>
+            {empresa.descricao && <p>{empresa.descricao}</p>}
+            {empresa.risco && (
+              <p className={`risco-etf risco-${nivelRisco(empresa.risco)}`}><strong>Risco:</strong> {empresa.risco}</p>
+            )}
+          </div>
         )}
         <p className="valor-grande num">{reais(empresa.preco)}</p>
         {mudanca !== null && (

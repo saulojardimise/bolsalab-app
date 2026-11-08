@@ -74,7 +74,8 @@ function ListaComFiltros({ dados, linhas, aoEscolher, tipo }) {
       (!termo || e.ticker.toLowerCase().includes(termo) || e.nome.toLowerCase().includes(termo)
         || (e.descricao ?? '').toLowerCase().includes(termo)))
     .map((e) => {
-      const base = e.nome;
+      // ETF: uma linha didática do que ele acompanha (o nome do fundo fica na página dele)
+      const base = etf ? (e.resumo || e.nome) : e.nome;
       const qtd = tenho[e.ticker];
       const tem = etf ? `${numero(qtd)} ${qtd === 1 ? 'cota' : 'cotas'}` : detalheQuantidade(qtd);
       return { ...e, detalhe: qtd ? `Você tem ${tem} · ${base}` : base };
