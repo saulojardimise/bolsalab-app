@@ -222,6 +222,10 @@ function criarGestao() {
 
 export function criarApiDemo() {
   let estado = criarEstado();
+  let avisosDemo = [
+    { id: 1, titulo: 'Aluguel da venda a descoberto mudou', texto: 'Agora o aluguel é de 5% ao ano, cobrado só em dias úteis.',
+      criado_em: new Date(Date.now() - 3600e3).toISOString(), do_professor: false, turma_id: null },
+  ];
   let gestao = criarGestao();
   const params = new URLSearchParams(location.search);
   let gestor = params.has('gestor');
@@ -528,6 +532,23 @@ export function criarApiDemo() {
     },
 
     // ---------------- área do gestor (dados fictícios) ----------------
+    async avisosGestor() {
+      await atraso();
+      return avisosDemo.map((a) => {
+        const t = gestao.turmas.find((x) => x.id === a.turma_id);
+        return { ...a, grupo: t?.nome ?? null,
+                 pessoas: a.turma_id == null ? gestao.alunos.length : gestao.alunos.filter((x) => x.turma_id === a.turma_id).length };
+      });
+    },
+    async criarAviso({ titulo, texto, grupo = null }) {
+      await atraso();
+      if ((titulo ?? '').trim().length < 3) throw new Error('Escreva um título com pelo menos 3 letras.');
+      const id = (avisosDemo[0]?.id ?? 0) + 1;
+      avisosDemo.unshift({ id, titulo: titulo.trim(), texto: (texto ?? '').trim(), criado_em: new Date().toISOString(),
+                           do_professor: true, turma_id: grupo });
+      return id;
+    },
+    async apagarAviso(id) { avisosDemo = avisosDemo.filter((a) => a.id !== id); },
     async turmas() {
       await atraso();
       return gestao.turmas.map((t) => {

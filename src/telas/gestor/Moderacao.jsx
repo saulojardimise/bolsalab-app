@@ -5,6 +5,7 @@ import Comunidade from '../Comunidade.jsx';
 import Discussoes from '../Discussoes.jsx';
 import TopicoTela from '../TopicoTela.jsx';
 import NovoTopico from '../NovoTopico.jsx';
+import AvisosGestor from './AvisosGestor.jsx';
 
 const ALVOS = {
   comentario: ['comentário do mural', 'Apagar comentário', (id) => api.apagarComentario(id)],
@@ -54,6 +55,8 @@ export default function Moderacao({ avisar }) {
         Nas discussões, também pode abrir tópicos, fixar no topo e apagar tópicos.
       </p>
       {erro && <p className="aviso aviso-erro" role="alert">{erro}</p>}
+
+      <AvisosGestor avisar={avisar} />
 
       <section aria-labelledby="titulo-denuncias">
         <h2 id="titulo-denuncias" className="secao-titulo">Denúncias {denuncias?.length ? `(${denuncias.length})` : ''}</h2>

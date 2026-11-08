@@ -976,6 +976,7 @@ input:focus-visible, select:focus-visible { outline: none; border-color: var(--f
 .notificacao-texto strong { color: var(--marinho); }
 .notificacao-citacao { font-style: italic; overflow-wrap: anywhere; }
 .notificacao-sistema { background: var(--azul-fundo); color: var(--azul); }
+.notificacao-professor { background: var(--verde-fundo); color: var(--verde-texto); }
 .ponto-novo { flex: none; width: 10px; height: 10px; margin-top: 6px; border-radius: 50%; background: var(--azul); }
 @media (max-width: 420px) {
   .topo .chip-simulacao:not(.chip-gestor) { padding: 7px 9px; font-size: 0; gap: 0; }
@@ -1148,3 +1149,16 @@ span.chip-topico-noticia { color: var(--texto); }
 @media (min-width: 1024px) and (hover: hover) {
   .ativo:hover, .posicao:hover { background: var(--fundo); }
 }
+
+/* ---------------------------------------------------------------- avisos do gestor */
+.avisos-gestor { display: grid; gap: 10px; }
+.avisos-gestor > .botao { justify-self: start; }
+.lista-avisos li { display: grid; gap: 4px; padding: 12px 0; }
+.lista-avisos p { margin: 0; }
+.aviso-linha-topo { display: flex; gap: 8px; align-items: baseline; justify-content: space-between; }
+.aviso-linha-topo strong { min-width: 0; overflow-wrap: anywhere; }
+.aviso-texto { white-space: pre-line; overflow-wrap: anywhere; }
+.aviso-rodape { display: flex; flex-wrap: wrap; gap: 4px 12px; justify-content: space-between; align-items: center; font-size: 0.86rem; }
+.chip-destino { flex: none; font-size: 0.75rem; font-weight: 700; padding: 2px 8px; border-radius: 999px;
+  background: var(--verde-fundo); color: var(--verde-texto); }
+.chip-destino-sistema { background: var(--azul-fundo); color: var(--azul); }

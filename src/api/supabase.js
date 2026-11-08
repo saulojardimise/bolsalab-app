@@ -343,6 +343,16 @@ export function criarApi(supabase, { urlRetorno } = {}) {
     },
 
     // ---------------- área do gestor ----------------
+    // avisos que aparecem no sino (grupo null = todo mundo)
+    async avisosGestor() {
+      return checar(await supabase.rpc('gestor_avisos'));
+    },
+    async criarAviso({ titulo, texto, grupo = null }) {
+      return checar(await supabase.rpc('gestor_criar_aviso', { p_titulo: titulo, p_texto: texto, p_turma_id: grupo }));
+    },
+    async apagarAviso(id) {
+      return checar(await supabase.rpc('gestor_apagar_aviso', { p_id: id }));
+    },
     async turmas() {
       return checar(await supabase.rpc('turmas_painel'));
     },

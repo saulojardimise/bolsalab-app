@@ -49,7 +49,9 @@ export default function Notificacoes({ versao, aoVoltar, aoLer, aoAbrirPublicaca
                 : n.tipo.startsWith('topico') ? aoAbrirTopico(n.operacao?.topico_id, Number(n.id.replace('topico-resposta-', '')))
                   : aoAbrirPublicacao(n.publicacao_id, n.id.startsWith('comentario-') ? Number(n.id.slice(11)) : null))}>
                 {n.tipo === 'sistema'
-                  ? <span className="notificacao-icone notificacao-sistema"><Icone nome="sino" tamanho={20} /></span>
+                  ? <span className={`notificacao-icone notificacao-sistema ${n.operacao?.professor ? 'notificacao-professor' : ''}`}>
+                      <Icone nome={n.operacao?.professor ? 'comunidade' : 'sino'} tamanho={20} />
+                    </span>
                   : n.tipo === 'automatica'
                   ? <span className="notificacao-icone"><Icone nome="alerta" tamanho={20} /></span>
                   : <span className="notificacao-foto">
@@ -86,6 +88,15 @@ function frase(n) {
   if (n.tipo === 'resposta_comentario') return <><strong>{quem}</strong> respondeu seu comentário.</>;
   if (n.tipo === 'resposta') {
     return <><strong>{quem}</strong> também comentou na operação de {nomeCurto(n.operacao?.autor)} que você comentou.</>;
+  }
+  if (n.tipo === 'sistema' && n.operacao?.professor) {
+    return (
+      <>
+        <span className="chip-professor">Professor</span>
+        {n.operacao.grupo && <span className="suave"> · {n.operacao.grupo}</span>}
+        <br /><strong>{n.titulo}</strong>
+      </>
+    );
   }
   return <strong>{n.titulo}</strong>;
 }
