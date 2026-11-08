@@ -39,17 +39,6 @@ export const ICONES_ETF = {
   // renda fixa: um título com juros
   FIXA11: titulo('#2563A8'),
   IMAB11: titulo('#1F7A8C'),
-  // mercado americano: listras e estrela
-  IVVB11: (
-    <>
-      <rect width="40" height="40" fill={B} />
-      {[0, 1, 2, 3, 4, 5, 6].map((i) => (
-        <rect key={i} y={i * 5.72} width="40" height="2.86" fill="#C8313A" />
-      ))}
-      <rect width="19" height="20" fill="#1F3A73" />
-      <path d="M9.5 4.5l1.5 3.4 3.7.3-2.8 2.4.9 3.6-3.3-2-3.2 2 .9-3.6-2.8-2.4 3.6-.3z" fill={B} />
-    </>
-  ),
   // games: controle
   JOGO11: (
     <>
@@ -57,15 +46,6 @@ export const ICONES_ETF = {
       <path d="M13 14h14a6 6 0 0 1 5.8 4.6l1.7 7.3a3.3 3.3 0 0 1-5.7 2.9L25.5 25h-11l-3.3 3.8a3.3 3.3 0 0 1-5.7-2.9l1.7-7.3A6 6 0 0 1 13 14z" fill={B} />
       <path d="M13 17.5v5M10.5 20h5" stroke="#6D3FC0" strokeWidth="1.9" strokeLinecap="round" />
       <circle cx="26.5" cy="18.5" r="1.5" fill="#F5B82E" /><circle cx="29" cy="21.5" r="1.5" fill="#3FD2A3" />
-    </>
-  ),
-  // tecnologia: notebook com código
-  NASD11: (
-    <>
-      <rect width="40" height="40" fill="#0E7490" />
-      <rect x="10" y="11" width="20" height="14" rx="2" fill={B} />
-      <path d="M7 27.5h26l-1.5 2.5h-23z" fill="#BDEBF5" />
-      <path d="M17 15.5l-3 2.5 3 2.5M23 15.5l3 2.5-3 2.5M21 14.8l-2 6.4" fill="none" stroke="#0E7490" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
     </>
   ),
   // pequenas empresas: lojinha com toldo
@@ -81,6 +61,15 @@ export const ICONES_ETF = {
       ))}
     </>
   ),
+  // dividendos de empresas brasileiras: bandeira do Brasil
+  DIVO11: (
+    <>
+      <rect width="40" height="40" fill="#009C3B" />
+      <path d="M20 6L36 20 20 34 4 20z" fill="#FFDF00" />
+      <circle cx="20" cy="20" r="7.6" fill="#002776" />
+      <path d="M12.6 18.6c4.8-1.3 10-.6 14.6 1.9" fill="none" stroke="#FFFFFF" strokeWidth="1.5" />
+    </>
+  ),
   // mundo: globo
   WRLD11: (
     <>
@@ -92,7 +81,20 @@ export const ICONES_ETF = {
   ),
 };
 
+// Ícones em imagem (enviados pelo professor), em public/etfs/
+export const IMAGENS_ETF = {
+  BBOI11: 'etfs/bboi11.png',
+  BOVA11: 'etfs/bova11.png',
+  NASD11: 'etfs/nasd11.png',
+  IVVB11: 'etfs/ivvb11.png',
+  BITC11: 'etfs/bitc11.png',
+};
+
+export const temIconeEtf = (ticker) => Boolean(IMAGENS_ETF[ticker] || ICONES_ETF[ticker]);
+
 export function IconeEtf({ ticker }) {
+  const imagem = IMAGENS_ETF[ticker];
+  if (imagem) return <img src={import.meta.env.BASE_URL + imagem} alt="" loading="lazy" />;
   const desenho = ICONES_ETF[ticker];
   if (!desenho) return null;
   return (
