@@ -182,10 +182,10 @@ export default function Painel({ uid }) {
     api.marcarAvisoVisto(AVISO_MINICONTRATOS).catch(() => {});
     setDados((d) => ({ ...d, perfil: { ...d.perfil, avisos_vistos: [...(d.perfil.avisos_vistos ?? []), AVISO_MINICONTRATOS] } }));
   };
-  const conhecerMinicontratos = () => {
+  // fechar o aviso leva sempre para a página inicial
+  const fecharAvisoIrInicio = () => {
     fecharAviso();
-    if (dados.futurosMercado?.some((f) => f.ativo === 'WIN' && f.preco != null)) abrirFuturo('WIN');
-    else trocarAba('mercado');
+    trocarAba('inicio');
   };
 
   const aoExecutar = async (mensagem) => {
@@ -268,7 +268,7 @@ export default function Painel({ uid }) {
         />
       )}
       {mostrarAviso && (
-        <AvisoNovidade futuros={dados.futurosMercado} aoFechar={fecharAviso} aoConhecer={conhecerMinicontratos} />
+        <AvisoNovidade futuros={dados.futurosMercado} aoFechar={fecharAvisoIrInicio} />
       )}
       {recado && <p className="recado" role="status">{recado}</p>}
     </div>

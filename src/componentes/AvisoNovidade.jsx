@@ -22,7 +22,7 @@ export function lembrarAvisoLocal(uid) {
 
 // Aviso de novidade: o que são os minicontratos, como funcionam e dois exemplos
 // com os preços de hoje. Aparece uma vez; fechado, não volta.
-export default function AvisoNovidade({ futuros, aoFechar, aoConhecer }) {
+export default function AvisoNovidade({ futuros, aoFechar }) {
   const dialogo = useRef(null);
   const titulo = useRef(null);
   useEffect(() => {
@@ -113,8 +113,7 @@ export default function AvisoNovidade({ futuros, aoFechar, aoConhecer }) {
         </p>
 
         <div className="aviso-botoes">
-          <button className="botao botao-principal" onClick={aoConhecer}>Conhecer os minicontratos</button>
-          <button className="botao" onClick={aoFechar}>Fechar</button>
+          <button className="botao botao-principal" onClick={aoFechar}>Fechar</button>
         </div>
         <p className="nota">Toque no "?" ao lado de cada termo, no app, para rever as explicações.</p>
       </div>
