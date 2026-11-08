@@ -7,14 +7,15 @@ import Avatar from './Avatar.jsx';
 import Icone from './Icone.jsx';
 
 // Uma operação no mural: quem fez, o que fez, como está desde então,
-// reações e comentários. moderar = visão do gestor (ocultar/mostrar).
+// reações e comentários (com respostas). moderar = visão do gestor (apaga comentários).
 export default function Publicacao({ p, aoEscolher, aoMudar, moderar = false, avisar }) {
   const [abertos, setAbertos] = useState(false);
   const [comentarios, setComentarios] = useState(null);
   const [texto, setTexto] = useState('');
   const [enviando, setEnviando] = useState(false);
   const [erro, setErro] = useState('');
-  const [denunciando, setDenunciando] = useState(null);   // { alvo, id }
+  const [denunciando, setDenunciando] = useState(null);   // id do comentário
+  const [respondendo, setRespondendo] = useState(null);   // comentário que está sendo respondido
 
   const desde = desdeOperacao(p);
   const frase = partesOperacao(p);
@@ -46,8 +47,8 @@ export default function Publicacao({ p, aoEscolher, aoMudar, moderar = false, av
     if (!texto.trim() || enviando) return;
     setEnviando(true); setErro('');
     try {
-      await api.comentar(p.id, texto);
-      setTexto('');
+      await api.comentar(p.id, texto, respondendo?.id ?? null);
+      setTexto(''); setRespondendo(null);
       await carregarComentarios();
       aoMudar({ ...p, comentarios: p.comentarios + 1 });
     } catch (err) {
@@ -60,32 +61,63 @@ export default function Publicacao({ p, aoEscolher, aoMudar, moderar = false, av
   async function apagar(c) {
     try {
       await api.apagarComentario(c.id);
-      setComentarios((l) => l.filter((x) => x.id !== c.id));
-      aoMudar({ ...p, comentarios: Math.max(0, p.comentarios - 1) });
+      // apagar um comentário apaga também as respostas a ele
+      const some = (x) => x.id === c.id || x.resposta_a === c.id;
+      const n = comentarios.filter(some).length;
+      setComentarios((l) => l.filter((x) => !some(x)));
+      aoMudar({ ...p, comentarios: Math.max(0, p.comentarios - n) });
     } catch (err) { setErro(err.message); }
   }
 
   async function denunciar() {
     try {
-      await api.denunciar(denunciando.alvo, denunciando.id);
+      await api.denunciar('comentario', denunciando);
       setDenunciando(null);
       avisar?.('Denúncia enviada ao professor. Obrigado.');
     } catch (err) { setErro(err.message); }
   }
 
-  async function ocultar(alvo, id, ocultar) {
-    try {
-      await api.ocultarNaComunidade(alvo, id, ocultar);
-      if (alvo === 'publicacao') aoMudar({ ...p, oculta: ocultar });
-      else setComentarios((l) => l.map((c) => (c.id === id ? { ...c, oculto: ocultar } : c)));
-      avisar?.(ocultar ? 'Ocultado para os alunos.' : 'Visível de novo.');
-    } catch (err) { setErro(err.message); }
+  function responder(c) {
+    setRespondendo(c);
+    setTimeout(() => document.getElementById(`comentar-${p.id}`)?.focus(), 0);
   }
 
-  const confirmaDenuncia = (alvo, id) => denunciando?.alvo === alvo && denunciando?.id === id;
+  const raizes = comentarios?.filter((c) => !c.resposta_a) ?? [];
+  const respostasDe = (id) => comentarios.filter((c) => c.resposta_a === id);
+
+  const comentario = (c, resposta = false) => (
+    <div key={c.id} className={`comentario ${resposta ? 'comentario-resposta' : ''}`}>
+      <Avatar foto={c.foto_url} tamanho={resposta ? 26 : 30} />
+      <div className="comentario-corpo">
+        <p>
+          <strong>{c.eu ? 'Você' : nomeCurto(c.nome)}</strong>
+          {c.professor && <span className="chip-professor">Professor</span>}
+          <span className="suave">{!c.professor && c.grupo ? ` · ${c.grupo}` : ''} · {quando(c.criado_em)}</span>
+        </p>
+        <p className="comentario-texto">{c.texto}</p>
+        <p className="comentario-acoes">
+          {denunciando === c.id ? (
+            <>
+              <span className="suave">Denunciar ao professor?</span>
+              <button className="link link-perigo" onClick={denunciar}>Sim</button>
+              <button className="link" onClick={() => setDenunciando(null)}>Não</button>
+            </>
+          ) : (
+            <>
+              <button className="link" onClick={() => responder(c)}>Responder</button>
+              {(c.eu || moderar) && <button className="link link-perigo" onClick={() => apagar(c)}>Apagar</button>}
+              {!c.eu && !moderar && !c.professor && (
+                <button className="link link-discreto" onClick={() => setDenunciando(c.id)}>Denunciar</button>
+              )}
+            </>
+          )}
+        </p>
+      </div>
+    </div>
+  );
 
   return (
-    <article className={`cartao publicacao ${p.oculta ? 'publicacao-oculta' : ''}`}>
+    <article className="cartao publicacao">
       <header className="publicacao-topo">
         <Avatar foto={p.foto_url} tamanho={40} />
         <div>
@@ -93,7 +125,7 @@ export default function Publicacao({ p, aoEscolher, aoMudar, moderar = false, av
             <strong>{p.eu ? 'Você' : nomeCurto(p.nome)}</strong>
             {p.grupo && <span className="suave"> · {p.grupo}</span>}
           </p>
-          <p className="suave publicacao-quando">{quando(p.criado_em)}{p.oculta && ' · oculta para os alunos'}</p>
+          <p className="suave publicacao-quando">{quando(p.criado_em)}</p>
         </div>
       </header>
 
@@ -136,64 +168,32 @@ export default function Publicacao({ p, aoEscolher, aoMudar, moderar = false, av
         <div className="comentarios">
           {comentarios === null && <p className="suave" aria-busy="true">Carregando…</p>}
           {comentarios?.length === 0 && <p className="suave">Nenhum comentário ainda.</p>}
-          {comentarios?.map((c) => (
-            <div key={c.id} className={`comentario ${c.oculto ? 'comentario-oculto' : ''}`}>
-              <Avatar foto={c.foto_url} tamanho={30} />
-              <div className="comentario-corpo">
-                <p>
-                  <strong>{c.eu ? 'Você' : nomeCurto(c.nome)}</strong>
-                  <span className="suave"> · {c.grupo} · {quando(c.criado_em)}{c.oculto && ' · oculto'}</span>
-                </p>
-                <p className="comentario-texto">{c.texto}</p>
-                <p className="comentario-acoes">
-                  {moderar ? (
-                    <>
-                      <button className="link" onClick={() => ocultar('comentario', c.id, !c.oculto)}>{c.oculto ? 'Mostrar' : 'Ocultar'}</button>
-                      <button className="link link-perigo" onClick={() => apagar(c)}>Apagar</button>
-                    </>
-                  ) : c.eu ? (
-                    <button className="link" onClick={() => apagar(c)}>Apagar</button>
-                  ) : confirmaDenuncia('comentario', c.id) ? (
-                    <>
-                      <span className="suave">Denunciar ao professor?</span>
-                      <button className="link link-perigo" onClick={denunciar}>Sim</button>
-                      <button className="link" onClick={() => setDenunciando(null)}>Não</button>
-                    </>
-                  ) : (
-                    <button className="link link-discreto" onClick={() => setDenunciando({ alvo: 'comentario', id: c.id })}>Denunciar</button>
-                  )}
-                </p>
-              </div>
+          {raizes.map((c) => (
+            <div key={c.id} className="fio">
+              {comentario(c)}
+              {respostasDe(c.id).map((r) => comentario(r, true))}
             </div>
           ))}
-          {!moderar && (
-            <form className="comentar" onSubmit={comentar}>
-              <label className="sr-only" htmlFor={`comentar-${p.id}`}>Escreva um comentário</label>
-              <textarea id={`comentar-${p.id}`} rows={1} maxLength={500} placeholder="Escreva um comentário"
-                        value={texto} onChange={(e) => setTexto(e.target.value)} />
-              <button className="botao-icone" disabled={!texto.trim() || enviando} aria-label="Enviar comentário">
-                <Icone nome="enviar" />
+          {respondendo && (
+            <p className="respondendo">
+              Respondendo a <strong>{respondendo.eu ? 'você' : nomeCurto(respondendo.nome)}</strong>
+              <button className="botao-icone" onClick={() => setRespondendo(null)} aria-label="Cancelar resposta">
+                <Icone nome="fechar" tamanho={16} />
               </button>
-            </form>
+            </p>
           )}
+          <form className="comentar" onSubmit={comentar}>
+            <label className="sr-only" htmlFor={`comentar-${p.id}`}>{respondendo ? 'Escreva sua resposta' : 'Escreva um comentário'}</label>
+            <textarea id={`comentar-${p.id}`} rows={1} maxLength={500}
+                      placeholder={respondendo ? 'Escreva sua resposta' : 'Escreva um comentário'}
+                      value={texto} onChange={(e) => setTexto(e.target.value)} />
+            <button className="botao-icone" disabled={!texto.trim() || enviando} aria-label="Enviar">
+              <Icone nome="enviar" />
+            </button>
+          </form>
         </div>
       )}
 
-      <footer className="publicacao-rodape">
-        {moderar ? (
-          <button className="link" onClick={() => ocultar('publicacao', p.id, !p.oculta)}>
-            {p.oculta ? 'Mostrar publicação' : 'Ocultar publicação'}
-          </button>
-        ) : !p.eu && (confirmaDenuncia('publicacao', p.id) ? (
-          <>
-            <span className="suave">Denunciar ao professor?</span>
-            <button className="link link-perigo" onClick={denunciar}>Sim</button>
-            <button className="link" onClick={() => setDenunciando(null)}>Não</button>
-          </>
-        ) : (
-          <button className="link link-discreto" onClick={() => setDenunciando({ alvo: 'publicacao', id: p.id })}>Denunciar</button>
-        ))}
-      </footer>
     </article>
   );
 }

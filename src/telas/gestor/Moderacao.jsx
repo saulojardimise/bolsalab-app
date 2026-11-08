@@ -3,7 +3,7 @@ import { api } from '../../api/index.js';
 import { quando } from '../../lib/noticias.js';
 import Comunidade from '../Comunidade.jsx';
 
-// Comunidade vista pelo gestor: denúncias abertas e o mural com "Ocultar".
+// Comunidade vista pelo gestor: denúncias abertas e o mural, onde pode comentar, responder e apagar comentários.
 export default function Moderacao({ avisar }) {
   const [denuncias, setDenuncias] = useState(null);
   const [versao, setVersao] = useState(0);
@@ -14,11 +14,11 @@ export default function Moderacao({ avisar }) {
   }, []);
   useEffect(carregar, [carregar]);
 
-  async function agir(d, ocultar) {
+  async function agir(d, apagar) {
     try {
-      if (ocultar) await api.ocultarNaComunidade(d.alvo, d.alvo_id, true);
+      if (apagar) await api.apagarComentario(d.alvo_id);
       else await api.descartarDenuncias(d.alvo, d.alvo_id);
-      avisar(ocultar ? 'Ocultado para os alunos.' : 'Denúncia descartada.');
+      avisar(apagar ? 'Comentário apagado.' : 'Denúncia descartada.');
       carregar();
       setVersao((v) => v + 1);
     } catch (e) { setErro(e.message); }
@@ -28,8 +28,7 @@ export default function Moderacao({ avisar }) {
     <div className="pilha">
       <div className="secao-topo"><h1>Comunidade</h1></div>
       <p className="suave">
-        Você vê tudo, inclusive o que está oculto. Ocultar tira a publicação ou o comentário da vista dos alunos;
-        dá para mostrar de novo.
+        Você pode comentar, responder e apagar qualquer comentário. Apagar um comentário apaga também as respostas a ele.
       </p>
       {erro && <p className="aviso aviso-erro" role="alert">{erro}</p>}
 
@@ -49,7 +48,9 @@ export default function Moderacao({ avisar }) {
                   {d.motivos?.length > 0 && ` · ${d.motivos.join('; ')}`}
                 </p>
                 <div className="denuncia-acoes">
-                  <button className="botao botao-principal botao-venda" onClick={() => agir(d, true)}>Ocultar</button>
+                  {d.alvo === 'comentario' && (
+                    <button className="botao botao-principal botao-venda" onClick={() => agir(d, true)}>Apagar comentário</button>
+                  )}
                   <button className="botao" onClick={() => agir(d, false)}>Descartar</button>
                 </div>
               </li>

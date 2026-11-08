@@ -876,7 +876,6 @@ input:focus-visible, select:focus-visible { outline: none; border-color: var(--f
 /* ---------------------------------------------------------------- comunidade */
 .mural { display: grid; gap: 12px; }
 .publicacao { display: grid; gap: 10px; }
-.publicacao-oculta { opacity: 0.6; outline: 2px dashed var(--vermelho); }
 .publicacao-topo { display: flex; align-items: center; gap: 10px; }
 .publicacao-topo p { margin: 0; }
 .publicacao-autor strong { color: var(--marinho); }
@@ -917,6 +916,14 @@ input:focus-visible, select:focus-visible { outline: none; border-color: var(--f
 .comentario-texto { overflow-wrap: anywhere; white-space: pre-wrap; }
 .comentario-acoes { display: flex; gap: 12px; align-items: center; }
 .comentario-acoes .link { font-size: 0.84rem; }
+.fio { display: grid; gap: 10px; }
+.comentario-resposta { margin-left: 40px; }
+.chip-professor {
+  display: inline-block; margin-left: 6px; padding: 0 7px; border-radius: 999px; vertical-align: 1px;
+  background: var(--azul-fundo); color: var(--azul); font-size: 0.72rem; font-weight: 750;
+}
+.respondendo { display: flex; align-items: center; gap: 6px; margin: 0; font-size: 0.88rem; color: var(--suave); }
+.respondendo .botao-icone { width: 28px; height: 28px; min-height: 0; }
 .comentar { display: flex; gap: 8px; align-items: flex-end; }
 .comentar textarea {
   flex: 1; resize: vertical; min-height: 44px; padding: 10px 12px; border: 1px solid var(--linha);

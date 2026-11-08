@@ -76,6 +76,7 @@ function frase(n) {
   const quem = nomeCurto(n.autor);
   if (n.tipo === 'reacao') return <><strong>{quem}</strong> reagiu {EMOJI[n.reacao]} à sua operação: você {op}.</>;
   if (n.tipo === 'comentario') return <><strong>{quem}</strong> comentou na sua operação: você {op}.</>;
+  if (n.tipo === 'resposta_comentario') return <><strong>{quem}</strong> respondeu seu comentário.</>;
   if (n.tipo === 'resposta') {
     return <><strong>{quem}</strong> também comentou na operação de {nomeCurto(n.operacao?.autor)} que você comentou.</>;
   }

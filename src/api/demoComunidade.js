@@ -22,6 +22,8 @@ export function criarComunidadeDemo({ ordens, futurosOrdens, perfil, contratos, 
     { id: 1, pub: 1, nome: 'Carla Menezes', grupo: 'ADM 3º período', texto: 'Também gosto, mas cuidado: o minério oscila muito.', criado_em: horasAtras(28), oculto: false },
     { id: 2, pub: 1, nome: 'Diego Rocha', grupo: 'ADM 5º período', texto: 'Qual seu preço para sair se der errado?', criado_em: horasAtras(25), oculto: false },
     { id: 3, pub: 3, nome: 'Bruno Lima', grupo: 'ADM 3º período', texto: 'Corajosa! O aluguel não pesa?', criado_em: horasAtras(18), oculto: false },
+    { id: 4, pub: 3, nome: 'Gabriela Tavares', grupo: 'ADM 3º período', texto: 'Pesa um pouco, mas acho que cai mais.', criado_em: horasAtras(17), oculto: false, resposta_a: 3 },
+    { id: 5, pub: 1, nome: 'Saulo Jardim', grupo: '', texto: 'Boa análise! Olhem também o preço do minério de ferro.', criado_em: horasAtras(24), oculto: false, professor: true },
   ];
   const denuncias = [];
   let vistas = null;   // última vez que abriu as notificações
@@ -103,20 +105,27 @@ export function criarComunidadeDemo({ ordens, futurosOrdens, perfil, contratos, 
     },
     async comentarios(pub) {
       return comentarios.filter((c) => c.pub === pub && (ehGestor() || !c.oculto))
-        .map(({ pub: _, ...c }) => ({ ...c, foto_url: null, eu: c.nome === perfil().nome }));
+        .map(({ pub: _, ...c }) => ({ resposta_a: null, professor: false, ...c, foto_url: null, eu: c.nome === perfil().nome }));
     },
-    async comentar(pub, texto) {
+    async comentar(pub, texto, respostaA = null) {
       const t = texto.trim();
+      let raiz = null;
+      if (respostaA) {
+        const r = comentarios.find((c) => c.id === respostaA);
+        if (!r) throw new Error('O comentário que você quer responder não existe mais.');
+        raiz = r.resposta_a ?? r.id;
+      }
       if (!t) throw new Error('Escreva o comentário.');
       if (t.length > 500) throw new Error('O comentário pode ter até 500 caracteres.');
       const id = proxComentario++;
-      comentarios.push({ id, pub, nome: perfil().nome, grupo: perfil().turma, texto: t, criado_em: new Date().toISOString(), oculto: false });
+      comentarios.push({ id, pub, nome: perfil().nome, grupo: ehGestor() ? '' : perfil().turma, texto: t, criado_em: new Date().toISOString(),
+                         oculto: false, resposta_a: raiz, professor: ehGestor() });
       return id;
     },
     async apagarComentario(id) {
       const i = comentarios.findIndex((c) => c.id === id && (ehGestor() || c.nome === perfil().nome));
       if (i < 0) throw new Error('Comentário não encontrado.');
-      comentarios.splice(i, 1);
+      for (let k = comentarios.length - 1; k >= 0; k--) if (comentarios[k].id === id || comentarios[k].resposta_a === id) comentarios.splice(k, 1);
     },
     async reagir(pub, tipo) {
       const r = reacoes[pub] ?? (reacoes[pub] = { contagem: {}, minha: null });

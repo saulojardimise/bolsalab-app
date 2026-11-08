@@ -268,8 +268,11 @@ export function criarApi(supabase, { urlRetorno } = {}) {
     async comentarios(publicacao) {
       return checar(await supabase.rpc('comunidade_comentarios', { p_publicacao: publicacao }));
     },
-    async comentar(publicacao, texto) {
-      return checar(await supabase.rpc('comentar', { p_publicacao: publicacao, p_texto: texto }));
+    // respostaA: id do comentário respondido (null = comentário novo)
+    async comentar(publicacao, texto, respostaA = null) {
+      const args = { p_publicacao: publicacao, p_texto: texto };
+      if (respostaA) args.p_resposta_a = respostaA;   // sem resposta funciona também antes do SQL 024
+      return checar(await supabase.rpc('comentar', args));
     },
     async apagarComentario(id) {
       return checar(await supabase.rpc('apagar_comentario', { p_id: id }));
@@ -280,9 +283,6 @@ export function criarApi(supabase, { urlRetorno } = {}) {
     },
     async denunciar(alvo, id, motivo = null) {
       return checar(await supabase.rpc('denunciar', { p_alvo: alvo, p_id: id, p_motivo: motivo }));
-    },
-    async ocultarNaComunidade(alvo, id, ocultar = true) {
-      return checar(await supabase.rpc('ocultar_na_comunidade', { p_alvo: alvo, p_id: id, p_ocultar: ocultar }));
     },
     async descartarDenuncias(alvo, id) {
       return checar(await supabase.rpc('descartar_denuncias', { p_alvo: alvo, p_id: id }));
