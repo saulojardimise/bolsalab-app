@@ -45,10 +45,12 @@ export default function Notificacoes({ versao, aoVoltar, aoLer, aoAbrirPublicaca
         <ul className="cartao cartao-lista notificacoes">
           {lista.map((n) => (
             <li key={n.id} className={n.lida ? '' : 'nao-lida'}>
-              <button onClick={() => (n.tipo === 'automatica' ? aoAbrirExtrato()
+              <button onClick={() => (n.tipo === 'sistema' ? null : n.tipo === 'automatica' ? aoAbrirExtrato()
                 : n.tipo.startsWith('topico') ? aoAbrirTopico(n.operacao?.topico_id, Number(n.id.replace('topico-resposta-', '')))
                   : aoAbrirPublicacao(n.publicacao_id, n.id.startsWith('comentario-') ? Number(n.id.slice(11)) : null))}>
-                {n.tipo === 'automatica'
+                {n.tipo === 'sistema'
+                  ? <span className="notificacao-icone notificacao-sistema"><Icone nome="sino" tamanho={20} /></span>
+                  : n.tipo === 'automatica'
                   ? <span className="notificacao-icone"><Icone nome="alerta" tamanho={20} /></span>
                   : <span className="notificacao-foto">
                       <Avatar foto={n.foto_url} tamanho={40} />
@@ -58,8 +60,8 @@ export default function Notificacoes({ versao, aoVoltar, aoLer, aoAbrirPublicaca
                     </span>}
                 <span className="notificacao-texto">
                   <span>{frase(n)}</span>
-                  {n.texto && n.tipo !== 'automatica' && <span className="notificacao-citacao">“{n.texto}”</span>}
-                  {n.tipo === 'automatica' && <span className="suave">{n.texto}</span>}
+                  {n.texto && n.tipo !== 'automatica' && n.tipo !== 'sistema' && <span className="notificacao-citacao">“{n.texto}”</span>}
+                  {(n.tipo === 'automatica' || n.tipo === 'sistema') && <span className="suave">{n.texto}</span>}
                   <small className="suave">{quando(n.criado_em)}{!n.lida && <span className="sr-only"> · nova</span>}</small>
                 </span>
                 {!n.lida && <span className="ponto-novo" aria-hidden="true" />}

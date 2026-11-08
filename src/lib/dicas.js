@@ -14,7 +14,7 @@ export const DICAS = [
   },
   {
     titulo: 'Venda a descoberto tem custo diário',
-    texto: 'Você paga aluguel de 3% ao mês pelas ações emprestadas. Se o preço demorar a cair, o aluguel come o lucro.',
+    texto: 'Você paga aluguel de 5% ao ano, em cada dia útil, pelas ações emprestadas. Se o preço demorar a cair, o aluguel come o lucro.',
   },
   {
     titulo: 'Perda e ganho não são simétricos',

@@ -17,7 +17,7 @@ const r2 = (v) => Math.round(v * 100) / 100;
  * @param {number} p.quantidade
  * @param {number} p.preco         último fechamento
  * @param {number} p.saldo         saldo disponível
- * @param {object} p.config        { corretagem, limite_descoberto, aluguel_mensal }
+ * @param {object} p.config        { corretagem, limite_descoberto, aluguel_anual }
  * @param {number} p.qtdComprada   ações que o aluno tem desta empresa
  * @param {object|null} p.vendida  posição vendida desta empresa ({ quantidade, garantia })
  * @param {number} p.exposicao     soma das vendas a descoberto abertas, a preço atual
@@ -55,10 +55,13 @@ export function previa({ tipo, quantidade, preco, saldo, config, qtdComprada = 0
     const livre = Math.max(0, limite - exposicao);
     maximo = saldo >= corretagem ? Math.max(0, Math.floor(livre / preco)) : 0;
     efeitoSaldo = -corretagem;
-    const aluguelDia = r2(bruto * Number(config.aluguel_mensal) / 30);
+    // aluguel como na B3: taxa anual, base 252 dias úteis (o banco antigo usava taxa mensal / 30)
+    const aluguelDia = config.aluguel_anual != null
+      ? r2(bruto * ((1 + Number(config.aluguel_anual)) ** (1 / 252) - 1))
+      : r2(bruto * Number(config.aluguel_mensal) / 30);
     linhas = [
       { rotulo: 'Corretagem (sai do saldo)', valor: corretagem },
-      { rotulo: 'Aluguel estimado por dia', valor: aluguelDia },
+      { rotulo: 'Aluguel estimado por dia útil', valor: aluguelDia },
       { rotulo: 'Limite livre para vender a descoberto', valor: livre },
       { rotulo: 'Fica bloqueado como garantia', valor: bruto, destaque: true },
     ];

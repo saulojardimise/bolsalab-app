@@ -38,10 +38,13 @@ export function criarComunidadeDemo({ ordens, futurosOrdens, perfil, contratos, 
     return [
       itub && { id: 'r1', tipo: 'reacao', criado_em: horasAtras(3), autor: 'Bruno Lima', reacao: 'palmas', publicacao_id: itub.id, operacao: itub.operacao },
       petr && { id: 'comentario-90', tipo: 'comentario', criado_em: horasAtras(6), autor: 'Carla Menezes', texto: 'Boa hora para realizar o lucro!', publicacao_id: petr.id, operacao: petr.operacao },
+      { id: 'aviso-1', tipo: 'sistema', criado_em: horasAtras(1), titulo: 'Aluguel da venda a descoberto mudou',
+        texto: 'Agora o aluguel é de 5% ao ano, para ações e ETFs, e é cobrado só em dias úteis, como na B3 (taxa anual com base em 252 dias úteis). Antes era 3% ao mês, cobrado todo dia. Vale a partir de hoje; o que já foi cobrado não muda.' },
       { id: 'a1', tipo: 'automatica', criado_em: horasAtras(15), titulo: 'Minicontrato zerado: WINZ26',
         texto: 'Exemplo: seu saldo ficou negativo (chamada de margem) e 1 contrato foi zerado a 131.005 pontos. Efeito no saldo: −R$ 120,00.' },
       mglu && { id: 'r2', tipo: 'reacao', criado_em: horasAtras(30), autor: 'Diego Rocha', reacao: 'surpresa', publicacao_id: mglu.id, operacao: mglu.operacao },
-    ].filter(Boolean).map((n) => ({ foto_url: null, texto: null, titulo: null, reacao: null, ...n }));
+    ].filter(Boolean).map((n) => ({ foto_url: null, texto: null, titulo: null, reacao: null, ...n }))
+      .sort((a, b) => b.criado_em.localeCompare(a.criado_em));
   }
   let semeado = false;
   function semear() {

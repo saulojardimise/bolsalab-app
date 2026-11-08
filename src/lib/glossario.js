@@ -48,7 +48,8 @@ export const GLOSSARIO = {
   aluguel: {
     titulo: 'Aluguel de ações',
     texto: 'Quem vende a descoberto paga uma taxa a quem emprestou as ações, enquanto a posição estiver aberta. '
-      + 'No simulador é 3% ao mês (0,1% por dia) sobre o valor atual das ações, cobrado todo dia do saldo.',
+      + 'Como na B3, a taxa é anual e cobrada só em dias úteis (base de 252 dias úteis por ano). No simulador é 5% ao ano, '
+      + 'para ações e ETFs, sobre o valor atual das ações vendidas: cerca de R$ 1,94 por dia útil a cada R$ 10.000.',
   },
   limite_descoberto: {
     titulo: 'Limite da venda a descoberto',

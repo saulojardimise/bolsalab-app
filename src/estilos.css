@@ -972,6 +972,7 @@ input:focus-visible, select:focus-visible { outline: none; border-color: var(--f
 .notificacao-texto { flex: 1; min-width: 0; display: grid; gap: 3px; line-height: 1.4; }
 .notificacao-texto strong { color: var(--marinho); }
 .notificacao-citacao { font-style: italic; overflow-wrap: anywhere; }
+.notificacao-sistema { background: var(--azul-fundo); color: var(--azul); }
 .ponto-novo { flex: none; width: 10px; height: 10px; margin-top: 6px; border-radius: 50%; background: var(--azul); }
 @media (max-width: 420px) {
   .topo .chip-simulacao:not(.chip-gestor) { padding: 7px 9px; font-size: 0; gap: 0; }

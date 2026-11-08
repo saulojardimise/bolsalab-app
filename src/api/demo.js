@@ -6,7 +6,7 @@ import { criarComunidadeDemo } from './demoComunidade.js';
 
 const CONFIG = {
   dominio_email: 'isecensa.edu.br', saldo_inicial: 10000, corretagem: 15,
-  aluguel_mensal: 0.03, limite_descoberto: 0.4, stop_prejuizo: 0.8,
+  aluguel_mensal: 0.03, aluguel_anual: 0.05, limite_descoberto: 0.4, stop_prejuizo: 0.8,
   hora_abre: 19, hora_fecha: 9, negociacao_pausada: false,
 };
 
