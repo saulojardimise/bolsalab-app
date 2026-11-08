@@ -289,8 +289,18 @@ export function criarApi(supabase, { urlRetorno } = {}) {
     },
 
     // ---------------- comunidade ----------------
-    async comunidade(escopo = 'todos', antes = null, limite = 20) {
-      return checar(await supabase.rpc('comunidade_feed', { p_escopo: escopo, p_antes: antes, p_limite: limite }));
+    // filtros: { ativo, grupo, lado, autor } (todos opcionais)
+    async comunidade(escopo = 'todos', antes = null, limite = 20, filtros = {}) {
+      const args = { p_escopo: escopo, p_antes: antes, p_limite: limite };
+      if (filtros.ativo) args.p_ativo = filtros.ativo;
+      if (filtros.grupo) args.p_grupo = filtros.grupo;
+      if (filtros.lado) args.p_lado = filtros.lado;
+      if (filtros.autor) args.p_autor = filtros.autor;
+      return checar(await supabase.rpc('comunidade_feed', args));
+    },
+    // opções dos filtros: { grupos: [{id, nome}], pessoas: [{id, nome, grupo}], ativos: [...] }
+    async comunidadeFiltros() {
+      return checar(await supabase.rpc('comunidade_filtros'));
     },
     // uma publicação só (aberta a partir de uma notificação)
     async publicacao(id) {

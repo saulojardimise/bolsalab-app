@@ -172,8 +172,22 @@ export function criarComunidadeDemo({ ordens, futurosOrdens, perfil, contratos, 
     async notificacoes() { return notificacoes(); },
     async notificacoesNaoLidas() { return notificacoes().filter((n) => !n.lida).length; },
     async marcarNotificacoesLidas() { vistas = new Date().toISOString(); },
-    async comunidade(escopo = 'todos', antes = null, limite = 20) {
+    async comunidadeFiltros() {
+      const lista = await todas();
+      const nomesGrupos = [...new Set(lista.flatMap((x) => x.grupo.split(', ')).filter(Boolean))].sort();
+      return {
+        grupos: nomesGrupos.map((nome) => ({ id: nome, nome })),
+        pessoas: [...new Map(lista.map((x) => [x.nome, { id: x.nome, nome: x.nome, grupo: x.grupo }])).values()]
+          .sort((a, b) => a.nome.localeCompare(b.nome)),
+        ativos: [...new Set(lista.map((x) => x.base ?? x.ativo))].sort(),
+      };
+    },
+    async comunidade(escopo = 'todos', antes = null, limite = 20, filtros = {}) {
       let lista = await todas();
+      if (filtros.ativo) lista = lista.filter((x) => (x.base ?? x.ativo) === filtros.ativo);
+      if (filtros.grupo) lista = lista.filter((x) => x.grupo.split(', ').includes(filtros.grupo));
+      if (filtros.lado) lista = lista.filter((x) => x.lado === filtros.lado);
+      if (filtros.autor) lista = lista.filter((x) => x.nome === filtros.autor);
       if (escopo === 'grupo') lista = lista.filter((x) => x.eu || meusGrupos().some((g) => x.grupo.split(', ').includes(g)));
       if (antes != null) {
         const i = lista.findIndex((x) => x.id === antes);
