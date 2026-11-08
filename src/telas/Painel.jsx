@@ -6,6 +6,7 @@ import Topo from '../componentes/Topo.jsx';
 import Navegacao from '../componentes/Navegacao.jsx';
 import Comunidade from './Comunidade.jsx';
 import Notificacoes from './Notificacoes.jsx';
+import PublicacaoTela from './PublicacaoTela.jsx';
 import MenuPerfil from '../componentes/MenuPerfil.jsx';
 import Inicio from './Inicio.jsx';
 import Mercado from './Mercado.jsx';
@@ -190,7 +191,11 @@ export default function Painel({ uid }) {
                              aoConcluir={async () => { await carregar(); fechar(); setRecado('Perfil de investidor atualizado.'); }} />;
   } else if (sobreposta?.tipo === 'notificacoes') {
     conteudo = <Notificacoes versao={versao} aoVoltar={fechar} aoLer={zerarNaoLidas}
-                             aoAbrirComunidade={() => trocarAba('comunidade')} aoAbrirExtrato={() => trocarSobreposta({ tipo: 'extrato' })} />;
+                             aoAbrirPublicacao={(id, comentario) => abrir({ tipo: 'publicacao', id, comentario })}
+                             aoAbrirExtrato={() => trocarSobreposta({ tipo: 'extrato' })} />
+  } else if (sobreposta?.tipo === 'publicacao') {
+    conteudo = <PublicacaoTela id={sobreposta.id} comentario={sobreposta.comentario} aoVoltar={fechar} avisar={setRecado}
+                               aoEscolher={abrirAcao} aoAbrirFuturo={abrirFuturo} />;;
   } else if (sobreposta?.tipo === 'extrato') {
     conteudo = <Extrato uid={uid} dados={dados} resumo={resumo} versao={versao} aoVoltar={fechar} />;
   } else if (aba === 'inicio') {

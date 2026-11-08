@@ -265,6 +265,14 @@ export function criarApi(supabase, { urlRetorno } = {}) {
     async comunidade(escopo = 'todos', antes = null, limite = 20) {
       return checar(await supabase.rpc('comunidade_feed', { p_escopo: escopo, p_antes: antes, p_limite: limite }));
     },
+    // uma publicação só (aberta a partir de uma notificação)
+    async publicacao(id) {
+      const { data, error } = await supabase.rpc('comunidade_feed', { p_escopo: 'todos', p_limite: 1, p_id: id });
+      if (!error) return data[0] ?? null;
+      // banco sem o SQL 025: procura entre as mais recentes
+      const lista = checar(await supabase.rpc('comunidade_feed', { p_escopo: 'todos', p_limite: 50 }));
+      return lista.find((x) => x.id === id) ?? null;
+    },
     async comentarios(publicacao) {
       return checar(await supabase.rpc('comunidade_comentarios', { p_publicacao: publicacao }));
     },

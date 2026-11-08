@@ -37,7 +37,7 @@ export function criarComunidadeDemo({ ordens, futurosOrdens, perfil, contratos, 
     const itub = opDe('ITUB4', 'compra'); const petr = opDe('PETR4', 'venda'); const mglu = opDe('MGLU3', 'venda_descoberto');
     return [
       itub && { id: 'r1', tipo: 'reacao', criado_em: horasAtras(3), autor: 'Bruno Lima', reacao: 'palmas', publicacao_id: itub.id, operacao: itub.operacao },
-      petr && { id: 'c1', tipo: 'comentario', criado_em: horasAtras(6), autor: 'Carla Menezes', texto: 'Boa hora para realizar o lucro!', publicacao_id: petr.id, operacao: petr.operacao },
+      petr && { id: 'comentario-90', tipo: 'comentario', criado_em: horasAtras(6), autor: 'Carla Menezes', texto: 'Boa hora para realizar o lucro!', publicacao_id: petr.id, operacao: petr.operacao },
       { id: 'a1', tipo: 'automatica', criado_em: horasAtras(15), titulo: 'Minicontrato zerado: WINZ26',
         texto: 'Exemplo: seu saldo ficou negativo (chamada de margem) e 1 contrato foi zerado a 131.005 pontos. Efeito no saldo: −R$ 120,00.' },
       mglu && { id: 'r2', tipo: 'reacao', criado_em: horasAtras(30), autor: 'Diego Rocha', reacao: 'surpresa', publicacao_id: mglu.id, operacao: mglu.operacao },
@@ -48,7 +48,7 @@ export function criarComunidadeDemo({ ordens, futurosOrdens, perfil, contratos, 
     if (semeado) return; semeado = true;
     for (const n of exemplos()) {
       if (n.tipo === 'reacao') reacoes[n.publicacao_id] = { contagem: { [n.reacao]: 1 }, minha: null };
-      if (n.tipo === 'comentario') comentarios.push({ id: proxComentario++, pub: n.publicacao_id, nome: n.autor, grupo: 'ADM 3º período', texto: n.texto, criado_em: n.criado_em, oculto: false });
+      if (n.tipo === 'comentario') comentarios.push({ id: Number(n.id.slice(11)), pub: n.publicacao_id, nome: n.autor, grupo: 'ADM 3º período', texto: n.texto, criado_em: n.criado_em, oculto: false });
     }
   }
   for (const c of COLEGAS) reacoes[c[0]] = { contagem: { ...c[10] }, minha: null };
@@ -82,6 +82,8 @@ export function criarComunidadeDemo({ ordens, futurosOrdens, perfil, contratos, 
       const r = reacoes[x.id] ?? (reacoes[x.id] = { contagem: {}, minha: null });
       const contagem = Object.fromEntries(Object.entries(r.contagem).filter(([, n]) => n > 0));
       return {
+        lista_comentarios: comentarios.filter((c) => c.pub === x.id && (ehGestor() || !c.oculto))
+          .map(({ pub: _, ...c }) => ({ resposta_a: null, professor: false, ...c, foto_url: null, eu: c.nome === p.nome })),
         ...x, tese: teses[x.id] ?? x.tese, reacoes: contagem, minha_reacao: r.minha, oculta: ocultas.has(x.id),
         comentarios: comentarios.filter((c) => c.pub === x.id && (ehGestor() || !c.oculto)).length,
       };
@@ -102,6 +104,9 @@ export function criarComunidadeDemo({ ordens, futurosOrdens, perfil, contratos, 
         lista = i >= 0 ? lista.slice(i + 1) : [];
       }
       return lista.slice(0, limite);
+    },
+    async publicacao(id) {
+      return (await todas()).find((x) => x.id === id) ?? null;
     },
     async comentarios(pub) {
       return comentarios.filter((c) => c.pub === pub && (ehGestor() || !c.oculto))

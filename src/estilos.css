@@ -917,6 +917,9 @@ input:focus-visible, select:focus-visible { outline: none; border-color: var(--f
 .comentario-acoes { display: flex; gap: 12px; align-items: center; }
 .comentario-acoes .link { font-size: 0.84rem; }
 .fio { display: grid; gap: 10px; }
+.mostrar-mais, .comentar-abrir { justify-self: start; font-size: 0.9rem; }
+.comentario-destaque { background: var(--azul-fundo); border-radius: 12px; padding: 6px; margin: -6px; }
+.comentario-resposta.comentario-destaque { margin-left: 34px; }
 .comentario-resposta { margin-left: 40px; }
 .chip-professor {
   display: inline-block; margin-left: 6px; padding: 0 7px; border-radius: 999px; vertical-align: 1px;

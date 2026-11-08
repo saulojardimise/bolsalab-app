@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { api } from '../api/index.js';
 import { quando } from '../lib/noticias.js';
 import { pct, tendencia } from '../lib/formato.js';
@@ -8,9 +8,14 @@ import Icone from './Icone.jsx';
 
 // Uma operação no mural: quem fez, o que fez, como está desde então,
 // reações e comentários (com respostas). moderar = visão do gestor (apaga comentários).
-export default function Publicacao({ p, aoEscolher, aoMudar, moderar = false, avisar }) {
-  const [abertos, setAbertos] = useState(false);
-  const [comentarios, setComentarios] = useState(null);
+// Mostra sempre os 2 comentários mais recentes (com as respostas); "Mostrar mais" abre o resto.
+// destaque = id de um comentário para rolar até ele (vindo de uma notificação).
+const VISIVEIS = 2;
+
+export default function Publicacao({ p, aoEscolher, aoMudar, moderar = false, avisar, destaque = null }) {
+  const [comentarios, setComentarios] = useState(p.lista_comentarios ?? null);
+  const [todos, setTodos] = useState(Boolean(destaque));
+  const [escrevendo, setEscrevendo] = useState(false);
   const [texto, setTexto] = useState('');
   const [enviando, setEnviando] = useState(false);
   const [erro, setErro] = useState('');
@@ -25,10 +30,23 @@ export default function Publicacao({ p, aoEscolher, aoMudar, moderar = false, av
     try { setComentarios(await api.comentarios(p.id)); } catch (e) { setErro(e.message); }
   }
 
-  function alternarComentarios() {
-    const abrir = !abertos;
-    setAbertos(abrir);
-    if (abrir && comentarios === null) carregarComentarios();
+  // o mural recarregou: usa a lista nova
+  useEffect(() => { if (p.lista_comentarios) setComentarios(p.lista_comentarios); }, [p.lista_comentarios]);
+  // sem a lista no mural (banco antigo): busca os comentários se houver algum
+  useEffect(() => {
+    if (!p.lista_comentarios && p.comentarios > 0) carregarComentarios();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  // veio de uma notificação: rola até o comentário
+  useEffect(() => {
+    if (!destaque || !comentarios) return;
+    const el = document.getElementById(`comentario-${destaque}`);
+    el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }, [destaque, comentarios]);
+
+  function abrirCaixa() {
+    setEscrevendo(true);
+    setTimeout(() => document.getElementById(`comentar-${p.id}`)?.focus(), 0);
   }
 
   async function reagir(tipo) {
@@ -79,14 +97,17 @@ export default function Publicacao({ p, aoEscolher, aoMudar, moderar = false, av
 
   function responder(c) {
     setRespondendo(c);
-    setTimeout(() => document.getElementById(`comentar-${p.id}`)?.focus(), 0);
+    abrirCaixa();
   }
 
-  const raizes = comentarios?.filter((c) => !c.resposta_a) ?? [];
+  const todasRaizes = comentarios?.filter((c) => !c.resposta_a) ?? [];
   const respostasDe = (id) => comentarios.filter((c) => c.resposta_a === id);
+  const raizes = todos ? todasRaizes : todasRaizes.slice(-VISIVEIS);
+  const escondidos = (comentarios?.length ?? 0) - raizes.reduce((n, c) => n + 1 + respostasDe(c.id).length, 0);
 
   const comentario = (c, resposta = false) => (
-    <div key={c.id} className={`comentario ${resposta ? 'comentario-resposta' : ''}`}>
+    <div key={c.id} id={`comentario-${c.id}`}
+         className={`comentario ${resposta ? 'comentario-resposta' : ''} ${destaque === c.id ? 'comentario-destaque' : ''}`}>
       <Avatar foto={c.foto_url} tamanho={resposta ? 26 : 30} />
       <div className="comentario-corpo">
         <p>
@@ -154,20 +175,22 @@ export default function Publicacao({ p, aoEscolher, aoMudar, moderar = false, av
             </button>
           );
         })}
-        <button className="reacao reacao-comentarios" aria-expanded={abertos} onClick={alternarComentarios}>
+        <button className="reacao reacao-comentarios" onClick={abrirCaixa} aria-label={`Comentar${p.comentarios ? `, ${p.comentarios} comentários` : ''}`}>
           <Icone nome="comentario" tamanho={18} />
           <span className="num">{p.comentarios || ''}</span>
-          <span className="sr-only">comentários</span>
         </button>
       </div>
       {total === 0 && !p.comentarios && !moderar && <p className="nota publicacao-convite">Seja o primeiro a reagir ou comentar.</p>}
 
       {erro && <p className="aviso aviso-erro" role="alert">{erro}</p>}
 
-      {abertos && (
+      {(comentarios?.length > 0 || escrevendo) && (
         <div className="comentarios">
-          {comentarios === null && <p className="suave" aria-busy="true">Carregando…</p>}
-          {comentarios?.length === 0 && <p className="suave">Nenhum comentário ainda.</p>}
+          {escondidos > 0 && (
+            <button className="link mostrar-mais" onClick={() => setTodos(true)}>
+              Mostrar mais {escondidos} {escondidos === 1 ? 'comentário' : 'comentários'}
+            </button>
+          )}
           {raizes.map((c) => (
             <div key={c.id} className="fio">
               {comentario(c)}
@@ -182,6 +205,10 @@ export default function Publicacao({ p, aoEscolher, aoMudar, moderar = false, av
               </button>
             </p>
           )}
+          {!escrevendo && (
+            <button className="link comentar-abrir" onClick={abrirCaixa}>Escrever um comentário</button>
+          )}
+          {escrevendo && (
           <form className="comentar" onSubmit={comentar}>
             <label className="sr-only" htmlFor={`comentar-${p.id}`}>{respondendo ? 'Escreva sua resposta' : 'Escreva um comentário'}</label>
             <textarea id={`comentar-${p.id}`} rows={1} maxLength={500}
@@ -191,6 +218,7 @@ export default function Publicacao({ p, aoEscolher, aoMudar, moderar = false, av
               <Icone nome="enviar" />
             </button>
           </form>
+          )}
         </div>
       )}
 

@@ -9,7 +9,7 @@ const EMOJI = Object.fromEntries(REACOES.map((r) => [r.id, r.emoji]));
 
 // Notificações: reações e comentários de colegas e operações automáticas na conta.
 // Abrir a tela marca tudo como lido.
-export default function Notificacoes({ versao, aoVoltar, aoLer, aoAbrirComunidade, aoAbrirExtrato }) {
+export default function Notificacoes({ versao, aoVoltar, aoLer, aoAbrirPublicacao, aoAbrirExtrato }) {
   const [lista, setLista] = useState(null);
   const [erro, setErro] = useState('');
 
@@ -45,7 +45,8 @@ export default function Notificacoes({ versao, aoVoltar, aoLer, aoAbrirComunidad
         <ul className="cartao cartao-lista notificacoes">
           {lista.map((n) => (
             <li key={n.id} className={n.lida ? '' : 'nao-lida'}>
-              <button onClick={n.tipo === 'automatica' ? aoAbrirExtrato : aoAbrirComunidade}>
+              <button onClick={() => (n.tipo === 'automatica' ? aoAbrirExtrato()
+                : aoAbrirPublicacao(n.publicacao_id, n.id.startsWith('comentario-') ? Number(n.id.slice(11)) : null))}>
                 {n.tipo === 'automatica'
                   ? <span className="notificacao-icone"><Icone nome="alerta" tamanho={20} /></span>
                   : <span className="notificacao-foto">
