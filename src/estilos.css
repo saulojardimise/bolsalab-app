@@ -1162,3 +1162,15 @@ span.chip-topico-noticia { color: var(--texto); }
 .chip-destino { flex: none; font-size: 0.75rem; font-weight: 700; padding: 2px 8px; border-radius: 999px;
   background: var(--verde-fundo); color: var(--verde-texto); }
 .chip-destino-sistema { background: var(--azul-fundo); color: var(--azul); }
+
+/* ---------------------------------------------------------------- instalar o app */
+.instalar-conteudo { display: grid; gap: 12px; padding: 20px 20px calc(20px + env(safe-area-inset-bottom)); text-align: center; }
+.instalar-conteudo h2 { margin: 0; }
+.instalar-conteudo p { margin: 0; }
+.instalar-logo { justify-self: center; border-radius: 18px; box-shadow: 0 6px 18px rgb(16 40 80 / 0.18); }
+.instalar-passos { text-align: left; display: grid; gap: 10px; margin: 4px 0; padding: 14px 14px 14px 34px;
+  background: var(--fundo); border-radius: 14px; line-height: 1.45; }
+.instalar-icone { display: inline-grid; place-items: center; vertical-align: -4px; width: 26px; height: 26px;
+  border-radius: 7px; background: var(--cartao, #fff); color: var(--azul); border: 1px solid var(--linha); }
+.instalar-pontos { font-weight: 800; color: var(--texto); }
+.instalar-conteudo .botao { width: 100%; }

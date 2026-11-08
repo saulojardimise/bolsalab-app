@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import Icone from './Icone.jsx';
+import { mostrarOpcaoInstalar } from '../lib/instalar.js';
 
 // Abas do app. No celular: barra embaixo com as principais e "Mais" para o resto.
 // No PC: menu lateral com todas (o CSS esconde o "Mais" e mostra as abas extras).
@@ -16,8 +17,9 @@ const EXTRAS = [
   ['turma', 'Grupos', 'Ranking, entrar ou sair de grupos'],
 ];
 
-export default function Navegacao({ aba, aoTrocar, aoAbrirExtrato, aoAbrirPerfil, aoAbrirNotificacoes, naoLidas = 0 }) {
+export default function Navegacao({ aba, aoTrocar, aoAbrirExtrato, aoAbrirPerfil, aoAbrirNotificacoes, aoInstalar, naoLidas = 0 }) {
   const [maisAberto, setMaisAberto] = useState(false);
+  const instalar = aoInstalar && mostrarOpcaoInstalar();
   const noMais = EXTRAS.some(([id]) => id === aba);
 
   return (
@@ -46,6 +48,12 @@ export default function Navegacao({ aba, aoTrocar, aoAbrirExtrato, aoAbrirPerfil
           <Icone nome="usuario" tamanho={24} />
           <span>Meu perfil</span>
         </button>
+        {instalar && (
+          <button className="nav-item nav-extra" onClick={aoInstalar}>
+            <Icone nome="baixar" tamanho={24} />
+            <span>Instalar app</span>
+          </button>
+        )}
         <button className="nav-item nav-mais" aria-current={noMais ? 'page' : undefined}
                 aria-haspopup="dialog" onClick={() => setMaisAberto(true)}>
           <span className="nav-icone">
@@ -64,6 +72,7 @@ export default function Navegacao({ aba, aoTrocar, aoAbrirExtrato, aoAbrirPerfil
                      ...EXTRAS.map(([id, rotulo, detalhe]) => ({ id, icone: id, rotulo, detalhe, acao: () => aoTrocar(id) })),
                      { id: 'extrato', icone: 'extrato', rotulo: 'Extrato', detalhe: 'Todo o dinheiro que entrou e saiu', acao: aoAbrirExtrato },
                      { id: 'perfil', icone: 'usuario', rotulo: 'Meu perfil', detalhe: 'Foto, desempenho, perfil de investidor e senha', acao: aoAbrirPerfil },
+                     ...(instalar ? [{ id: 'instalar', icone: 'baixar', rotulo: 'Instalar app', detalhe: 'Ícone na tela de início, abre em tela cheia', acao: aoInstalar }] : []),
                    ]} />
       )}
     </>

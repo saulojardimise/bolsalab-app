@@ -20,6 +20,8 @@ import Extrato from './Extrato.jsx';
 import Questionario from './Questionario.jsx';
 import Noticias from './Noticias.jsx';
 import Futuro from './Futuro.jsx';
+import InstalarApp from '../componentes/InstalarApp.jsx';
+import { deveSugerirInstalar, ouvirInstalacao } from '../lib/instalar.js';
 import AvisoNovidade, { AVISO_MINICONTRATOS, deveMostrarAviso, lembrarAvisoLocal } from '../componentes/AvisoNovidade.jsx';
 import CompletarFoto, { fotoAdiada } from './CompletarFoto.jsx';
 
@@ -45,7 +47,11 @@ export default function Painel({ uid }) {
   const [recado, setRecado] = useState('');
   const [versao, setVersao] = useState(0);
   const [fotoVista, setFotoVista] = useState(false);
-  const [avisoFechado, setAvisoFechado] = useState(false);   // já mostrou o convite da foto nesta visita
+  const [avisoFechado, setAvisoFechado] = useState(false);
+  const [instalarAberto, setInstalarAberto] = useState(false);   // aberto pelo menu
+  const [instalarVisto, setInstalarVisto] = useState(false);     // já apareceu sozinho nesta visita
+  const [, setTiqueInstalar] = useState(0);
+  useEffect(() => ouvirInstalacao(() => setTiqueInstalar((n) => n + 1)), []);   // já mostrou o convite da foto nesta visita
 
   const carregar = useCallback(async () => {
     try {
@@ -183,6 +189,11 @@ export default function Painel({ uid }) {
     setDados((d) => ({ ...d, perfil: { ...d.perfil, avisos_vistos: [...(d.perfil.avisos_vistos ?? []), AVISO_MINICONTRATOS] } }));
   };
   // fechar o aviso leva sempre para a página inicial
+  // Instalar o app: aparece sozinho depois do aviso de novidade (celular, fora do app instalado)
+  const mostrarInstalarSozinho = !instalarVisto && !mostrarAviso && !sobreposta && !perfilAberto && deveSugerirInstalar();
+  const mostrarInstalar = instalarAberto || mostrarInstalarSozinho;
+  const fecharInstalar = () => { setInstalarAberto(false); setInstalarVisto(true); };
+
   const fecharAvisoIrInicio = () => {
     fecharAviso();
     trocarAba('inicio');
@@ -253,7 +264,8 @@ export default function Painel({ uid }) {
       <main className="conteudo">{conteudo}</main>
       <Navegacao aba={sobreposta?.tipo === 'acao' || sobreposta?.tipo === 'futuro' ? 'mercado' : sobreposta?.tipo === 'extrato' || sobreposta?.tipo === 'notificacoes' ? sobreposta.tipo : aba} aoTrocar={trocarAba}
                  aoAbrirExtrato={abrirExtrato} aoAbrirPerfil={() => setPerfilAberto(true)}
-                 aoAbrirNotificacoes={abrirNotificacoes} naoLidas={dados.naoLidas ?? 0} />
+                 aoAbrirNotificacoes={abrirNotificacoes} naoLidas={dados.naoLidas ?? 0}
+                 aoInstalar={() => setInstalarAberto(true)} />
 
       {perfilAberto && (
         <MenuPerfil
@@ -270,6 +282,7 @@ export default function Painel({ uid }) {
       {mostrarAviso && (
         <AvisoNovidade futuros={dados.futurosMercado} aoFechar={fecharAvisoIrInicio} />
       )}
+      {mostrarInstalar && !mostrarAviso && <InstalarApp aoFechar={fecharInstalar} avisar={setRecado} />}
       {recado && <p className="recado" role="status">{recado}</p>}
     </div>
   );

@@ -1,5 +1,8 @@
 // Ícones de traço (24×24). Cor = currentColor.
 const DESENHOS = {
+  compartilhar: <><path d="M12 3v12M8 7l4-4 4 4" /><path d="M8 10H6.5A1.5 1.5 0 0 0 5 11.5v8A1.5 1.5 0 0 0 6.5 21h11a1.5 1.5 0 0 0 1.5-1.5v-8a1.5 1.5 0 0 0-1.5-1.5H16" /></>,
+  baixar: <><path d="M12 4v11M7.5 10.5 12 15l4.5-4.5" /><path d="M5 19h14" /></>,
+  celular: <><rect x="7" y="2.5" width="10" height="19" rx="2.5" /><path d="M11 18.5h2" /></>,
   inicio: <path d="M4 10.5 12 4l8 6.5V20a1 1 0 0 1-1 1h-4.5v-6h-5v6H5a1 1 0 0 1-1-1z" />,
   mercado: <path d="M6 20v-6M12 20V8M18 20V4" />,
   noticias: <><path d="M5 4h11a1 1 0 0 1 1 1v14a1 1 0 0 0 2 0V9h-2" /><path d="M19 20H6a2 2 0 0 1-2-2V5a1 1 0 0 1 1-1" /><path d="M8 8h5M8 11.5h5M8 15h3" /></>,
