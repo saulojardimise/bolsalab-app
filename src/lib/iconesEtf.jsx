@@ -3,18 +3,6 @@
 
 const B = '#FFFFFF';
 
-const titulo = (fundo) => (
-  <>
-    <rect width="40" height="40" fill={fundo} />
-    <path d="M12 9h12l5 5v17H12z" fill={B} />
-    <path d="M24 9v5h5" fill="none" stroke={fundo} strokeWidth="1.4" strokeOpacity=".35" />
-    <path d="M15.5 18h10M15.5 21.5h10M15.5 25h6" stroke={fundo} strokeWidth="1.8" strokeLinecap="round" />
-    <circle cx="27.5" cy="28" r="5" fill="#F5B82E" stroke={B} strokeWidth="1.5" />
-    <path d="M25.6 30l3.8-4" stroke={B} strokeWidth="1.3" strokeLinecap="round" />
-    <circle cx="25.9" cy="26.4" r=".9" fill={B} /><circle cx="29.1" cy="29.6" r=".9" fill={B} />
-  </>
-);
-
 export const ICONES_ETF = {
   // Ethereum: o losango em duas metades
   EETH11: (
@@ -37,8 +25,6 @@ export const ICONES_ETF = {
     </>
   ),
   // renda fixa: um título com juros
-  FIXA11: titulo('#2563A8'),
-  IMAB11: titulo('#1F7A8C'),
   // games: controle
   JOGO11: (
     <>
@@ -48,19 +34,6 @@ export const ICONES_ETF = {
       <circle cx="26.5" cy="18.5" r="1.5" fill="#F5B82E" /><circle cx="29" cy="21.5" r="1.5" fill="#3FD2A3" />
     </>
   ),
-  // pequenas empresas: lojinha com toldo
-  SMAL11: (
-    <>
-      <rect width="40" height="40" fill="#E1F2EC" />
-      <rect x="11" y="18" width="18" height="13" fill="#00956F" />
-      <rect x="22" y="22" width="4.5" height="9" fill="#E1F2EC" />
-      <rect x="13.5" y="21.5" width="6" height="4.5" fill="#E1F2EC" />
-      <path d="M9 13l2-4h18l2 4z" fill="#007A5B" />
-      {[0, 1, 2, 3, 4].map((i) => (
-        <path key={i} d={`M${9 + i * 4.4} 13h4.4v2.2a2.2 2.2 0 0 1-4.4 0z`} fill={i % 2 ? '#F5B82E' : B} />
-      ))}
-    </>
-  ),
   // dividendos de empresas brasileiras: bandeira do Brasil
   DIVO11: (
     <>
@@ -68,6 +41,17 @@ export const ICONES_ETF = {
       <path d="M20 6L36 20 20 34 4 20z" fill="#FFDF00" />
       <circle cx="20" cy="20" r="7.6" fill="#002776" />
       <path d="M12.6 18.6c4.8-1.3 10-.6 14.6 1.9" fill="none" stroke="#FFFFFF" strokeWidth="1.5" />
+    </>
+  ),
+  // dólar: uma nota com o cifrão
+  DOLA11: (
+    <>
+      <rect width="40" height="40" fill="#E7F3EA" />
+      <rect x="5" y="11" width="30" height="18" rx="2.5" fill="#2E7D4F" />
+      <rect x="7.5" y="13.5" width="25" height="13" rx="1.5" fill="none" stroke="#BFE3CB" strokeWidth="1" />
+      <circle cx="20" cy="20" r="5.6" fill="#BFE3CB" />
+      <path d="M22 17.6c-.5-.8-1.3-1.1-2.1-1.1-1.2 0-2 .6-2 1.5 0 2 4.2 1.1 4.2 3.2 0 1-.9 1.6-2.2 1.6-.9 0-1.8-.4-2.3-1.2M20 15.4v9.2" fill="none" stroke="#2E7D4F" strokeWidth="1.3" strokeLinecap="round" />
+      <circle cx="10.5" cy="20" r="1.4" fill="#BFE3CB" /><circle cx="29.5" cy="20" r="1.4" fill="#BFE3CB" />
     </>
   ),
   // mundo: globo
@@ -88,7 +72,13 @@ export const IMAGENS_ETF = {
   NASD11: 'etfs/nasd11.png',
   IVVB11: 'etfs/ivvb11.png',
   BITC11: 'etfs/bitc11.png',
+  XINA11: 'etfs/xina11.png',
+  FIXA11: 'etfs/fixa11.png',
+  IMAB11: 'etfs/imab11.png',
+  CHIP11: 'etfs/chip11.png',
 };
+
+ICONES_ETF.SMAL11 = ICONES_ETF.DIVO11;
 
 export const temIconeEtf = (ticker) => Boolean(IMAGENS_ETF[ticker] || ICONES_ETF[ticker]);
 
