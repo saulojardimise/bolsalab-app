@@ -54,7 +54,7 @@ export default function MenuPerfil({ perfil, grupos = [], resumo, aoFechar, aoSa
       });
     }).catch(() => {});
     return () => { vivo = false; };
-  }, [perfil.user_id, perfil.turma_id]);
+  }, [perfil.user_id, perfil.turma_id, perfil.turma]);
 
   async function aoEscolher(e) {
     const arquivo = e.target.files?.[0];

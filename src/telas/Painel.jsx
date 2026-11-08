@@ -87,6 +87,8 @@ export default function Painel({ uid }) {
 
   // botão voltar do aparelho
   useEffect(() => {
+    // o app recarregou com uma tela aberta: começa na aba e esquece a tela antiga do histórico
+    if (window.history.state?.sobreposta) window.history.replaceState(null, '');
     const aoVoltarHistorico = (e) => setSobreposta(e.state?.sobreposta ?? null);
     window.addEventListener('popstate', aoVoltarHistorico);
     return () => window.removeEventListener('popstate', aoVoltarHistorico);
@@ -139,15 +141,17 @@ export default function Painel({ uid }) {
     );
   }
 
+  // nivel = quantas telas estão empilhadas por cima da aba (para voltar todas de uma vez)
+  const nivelAtual = () => window.history.state?.nivel ?? (sobreposta ? 1 : 0);
   const abrir = (s) => {
-    window.history.pushState({ sobreposta: s }, '');
+    window.history.pushState({ sobreposta: s, nivel: nivelAtual() + 1 }, '');
     setSobreposta(s);
     window.scrollTo({ top: 0 });
   };
   const fechar = () => window.history.back();
   // troca a tela de cima sem empilhar outra (o voltar leva para onde estava antes)
   const trocarSobreposta = (s) => {
-    window.history.replaceState({ sobreposta: s }, '');
+    window.history.replaceState({ sobreposta: s, nivel: nivelAtual() || 1 }, '');
     setSobreposta(s);
     window.scrollTo({ top: 0 });
   };
@@ -163,7 +167,9 @@ export default function Painel({ uid }) {
   const abrirNotificacoes = () => abrir({ tipo: 'notificacoes' });
   const zerarNaoLidas = () => setDados((d) => ({ ...d, naoLidas: 0 }));
   const trocarAba = (id) => {
-    if (sobreposta) window.history.back();
+    // fecha todas as telas empilhadas (ex.: Notificações > Publicação) antes de trocar de aba
+    const n = nivelAtual();
+    if (n > 0) window.history.go(-n);
     setAba(id);
     window.scrollTo({ top: 0 });
   };
