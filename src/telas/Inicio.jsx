@@ -15,6 +15,7 @@ import { mercadoAgora, oscilacaoHoje } from '../lib/intradia.js';
 import { LinhaHoje } from '../componentes/Hoje.jsx';
 import Comparativo, { extrasComparacao } from '../componentes/Comparativo.jsx';
 import Avatar from '../componentes/Avatar.jsx';
+import AvisoEndereco from '../componentes/AvisoEndereco.jsx';
 import { fraseOperacao, nomeCurto, resumoReacoes } from '../lib/comunidade.js';
 
 // Tela inicial: patrimônio (com Ibovespa e CDI no mesmo gráfico), saldo e extrato,
@@ -72,6 +73,7 @@ export default function Inicio({ uid, dados, resumo, linhas, versao, aoEscolher,
         <h1>Olá, {nome}!</h1>
         <StatusPregao liberada={dados.liberada} pausada={dados.config.negociacao_pausada} demo={api.modoDemo} />
       </section>
+      <AvisoEndereco perfil={dados.perfil} />
 
       <div className="coluna coluna-a">
       <section className="cartao" aria-labelledby="titulo-patrimonio">

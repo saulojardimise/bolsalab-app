@@ -36,8 +36,9 @@ jobs:
       - name: Gerar o site
         run: npm run build
         env:
-          # o site fica em https://<usuario>.github.io/<repositorio>/
-          BASE_PATH: /${{ github.event.repository.name }}/
+          # o site fica na raiz do domínio próprio: https://bolsalab.app/
+          # (o endereço antigo saulojardimise.github.io/bolsalab redireciona para cá)
+          BASE_PATH: /
           # chaves públicas do Supabase (podem ficar aqui; a segurança está nas regras do banco)
           VITE_SUPABASE_URL: https://pvkhqfomfmhtdmvbzohq.supabase.co
           VITE_SUPABASE_ANON_KEY: sb_publishable_BfV3fJAiDJQMpwXkD8vZRw_EBL-Z95n

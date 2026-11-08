@@ -1079,6 +1079,11 @@ span.chip-topico-noticia { color: var(--texto); }
 .risco-alto { background: var(--ambar-fundo); color: var(--ambar-texto); }
 .risco-muito-alto { background: var(--vermelho-fundo); color: var(--vermelho); }
 
+.aviso-endereco { display: flex; gap: 10px; align-items: flex-start; border: 1.5px solid var(--azul); background: var(--azul-fundo); }
+.aviso-endereco h2 { margin: 0 0 6px; font-size: 1rem; color: var(--marinho); }
+.aviso-endereco p { margin: 0; font-size: 0.9rem; line-height: 1.5; }
+.aviso-endereco > div { flex: 1; }
+
 @media (min-width: 1024px) {
   .painel { padding-left: 232px; padding-bottom: 40px; }
   .topo, .faixa-demo, .conteudo { max-width: 1180px; }
