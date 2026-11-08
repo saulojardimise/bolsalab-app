@@ -11,12 +11,13 @@ import Icone from '../componentes/Icone.jsx';
 import Logo from '../componentes/Logo.jsx';
 import Boleta from './Boleta.jsx';
 import Termo from '../componentes/Termo.jsx';
+import DiscussoesDoAtivo from '../componentes/DiscussoesDoAtivo.jsx';
 
 // Página de uma ação: preço, gráfico, informações do dia, últimos fechamentos e boleta.
 // Resultado da venda a descoberto em % do valor vendido (sem custos, como nas ações compradas)
 const resultadoPct = (v) => (Number(v.garantia) > 0 ? (Number(v.resultado) / Number(v.garantia)) * 100 : 0);
 
-export default function Acao({ ticker, operacaoInicial, dados, aoVoltar, aoExecutar }) {
+export default function Acao({ ticker, operacaoInicial, dados, aoVoltar, aoExecutar, discussoes = {} }) {
   const empresa = dados.mercado.find((e) => e.ticker === ticker);
   const comprada = dados.carteira.find((p) => p.ticker === ticker);
   const vendida = dados.vendidas.find((v) => v.ticker === ticker);
@@ -127,6 +128,9 @@ export default function Acao({ ticker, operacaoInicial, dados, aoVoltar, aoExecu
             </table>
           </section>
         )}
+        <div className="ordem-fim">
+          <DiscussoesDoAtivo ativo={ticker} {...discussoes} />
+        </div>
         </div>
 
         <div className="coluna coluna-b">

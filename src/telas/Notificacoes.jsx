@@ -9,7 +9,7 @@ const EMOJI = Object.fromEntries(REACOES.map((r) => [r.id, r.emoji]));
 
 // Notificações: reações e comentários de colegas e operações automáticas na conta.
 // Abrir a tela marca tudo como lido.
-export default function Notificacoes({ versao, aoVoltar, aoLer, aoAbrirPublicacao, aoAbrirExtrato }) {
+export default function Notificacoes({ versao, aoVoltar, aoLer, aoAbrirPublicacao, aoAbrirTopico, aoAbrirExtrato }) {
   const [lista, setLista] = useState(null);
   const [erro, setErro] = useState('');
 
@@ -46,7 +46,8 @@ export default function Notificacoes({ versao, aoVoltar, aoLer, aoAbrirPublicaca
           {lista.map((n) => (
             <li key={n.id} className={n.lida ? '' : 'nao-lida'}>
               <button onClick={() => (n.tipo === 'automatica' ? aoAbrirExtrato()
-                : aoAbrirPublicacao(n.publicacao_id, n.id.startsWith('comentario-') ? Number(n.id.slice(11)) : null))}>
+                : n.tipo.startsWith('topico') ? aoAbrirTopico(n.operacao?.topico_id, Number(n.id.replace('topico-resposta-', '')))
+                  : aoAbrirPublicacao(n.publicacao_id, n.id.startsWith('comentario-') ? Number(n.id.slice(11)) : null))}>
                 {n.tipo === 'automatica'
                   ? <span className="notificacao-icone"><Icone nome="alerta" tamanho={20} /></span>
                   : <span className="notificacao-foto">
@@ -77,6 +78,9 @@ function frase(n) {
   const quem = nomeCurto(n.autor);
   if (n.tipo === 'reacao') return <><strong>{quem}</strong> reagiu {EMOJI[n.reacao]} à sua operação: você {op}.</>;
   if (n.tipo === 'comentario') return <><strong>{quem}</strong> comentou na sua operação: você {op}.</>;
+  if (n.tipo === 'topico_resposta') return <><strong>{quem}</strong> respondeu seu tópico “{n.titulo}”.</>;
+  if (n.tipo === 'topico_resposta_minha') return <><strong>{quem}</strong> respondeu você na discussão “{n.titulo}”.</>;
+  if (n.tipo === 'topico_participei') return <><strong>{quem}</strong> também respondeu na discussão “{n.titulo}”.</>;
   if (n.tipo === 'resposta_comentario') return <><strong>{quem}</strong> respondeu seu comentário.</>;
   if (n.tipo === 'resposta') {
     return <><strong>{quem}</strong> também comentou na operação de {nomeCurto(n.operacao?.autor)} que você comentou.</>;

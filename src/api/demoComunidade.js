@@ -90,9 +90,85 @@ export function criarComunidadeDemo({ ordens, futurosOrdens, perfil, contratos, 
     }).filter((x) => ehGestor() || !x.oculta).sort((a, b) => b.criado_em.localeCompare(a.criado_em));
   }
 
+  // ---------------- discussões ----------------
+  const PROF = 'Saulo Jardim';
+  const topicos = [
+    { id: 1, titulo: 'WEGE3 está cara?', nome: 'Carla Menezes', grupo: 'ADM 3º período', ativo: 'WEGE3', h: 20,
+      texto: 'Subiu muito no ano e o P/L passou de 30. Ainda vale entrar ou é melhor esperar uma correção?' },
+    { id: 2, titulo: 'Mini dólar com R$ 10 mil: arriscado?', nome: 'Diego Rocha', grupo: 'ADM 5º período', ativo: 'WDO', h: 9,
+      texto: 'Pensando em comprar 2 contratos de WDO. Alguém já testou?' },
+    { id: 3, titulo: 'Como vocês escolhem em qual setor investir?', nome: PROF, grupo: '', fixado: true, h: 48,
+      texto: 'Contem aqui o critério de vocês: dividendos, crescimento, notícias, intuição… Vamos discutir em aula.' },
+    { id: 4, titulo: 'Petrobras vai investir mais: bom para o acionista?', nome: 'Felipe Arruda', grupo: 'ADM 5º período', h: 3,
+      noticia_id: 2, noticia_titulo: 'Petrobras anuncia novo plano de investimentos para os próximos cinco anos', noticia_link: 'https://example.com/',
+      texto: 'Mais investimento pode significar menos dividendo no curto prazo. O que acham?' },
+  ].map((t) => ({ texto: '', ativo: null, noticia_id: null, noticia_titulo: null, noticia_link: null, fixado: false, ...t,
+                  criado_em: horasAtras(t.h), atividade_em: horasAtras(t.h) }));
+  let proxTopico = 10;
+  let proxResposta = 10;
+  const respostas = [
+    { id: 1, topico: 1, nome: 'Bruno Lima', grupo: 'ADM 3º período', texto: 'Cara está, mas a empresa cresce todo ano.', h: 18 },
+    { id: 2, topico: 1, nome: 'Gabriela Tavares', grupo: 'ADM 3º período', texto: 'Eu prefiro esperar o próximo balanço.', h: 17, resposta_a: 1 },
+    { id: 3, topico: 2, nome: PROF, grupo: '', texto: 'Com R$ 1.500 de margem por contrato, 50 pontos de variação já mexem R$ 500 no saldo. Comecem com 1 contrato.', h: 8 },
+    { id: 4, topico: 3, nome: 'Helena Castro', grupo: 'Finanças UFF', texto: 'Eu olho primeiro os dividendos dos últimos 5 anos.', h: 40 },
+  ].map((r) => ({ resposta_a: null, ...r, criado_em: horasAtras(r.h) }));
+  for (const t of topicos) {
+    const ult = respostas.filter((r) => r.topico === t.id).map((r) => r.criado_em).sort().at(-1);
+    if (ult) t.atividade_em = ult;
+  }
+  const quemSou = () => (ehGestor() ? PROF : perfil().nome);
+  const formatarTopico = (t) => ({
+    ...t, eu: t.nome === quemSou(), professor: t.nome === PROF, foto_url: null,
+    respostas: respostas.filter((r) => r.topico === t.id).length,
+  });
+  const formatarResposta = (r) => ({ ...r, eu: r.nome === quemSou(), professor: r.nome === PROF, foto_url: null });
+
   const notificacoes = () => { semear(); return exemplos().map((n) => ({ ...n, lida: vistas != null && n.criado_em <= vistas })); };
 
   return {
+    async topicos({ tipo = null, ativo = null, noticia = null, busca = null, limite = 30, pular = 0 } = {}) {
+      const b = busca?.trim().toLowerCase();
+      return topicos.filter((t) => (!ativo || t.ativo === ativo.toUpperCase())
+        && (!noticia || t.noticia_id === noticia)
+        && (!tipo || (tipo === 'acoes' && t.ativo && !['WIN', 'WDO'].includes(t.ativo))
+            || (tipo === 'futuros' && ['WIN', 'WDO'].includes(t.ativo))
+            || (tipo === 'noticias' && t.noticia_titulo) || (tipo === 'gerais' && !t.ativo && !t.noticia_titulo))
+        && (!b || t.titulo.toLowerCase().includes(b) || t.texto.toLowerCase().includes(b) || (t.ativo ?? '').toLowerCase() === b))
+        .sort((a, c) => (c.fixado - a.fixado) || c.atividade_em.localeCompare(a.atividade_em))
+        .slice(pular, pular + limite).map(formatarTopico);
+    },
+    async topico(id) {
+      const t = topicos.find((x) => x.id === id);
+      if (!t) return null;
+      return { ...formatarTopico(t), respostas: respostas.filter((r) => r.topico === id).map(formatarResposta) };
+    },
+    async criarTopico({ titulo, texto = '', ativo = null, noticia = null }) {
+      if (titulo.trim().length < 5) throw new Error('Escreva um título com pelo menos 5 letras.');
+      const id = proxTopico++;
+      const agora = new Date().toISOString();
+      topicos.push({ id, titulo: titulo.trim(), texto: texto.trim(), nome: quemSou(), grupo: ehGestor() ? '' : perfil().turma,
+                     ativo: ativo || null, noticia_id: noticia?.id ?? null, noticia_titulo: noticia?.titulo ?? null,
+                     noticia_link: noticia?.link ?? null, fixado: false, criado_em: agora, atividade_em: agora });
+      return id;
+    },
+    async responderTopico(topico, texto, respostaA = null) {
+      if (!texto.trim()) throw new Error('Escreva a resposta.');
+      const pai = respostaA && respostas.find((r) => r.id === respostaA);
+      const id = proxResposta++;
+      const agora = new Date().toISOString();
+      respostas.push({ id, topico, nome: quemSou(), grupo: ehGestor() ? '' : perfil().turma, texto: texto.trim(),
+                       resposta_a: pai ? (pai.resposta_a ?? pai.id) : null, criado_em: agora });
+      topicos.find((t) => t.id === topico).atividade_em = agora;
+      return id;
+    },
+    async apagarTopico(id) {
+      const i = topicos.findIndex((t) => t.id === id);
+      if (i >= 0) topicos.splice(i, 1);
+    },
+    async apagarRespostaTopico(id) {
+      for (let k = respostas.length - 1; k >= 0; k--) if (respostas[k].id === id || respostas[k].resposta_a === id) respostas.splice(k, 1);
+    },
+    async fixarTopico(id, fixar = true) { topicos.find((t) => t.id === id).fixado = fixar; },
     async notificacoes() { return notificacoes(); },
     async notificacoesNaoLidas() { return notificacoes().filter((n) => !n.lida).length; },
     async marcarNotificacoesLidas() { vistas = new Date().toISOString(); },

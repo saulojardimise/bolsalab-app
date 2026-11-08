@@ -261,6 +261,33 @@ export function criarApi(supabase, { urlRetorno } = {}) {
       return checar(await supabase.rpc('marcar_notificacoes_lidas'));
     },
 
+    // ---------------- discussões (tópicos) ----------------
+    // filtros: { tipo: 'acoes'|'futuros'|'noticias'|'gerais', ativo, noticia, busca, limite, pular }
+    async topicos({ tipo = null, ativo = null, noticia = null, busca = null, limite = 30, pular = 0 } = {}) {
+      return checar(await supabase.rpc('topicos_lista', {
+        p_tipo: tipo, p_ativo: ativo, p_noticia: noticia, p_busca: busca, p_limite: limite, p_pular: pular,
+      }));
+    },
+    async topico(id) {
+      const r = checar(await supabase.rpc('topico', { p_id: id }));
+      return r[0] ?? null;
+    },
+    async criarTopico({ titulo, texto = '', ativo = null, noticia = null }) {
+      return checar(await supabase.rpc('criar_topico', { p_titulo: titulo, p_texto: texto, p_ativo: ativo, p_noticia: noticia?.id ?? null }));
+    },
+    async responderTopico(topico, texto, respostaA = null) {
+      return checar(await supabase.rpc('responder_topico', { p_topico: topico, p_texto: texto, p_resposta_a: respostaA }));
+    },
+    async apagarTopico(id) {
+      return checar(await supabase.rpc('apagar_topico', { p_id: id }));
+    },
+    async apagarRespostaTopico(id) {
+      return checar(await supabase.rpc('apagar_resposta_topico', { p_id: id }));
+    },
+    async fixarTopico(id, fixar = true) {
+      return checar(await supabase.rpc('fixar_topico', { p_id: id, p_fixar: fixar }));
+    },
+
     // ---------------- comunidade ----------------
     async comunidade(escopo = 'todos', antes = null, limite = 20) {
       return checar(await supabase.rpc('comunidade_feed', { p_escopo: escopo, p_antes: antes, p_limite: limite }));

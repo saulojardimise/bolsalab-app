@@ -1,13 +1,14 @@
 import { useCallback, useEffect, useState } from 'react';
 import { api } from '../api/index.js';
 import Publicacao from '../componentes/Publicacao.jsx';
+import Icone from '../componentes/Icone.jsx';
 
 const ESCOPOS = [['todos', 'Todos'], ['grupo', 'Meus grupos']];
 const LIMITE = 20;
 
 // Comunidade: mural com as operações dos alunos de todos os grupos,
 // reações e comentários.
-export default function Comunidade({ dados, versao, aoEscolher, aoAbrirFuturo, avisar, moderar = false }) {
+export default function Comunidade({ dados, versao, aoEscolher, aoAbrirFuturo, avisar, aoVerDiscussoes, moderar = false }) {
   const [escopo, setEscopo] = useState(() => {
     try { return localStorage.getItem('bolsalab:comunidade') || 'todos'; } catch { return 'todos'; }
   });
@@ -51,6 +52,13 @@ export default function Comunidade({ dados, versao, aoEscolher, aoAbrirFuturo, a
           <p className="suave">
             As operações de todos que simulam no BolsaLab. Reaja e comente.
           </p>
+          {aoVerDiscussoes && (
+            <button className="cartao atalho-discussoes" onClick={aoVerDiscussoes}>
+              <Icone nome="discussoes" />
+              <span><strong>Discussões</strong><small>Tópicos sobre ações, minicontratos e notícias</small></span>
+              <Icone nome="seta" tamanho={18} />
+            </button>
+          )}
           <div className="chips" role="group" aria-label="Mostrar">
             {ESCOPOS.filter(([id]) => id !== 'grupo' || dados?.grupos?.length > 0).map(([id, rotulo]) => (
               <button key={id} aria-pressed={escopo === id} onClick={() => trocarEscopo(id)}>{rotulo}</button>

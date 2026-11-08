@@ -11,6 +11,7 @@ const ABAS = [
 ];
 // no celular ficam dentro do "Mais"; no PC aparecem no menu lateral
 const EXTRAS = [
+  ['discussoes', 'Discussões', 'Tópicos sobre ações, minicontratos e notícias'],
   ['noticias', 'Notícias', 'Manchetes do dia e fatos relevantes'],
   ['turma', 'Grupos', 'Ranking, entrar ou sair de grupos'],
 ];

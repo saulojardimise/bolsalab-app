@@ -15,7 +15,7 @@ const FILTROS = [
 
 // Página de notícias: capa com as principais chamadas e filtros por
 // empresa, setor, minhas ações, mercado e fatos relevantes.
-export default function Noticias({ dados, aoEscolher }) {
+export default function Noticias({ dados, aoEscolher, aoDiscutir }) {
   const [noticias, setNoticias] = useState(null);
   const [erro, setErro] = useState('');
   const [filtro, setFiltro] = useState('');
@@ -41,7 +41,7 @@ export default function Noticias({ dados, aoEscolher }) {
   const atualizado = noticias?.length ? noticias.reduce((m, n) => (n.coletada_em > m ? n.coletada_em : m), '') : null;
 
   const item = (n, grande = false) => (
-    <Noticia key={n.id} n={n} porTicker={porTicker} aoEscolher={aoEscolher} grande={grande} />
+    <Noticia key={n.id} n={n} porTicker={porTicker} aoEscolher={aoEscolher} grande={grande} aoDiscutir={aoDiscutir} />
   );
 
   return (
@@ -130,7 +130,7 @@ export default function Noticias({ dados, aoEscolher }) {
   );
 }
 
-function Noticia({ n, porTicker, aoEscolher, grande }) {
+function Noticia({ n, porTicker, aoEscolher, grande, aoDiscutir }) {
   const empresas = n.tickers.map((t) => porTicker[t]).filter(Boolean).slice(0, 3);
   return (
     <article className={`noticia ${grande ? 'noticia-grande' : ''}`}>
@@ -145,7 +145,7 @@ function Noticia({ n, porTicker, aoEscolher, grande }) {
           <span aria-hidden="true">·</span>
           <span>{quando(n.publicada_em)}</span>
         </p>
-        {empresas.length > 0 && (
+        {(empresas.length > 0 || aoDiscutir) && (
           <div className="noticia-empresas">
             {empresas.map((e) => (
               <button key={e.ticker} className="chip-acao" onClick={() => aoEscolher(e.ticker)}
@@ -155,6 +155,11 @@ function Noticia({ n, porTicker, aoEscolher, grande }) {
                 {e.variacao_pct != null && <span className={`num ${tendencia(e.variacao_pct)}`}>{pct(e.variacao_pct)}</span>}
               </button>
             ))}
+            {aoDiscutir && (
+              <button className="chip-acao chip-discutir" onClick={() => aoDiscutir(n)} aria-label={`Discutir a notícia: ${n.titulo}`}>
+                <Icone nome="discussoes" tamanho={16} /><span>Discutir isso</span>
+              </button>
+            )}
           </div>
         )}
       </div>

@@ -7,6 +7,9 @@ import Navegacao from '../componentes/Navegacao.jsx';
 import Comunidade from './Comunidade.jsx';
 import Notificacoes from './Notificacoes.jsx';
 import PublicacaoTela from './PublicacaoTela.jsx';
+import Discussoes from './Discussoes.jsx';
+import TopicoTela from './TopicoTela.jsx';
+import NovoTopico from './NovoTopico.jsx';
 import MenuPerfil from '../componentes/MenuPerfil.jsx';
 import Inicio from './Inicio.jsx';
 import Mercado from './Mercado.jsx';
@@ -33,6 +36,7 @@ export default function Painel({ uid }) {
     setAbaEstado(id);
     try { sessionStorage.setItem('bolsalab:aba', id); } catch { /* sem armazenamento */ }
   };
+  const [discussoesBusca, setDiscussoesBusca] = useState('');   // filtro ao abrir "Ver todas"
   const [sobreposta, setSobreposta] = useState(null);   // { tipo: 'acao', ticker, operacao }
   const [perfilAberto, setPerfilAberto] = useState(false);
   const [dados, setDados] = useState(null);
@@ -150,6 +154,12 @@ export default function Painel({ uid }) {
   const abrirAcao = (ticker, operacao) => abrir({ tipo: 'acao', ticker, operacao });
   const abrirExtrato = () => abrir({ tipo: 'extrato' });
   const abrirFuturo = (ativo) => abrir({ tipo: 'futuro', ativo });
+  const abrirAtivo = (a) => (a === 'WIN' || a === 'WDO' ? abrirFuturo(a) : abrirAcao(a));
+  const abrirTopico = (id, destaque = null) => abrir({ tipo: 'topico', id, destaque });
+  const novoTopico = (inicial = {}) => abrir({ tipo: 'novo-topico', inicial });
+  const verDiscussoes = (busca = '') => { setDiscussoesBusca(busca); trocarAba('discussoes'); };
+  // seção "Discussões sobre X" das páginas de ação e minicontrato
+  const discussoes = { aoAbrirTopico: (id) => abrirTopico(id), aoNovoTopico: novoTopico, aoVerTodas: verDiscussoes };
   const abrirNotificacoes = () => abrir({ tipo: 'notificacoes' });
   const zerarNaoLidas = () => setDados((d) => ({ ...d, naoLidas: 0 }));
   const trocarAba = (id) => {
@@ -182,20 +192,29 @@ export default function Painel({ uid }) {
   if (sobreposta?.tipo === 'acao') {
     conteudo = (
       <Acao key={sobreposta.ticker} ticker={sobreposta.ticker} operacaoInicial={sobreposta.operacao}
-            dados={dados} aoVoltar={fechar} aoExecutar={aoExecutar} />
+            dados={dados} aoVoltar={fechar} aoExecutar={aoExecutar} discussoes={discussoes} />
     );
   } else if (sobreposta?.tipo === 'futuro') {
-    conteudo = <Futuro key={sobreposta.ativo} ativo={sobreposta.ativo} dados={dados} aoVoltar={fechar} aoExecutar={aoExecutar} />;
+    conteudo = <Futuro key={sobreposta.ativo} ativo={sobreposta.ativo} dados={dados} aoVoltar={fechar} aoExecutar={aoExecutar}
+                       discussoes={discussoes} />;
   } else if (sobreposta?.tipo === 'questionario') {
     conteudo = <Questionario perfilAtual={dados.perfil.perfil_investidor} aoVoltar={fechar}
                              aoConcluir={async () => { await carregar(); fechar(); setRecado('Perfil de investidor atualizado.'); }} />;
   } else if (sobreposta?.tipo === 'notificacoes') {
     conteudo = <Notificacoes versao={versao} aoVoltar={fechar} aoLer={zerarNaoLidas}
                              aoAbrirPublicacao={(id, comentario) => abrir({ tipo: 'publicacao', id, comentario })}
+                             aoAbrirTopico={(id, resposta) => abrir({ tipo: 'topico', id, destaque: resposta })}
                              aoAbrirExtrato={() => trocarSobreposta({ tipo: 'extrato' })} />
   } else if (sobreposta?.tipo === 'publicacao') {
     conteudo = <PublicacaoTela id={sobreposta.id} comentario={sobreposta.comentario} aoVoltar={fechar} avisar={setRecado}
-                               aoEscolher={abrirAcao} aoAbrirFuturo={abrirFuturo} />;;
+                               aoEscolher={abrirAcao} aoAbrirFuturo={abrirFuturo} />;
+  } else if (sobreposta?.tipo === 'topico') {
+    conteudo = <TopicoTela key={sobreposta.id} id={sobreposta.id} destaque={sobreposta.destaque} aoVoltar={fechar}
+                           avisar={setRecado} aoAbrirAtivo={abrirAtivo} />;
+  } else if (sobreposta?.tipo === 'novo-topico') {
+    conteudo = <NovoTopico inicial={sobreposta.inicial} mercado={dados.mercado} aoVoltar={fechar}
+                           aoCriado={(id) => { setRecado('Tópico publicado.'); setVersao((v) => v + 1); trocarSobreposta({ tipo: 'topico', id }); }}
+                           aoAbrirTopico={(id) => trocarSobreposta({ tipo: 'topico', id })} />;
   } else if (sobreposta?.tipo === 'extrato') {
     conteudo = <Extrato uid={uid} dados={dados} resumo={resumo} versao={versao} aoVoltar={fechar} />;
   } else if (aba === 'inicio') {
@@ -204,9 +223,14 @@ export default function Painel({ uid }) {
   } else if (aba === 'mercado') {
     conteudo = <Mercado dados={dados} linhas={linhas} aoEscolher={abrirAcao} aoAbrirFuturo={abrirFuturo} />;
   } else if (aba === 'comunidade') {
-    conteudo = <Comunidade dados={dados} versao={versao} aoEscolher={abrirAcao} aoAbrirFuturo={abrirFuturo} avisar={setRecado} />;
+    conteudo = <Comunidade dados={dados} versao={versao} aoEscolher={abrirAcao} aoAbrirFuturo={abrirFuturo} avisar={setRecado}
+                           aoVerDiscussoes={() => verDiscussoes('')} />;
+  } else if (aba === 'discussoes') {
+    conteudo = <Discussoes key={discussoesBusca} buscaInicial={discussoesBusca} versao={versao}
+                           aoAbrirTopico={(id) => abrirTopico(id)} aoNovoTopico={novoTopico} />;
   } else if (aba === 'noticias') {
-    conteudo = <Noticias dados={dados} aoEscolher={abrirAcao} />;
+    conteudo = <Noticias dados={dados} aoEscolher={abrirAcao}
+                         aoDiscutir={(n) => novoTopico({ noticia: { id: n.id, titulo: n.titulo, link: n.link } })} />;
   } else if (aba === 'carteira') {
     conteudo = <Carteira uid={uid} dados={dados} resumo={resumo} versao={versao}
                          aoEscolher={abrirAcao} irPara={trocarAba} aoAbrirExtrato={abrirExtrato} aoAbrirFuturo={abrirFuturo} />;

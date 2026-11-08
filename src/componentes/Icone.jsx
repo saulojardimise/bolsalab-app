@@ -26,6 +26,8 @@ const DESENHOS = {
   comentario: <path d="M5 5.5A1.5 1.5 0 0 1 6.5 4h11A1.5 1.5 0 0 1 19 5.5v9a1.5 1.5 0 0 1-1.5 1.5H10l-4 3.5V16h0.5A1.5 1.5 0 0 1 5 14.5z" />,
   enviar: <path d="M4 12 20 4l-4 16-4-7zM12 13l8-9" />,
   sino: <><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z" /><path d="M10 20.5a2.2 2.2 0 0 0 4 0" /></>,
+  discussoes: <><path d="M4 5.5A1.5 1.5 0 0 1 5.5 4h13A1.5 1.5 0 0 1 20 5.5v9a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 4v-4h0A1.5 1.5 0 0 1 4 14.5z" /><path d="M8 8.5h8M8 12h5" /></>,
+  alfinete: <><path d="M9 4h6l-1 5 3 3H7l3-3z" /><path d="M12 12v8" /></>,
   menu: <><rect x="4" y="4" width="6.5" height="6.5" rx="1.6" /><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.6" /><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.6" /><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.6" /></>,
   editar: <path d="M4 20h4L19 9l-4-4L4 16zM13.5 6.5l4 4" />,
   pausa: <path d="M9 5v14M15 5v14" />,

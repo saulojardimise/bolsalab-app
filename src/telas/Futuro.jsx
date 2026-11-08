@@ -9,13 +9,14 @@ import { PrecoAgora } from '../componentes/Hoje.jsx';
 import { futuroAgora } from '../lib/intradia.js';
 import Periodos from '../componentes/Periodos.jsx';
 import Icone from '../componentes/Icone.jsx';
+import DiscussoesDoAtivo from '../componentes/DiscussoesDoAtivo.jsx';
 import Termo from '../componentes/Termo.jsx';
 
 const dataBR = (iso) => iso && new Date(`${iso}T12:00:00`).toLocaleDateString('pt-BR');
 
 // Página de um minicontrato (WIN ou WDO): preço em pontos, gráfico,
 // especificações do contrato, posição do aluno e boleta.
-export default function Futuro({ ativo, dados, aoVoltar, aoExecutar }) {
+export default function Futuro({ ativo, dados, aoVoltar, aoExecutar, discussoes = {} }) {
   const contrato = dados.futurosMercado.find((f) => f.ativo === ativo);
   const posicao = dados.futuros.find((f) => f.ativo === ativo && f.contrato === contrato?.contrato)
     ?? dados.futuros.find((f) => f.ativo === ativo);
@@ -142,6 +143,9 @@ export default function Futuro({ ativo, dados, aoVoltar, aoExecutar }) {
         </p>
       </section>
 
+      <div className="ordem-fim">
+        <DiscussoesDoAtivo ativo={ativo} rotulo={ativo === 'WIN' ? 'o mini Ibovespa' : 'o mini dólar'} {...discussoes} />
+      </div>
       </div>
 
       <div className="coluna coluna-b">
