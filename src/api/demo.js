@@ -573,6 +573,13 @@ export function criarApiDemo() {
       if (!a || a.turma_id !== grupoId) throw new Error('Essa pessoa não está no grupo.');
       a.turma_id = null;
     },
+    async excluirUsuario(userId) {
+      await atraso();
+      const a = gestao.alunos.find((x) => x.user_id === userId);
+      if (!a) throw new Error('Pessoa não encontrada.');
+      gestao.alunos = gestao.alunos.filter((x) => x.user_id !== userId);
+      return a.nome || a.email;
+    },
     async alunosTurma(id) {
       await atraso();
       return gestao.alunos.filter((a) => (id === 0 ? a.turma_id == null : a.turma_id === id)).sort((a, b) => b.patrimonio - a.patrimonio)

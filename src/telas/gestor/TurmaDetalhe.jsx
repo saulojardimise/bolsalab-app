@@ -261,56 +261,82 @@ function EditarTurma({ turma, aoCancelar, aoSalvar }) {
 
 // Remover a pessoa deste grupo (com confirmação) ou, na lista "Sem grupo", pôr num grupo
 function AcoesMembro({ grupoId, grupoNome, pessoa, avisar, aoMudar }) {
-  const [confirmando, setConfirmando] = useState(false);
+  const [confirmando, setConfirmando] = useState(null);   // 'remover' | 'excluir'
   const [grupos, setGrupos] = useState(null);
   const [destino, setDestino] = useState('');
   const [erro, setErro] = useState('');
+  const [enviando, setEnviando] = useState(false);
+  const quem = pessoa.nome || pessoa.email;
 
   useEffect(() => {
     if (grupoId === 0) api.turmas().then(setGrupos).catch((e) => setErro(e.message));
   }, [grupoId]);
 
-  async function remover() {
+  async function executar(acao) {
+    setEnviando(true); setErro('');
     try {
-      await api.removerDoGrupo(grupoId, pessoa.user_id);
-      avisar(`${pessoa.nome || pessoa.email} saiu do grupo ${grupoNome}. A conta continua.`);
+      await acao();
       aoMudar();
-    } catch (e) { setErro(e.message); setConfirmando(false); }
+    } catch (e) { setErro(e.message); setConfirmando(null); } finally { setEnviando(false); }
   }
 
-  async function adicionar() {
-    if (!destino) return;
-    try {
-      const nome = await api.adicionarAoGrupo(Number(destino), pessoa.user_id);
-      avisar(`${pessoa.nome || pessoa.email} entrou no grupo ${nome}.`);
-      aoMudar();
-    } catch (e) { setErro(e.message); }
-  }
+  const remover = () => executar(async () => {
+    await api.removerDoGrupo(grupoId, pessoa.user_id);
+    avisar(`${quem} saiu do grupo ${grupoNome}. A conta continua.`);
+  });
+  const excluir = () => executar(async () => {
+    await api.excluirUsuario(pessoa.user_id);
+    avisar(`A conta de ${quem} foi excluída do BolsaLab.`);
+  });
+  const adicionar = () => destino && executar(async () => {
+    const nome = await api.adicionarAoGrupo(Number(destino), pessoa.user_id);
+    avisar(`${quem} entrou no grupo ${nome}.`);
+  });
 
-  if (grupoId === 0) {
+  if (confirmando === 'excluir') {
     return (
-      <span className="acoes-membro">
-        <label className="sr-only" htmlFor={`destino-${pessoa.user_id}`}>Grupo</label>
-        <select id={`destino-${pessoa.user_id}`} value={destino} onChange={(e) => setDestino(e.target.value)}>
-          <option value="">Pôr no grupo…</option>
-          {grupos?.map((g) => <option key={g.id} value={g.id}>{g.nome}</option>)}
-        </select>
-        <button className="botao botao-compacto" onClick={adicionar} disabled={!destino}>Adicionar</button>
-        {erro && <small className="token-erro">{erro}</small>}
+      <span className="acoes-membro confirmacao-membro" role="alert">
+        <small>
+          Excluir a conta de <strong>{quem}</strong> do app? Carteira, ordens, publicações e comentários
+          são apagados. <strong>Não dá para desfazer.</strong> A pessoa pode se cadastrar de novo depois.
+        </small>
+        <span className="botoes-membro">
+          <button className="link link-perigo" onClick={excluir} disabled={enviando}>{enviando ? 'Excluindo…' : 'Sim, excluir conta'}</button>
+          <button className="link" onClick={() => setConfirmando(null)} disabled={enviando}>Cancelar</button>
+        </span>
       </span>
     );
   }
+  if (confirmando === 'remover') {
+    return (
+      <span className="acoes-membro confirmacao-membro">
+        <small>Tirar do grupo {grupoNome}? A conta e a carteira continuam.</small>
+        <span className="botoes-membro">
+          <button className="link link-perigo" onClick={remover} disabled={enviando}>Sim, remover</button>
+          <button className="link" onClick={() => setConfirmando(null)}>Cancelar</button>
+        </span>
+      </span>
+    );
+  }
+
   return (
     <span className="acoes-membro">
-      {confirmando ? (
-        <>
-          <small>Tirar do grupo {grupoNome}? A conta e a carteira continuam.</small>
-          <button className="link link-perigo" onClick={remover}>Sim, remover</button>
-          <button className="link" onClick={() => setConfirmando(false)}>Cancelar</button>
-        </>
-      ) : (
-        <button className="link link-discreto" onClick={() => setConfirmando(true)}>Remover do grupo</button>
+      {grupoId === 0 && (
+        <span className="por-no-grupo">
+          <label className="sr-only" htmlFor={`destino-${pessoa.user_id}`}>Grupo</label>
+          <select id={`destino-${pessoa.user_id}`} value={destino} onChange={(e) => setDestino(e.target.value)}>
+            <option value="">Grupo…</option>
+            {grupos?.map((g) => <option key={g.id} value={g.id}>{g.nome}</option>)}
+          </select>
+          <button className="botao botao-compacto" onClick={adicionar} disabled={!destino || enviando}>Adicionar</button>
+        </span>
       )}
+      <span className="botoes-membro">
+        {grupoId !== 0 && (
+          <button className="link link-discreto" onClick={() => setConfirmando('remover')}>Remover do grupo</button>
+        )}
+        <button className="link link-perigo" onClick={() => setConfirmando('excluir')}>Excluir conta</button>
+      </span>
       {erro && <small className="token-erro">{erro}</small>}
     </span>
   );

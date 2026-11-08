@@ -1001,8 +1001,13 @@ input:focus-visible, select:focus-visible { outline: none; border-color: var(--f
 .sem-grupo strong { color: var(--marinho); }
 
 /* gestor: membros dos grupos */
-.acoes-membro { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; margin-top: 4px; }
-.acoes-membro select { width: auto; min-height: 38px; flex: 1; min-width: 160px; }
+.acoes-membro { display: grid; gap: 8px; margin-top: 6px; min-width: 0; }
+.por-no-grupo { display: flex; gap: 8px; min-width: 0; }
+.por-no-grupo select { flex: 1 1 auto; width: 0; min-width: 0; min-height: 38px; text-overflow: ellipsis; }
+.por-no-grupo .botao { flex: none; }
+.botoes-membro { display: flex; flex-wrap: wrap; gap: 4px 16px; align-items: center; }
+.confirmacao-membro { background: var(--fundo); border-radius: 10px; padding: 10px 12px; }
+.confirmacao-membro small { line-height: 1.45; }
 .acoes-membro .link { font-size: 0.86rem; padding: 2px 0; }
 .adicionar-pessoa { display: grid; gap: 10px; }
 .adicionar-pessoa p { margin: 0; }
