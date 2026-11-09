@@ -349,6 +349,7 @@ export function criarApiDemo() {
     },
 
     async perfil() { await atraso(); return { ...estado.perfil }; },
+    async fotoProfessor() { return null; },
     async config() { return { ...CONFIG, negociacao_pausada: gestao.pausada }; },
     async mercado() {
       await atraso();

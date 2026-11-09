@@ -117,6 +117,11 @@ export function criarApi(supabase, { urlRetorno } = {}) {
     // Atenção: o gestor (admin) enxerga as linhas de todos;
     // por isso toda consulta da conta filtra pelo próprio user_id.
 
+    // foto do professor para a página Sobre (aberta também a quem não entrou)
+    async fotoProfessor() {
+      const { data, error } = await supabase.rpc('foto_professor');
+      return error ? null : data;
+    },
     async perfil(uid) {
       return checar(await supabase.from('perfis').select('*').eq('user_id', uid).single());
     },

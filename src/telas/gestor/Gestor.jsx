@@ -8,6 +8,7 @@ import Alertas from './Alertas.jsx';
 import Eventos from './Eventos.jsx';
 import Sistema from './Sistema.jsx';
 import Moderacao from './Moderacao.jsx';
+import Assinatura from '../../componentes/Assinatura.jsx';
 
 const ABAS = [
   ['turmas', 'Grupos', 'turma'],
@@ -81,7 +82,7 @@ export default function Gestor({ email }) {
         </header>
       )}
       {api.modoDemo && <p className="faixa-demo">Demonstração com dados fictícios</p>}
-      <main className="conteudo">{conteudo}</main>
+      <main className="conteudo">{conteudo}<Assinatura /></main>
 
       <nav className="navegacao" aria-label="Seções do gestor">
         {ABAS.map(([id, rotulo, icone]) => (

@@ -17,7 +17,7 @@ const EXTRAS = [
   ['turma', 'Grupos', 'Ranking, entrar ou sair de grupos'],
 ];
 
-export default function Navegacao({ aba, aoTrocar, aoAbrirExtrato, aoAbrirPerfil, aoAbrirNotificacoes, aoInstalar, naoLidas = 0 }) {
+export default function Navegacao({ aba, aoTrocar, aoAbrirExtrato, aoAbrirPerfil, aoAbrirNotificacoes, aoInstalar, aoAbrirSobre, naoLidas = 0 }) {
   const [maisAberto, setMaisAberto] = useState(false);
   const instalar = aoInstalar && mostrarOpcaoInstalar();
   const noMais = EXTRAS.some(([id]) => id === aba);
@@ -48,6 +48,12 @@ export default function Navegacao({ aba, aoTrocar, aoAbrirExtrato, aoAbrirPerfil
           <Icone nome="usuario" tamanho={24} />
           <span>Meu perfil</span>
         </button>
+        {aoAbrirSobre && (
+          <button className="nav-item nav-extra" aria-current={aba === 'sobre' ? 'page' : undefined} onClick={aoAbrirSobre}>
+            <Icone nome="info" tamanho={24} />
+            <span>Sobre o app</span>
+          </button>
+        )}
         {instalar && (
           <button className="nav-item nav-extra" onClick={aoInstalar}>
             <Icone nome="baixar" tamanho={24} />
@@ -72,6 +78,7 @@ export default function Navegacao({ aba, aoTrocar, aoAbrirExtrato, aoAbrirPerfil
                      ...EXTRAS.map(([id, rotulo, detalhe]) => ({ id, icone: id, rotulo, detalhe, acao: () => aoTrocar(id) })),
                      { id: 'extrato', icone: 'extrato', rotulo: 'Extrato', detalhe: 'Todo o dinheiro que entrou e saiu', acao: aoAbrirExtrato },
                      { id: 'perfil', icone: 'usuario', rotulo: 'Meu perfil', detalhe: 'Foto, desempenho, perfil de investidor e senha', acao: aoAbrirPerfil },
+                     ...(aoAbrirSobre ? [{ id: 'sobre', icone: 'info', rotulo: 'Sobre o app', detalhe: 'Quem criou o BolsaLab e para quê', acao: aoAbrirSobre }] : []),
                      ...(instalar ? [{ id: 'instalar', icone: 'baixar', rotulo: 'Instalar app', detalhe: 'Ícone na tela de início, abre em tela cheia', acao: aoInstalar }] : []),
                    ]} />
       )}

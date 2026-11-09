@@ -1174,3 +1174,19 @@ span.chip-topico-noticia { color: var(--texto); }
   border-radius: 7px; background: var(--cartao, #fff); color: var(--azul); border: 1px solid var(--linha); }
 .instalar-pontos { font-weight: 800; color: var(--texto); }
 .instalar-conteudo .botao { width: 100%; }
+
+/* ---------------------------------------------------------------- sobre o app e assinatura */
+.assinatura { text-align: center; padding: 28px 16px 8px; font-size: 0.85rem; color: var(--suave); }
+.assinatura .link { color: var(--suave); font-weight: 400; }
+.assinatura strong { color: var(--texto); font-weight: 600; }
+.sobre .cartao p { margin: 0 0 10px; line-height: 1.55; }
+.sobre .cartao p:last-child { margin-bottom: 0; }
+.sobre-marca { display: grid; gap: 12px; }
+.sobre-autor { display: grid; grid-template-columns: auto 1fr; gap: 12px 16px; align-items: center; }
+.sobre-autor > p { grid-column: 1 / -1; }
+.sobre-autor h2 { margin: 0 0 2px; }
+.sobre-autor .suave { margin: 0; }
+.sobre-foto { width: 88px; height: 88px; border-radius: 50%; object-fit: cover; border: 3px solid var(--verde-fundo); }
+.sobre-foto-vazia { display: grid; place-items: center; background: var(--fundo); color: var(--suave); }
+.sobre-lista { margin: 0; padding-left: 20px; display: grid; gap: 8px; line-height: 1.5; }
+.entrada-sobre { max-width: 640px; margin: 0 auto; padding: 16px; }

@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 import InstalarApp from '../componentes/InstalarApp.jsx';
+import Assinatura from '../componentes/Assinatura.jsx';
+import Sobre from './Sobre.jsx';
 import { deveSugerirInstalar, ouvirInstalacao } from '../lib/instalar.js';
 import { api } from '../api/index.js';
 import { emailAceito } from '../api/supabase.js';
@@ -16,6 +18,7 @@ export default function Entrada() {
   const [enviando, setEnviando] = useState(false);
   // convite para instalar o app logo que a pessoa abre o site (celular, fora do app instalado)
   const [instalarVisto, setInstalarVisto] = useState(false);
+  const [sobreAberto, setSobreAberto] = useState(false);
   const [, setTique] = useState(0);
   useEffect(() => ouvirInstalacao(() => setTique((n) => n + 1)), []);
 
@@ -71,6 +74,14 @@ export default function Entrada() {
   const titulos = { entrar: 'Entre na sua conta', cadastrar: 'Crie sua conta', recuperar: 'Recuperar senha' };
   const botoes = { entrar: 'Entrar', cadastrar: 'Criar conta', recuperar: 'Enviar link' };
   const exemploEmail = turma?.dominio_email ? `seu.nome@${turma.dominio_email}` : 'seu.nome@email.com';
+
+  if (sobreAberto) {
+    return (
+      <main className="entrada entrada-sobre">
+        <Sobre aoVoltar={() => setSobreAberto(false)} />
+      </main>
+    );
+  }
 
   return (
     <main className="entrada">
@@ -156,6 +167,7 @@ export default function Entrada() {
           </p>
         )}
       </form>
+      <Assinatura aoAbrir={() => { setSobreAberto(true); window.scrollTo({ top: 0 }); }} />
       {!instalarVisto && deveSugerirInstalar() && <InstalarApp aoFechar={() => setInstalarVisto(true)} />}
     </main>
   );

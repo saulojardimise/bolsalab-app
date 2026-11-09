@@ -17,6 +17,8 @@ import Acao from './Acao.jsx';
 import Carteira from './Carteira.jsx';
 import Turma from './Turma.jsx';
 import Extrato from './Extrato.jsx';
+import Sobre from './Sobre.jsx';
+import Assinatura from '../componentes/Assinatura.jsx';
 import Questionario from './Questionario.jsx';
 import Noticias from './Noticias.jsx';
 import Futuro from './Futuro.jsx';
@@ -163,6 +165,7 @@ export default function Painel({ uid }) {
   };
   const abrirAcao = (ticker, operacao) => abrir({ tipo: 'acao', ticker, operacao });
   const abrirExtrato = () => abrir({ tipo: 'extrato' });
+  const abrirSobre = () => (sobreposta ? trocarSobreposta({ tipo: 'sobre' }) : abrir({ tipo: 'sobre' }));
   const abrirFuturo = (ativo) => abrir({ tipo: 'futuro', ativo });
   const abrirAtivo = (a) => (a === 'WIN' || a === 'WDO' ? abrirFuturo(a) : abrirAcao(a));
   const abrirTopico = (id, destaque = null) => abrir({ tipo: 'topico', id, destaque });
@@ -232,6 +235,8 @@ export default function Painel({ uid }) {
     conteudo = <NovoTopico inicial={sobreposta.inicial} mercado={dados.mercado} aoVoltar={fechar}
                            aoCriado={(id) => { setRecado('Tópico publicado.'); setVersao((v) => v + 1); trocarSobreposta({ tipo: 'topico', id }); }}
                            aoAbrirTopico={(id) => trocarSobreposta({ tipo: 'topico', id })} />;
+  } else if (sobreposta?.tipo === 'sobre') {
+    conteudo = <Sobre aoVoltar={fechar} />;
   } else if (sobreposta?.tipo === 'extrato') {
     conteudo = <Extrato uid={uid} dados={dados} resumo={resumo} versao={versao} aoVoltar={fechar} />;
   } else if (aba === 'inicio') {
@@ -261,11 +266,14 @@ export default function Painel({ uid }) {
                              naoLidas={dados.naoLidas ?? 0} aoAbrirNotificacoes={abrirNotificacoes} />}
       {api.modoDemo && <p className="faixa-demo">Demonstração com preços fictícios</p>}
       {erro && <p className="aviso aviso-erro conteudo" role="alert">{erro}</p>}
-      <main className="conteudo">{conteudo}</main>
-      <Navegacao aba={sobreposta?.tipo === 'acao' || sobreposta?.tipo === 'futuro' ? 'mercado' : sobreposta?.tipo === 'extrato' || sobreposta?.tipo === 'notificacoes' ? sobreposta.tipo : aba} aoTrocar={trocarAba}
+      <main className="conteudo">
+        {conteudo}
+        {sobreposta?.tipo !== 'sobre' && <Assinatura aoAbrir={abrirSobre} />}
+      </main>
+      <Navegacao aba={sobreposta?.tipo === 'acao' || sobreposta?.tipo === 'futuro' ? 'mercado' : sobreposta?.tipo === 'extrato' || sobreposta?.tipo === 'notificacoes' || sobreposta?.tipo === 'sobre' ? sobreposta.tipo : aba} aoTrocar={trocarAba}
                  aoAbrirExtrato={abrirExtrato} aoAbrirPerfil={() => setPerfilAberto(true)}
                  aoAbrirNotificacoes={abrirNotificacoes} naoLidas={dados.naoLidas ?? 0}
-                 aoInstalar={() => setInstalarAberto(true)} />
+                 aoInstalar={() => setInstalarAberto(true)} aoAbrirSobre={abrirSobre} />
 
       {perfilAberto && (
         <MenuPerfil
