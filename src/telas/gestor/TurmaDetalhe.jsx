@@ -147,7 +147,7 @@ export default function TurmaDetalhe({ id, aoVoltar, avisar }) {
           )}
           {alunos.length > 0 && (
             <p className="nota">
-              Perfil na prática: arrojado se fez venda a descoberto ou tem mais de 80% do patrimônio em ações;
+              Perfil na prática: arrojado se fez venda a descoberto ou tem mais de 80% do patrimônio em ações e ETFs;
               moderado acima de 40%; conservador no resto. A faixa amarela marca quem age diferente do que declarou.
             </p>
           )}
@@ -163,7 +163,7 @@ function PerfilAluno({ a }) {
   const diverge = a.perfil_pratica && a.perfil_pratica !== a.perfil_investidor;
   const motivo = Number(a.vendas_descoberto) > 0
     ? `${a.vendas_descoberto} ${Number(a.vendas_descoberto) === 1 ? 'venda' : 'vendas'} a descoberto`
-    : `${String(a.acoes_pct).replace('.', ',')}% em ações`;
+    : `${String(a.acoes_pct).replace('.', ',')}% em ações e ETFs`;
   return (
     <span className={`perfis-aluno ${diverge ? 'perfis-divergem' : ''}`}>
       <span className={`chip-perfil perfil-${a.perfil_investidor}`}>Declarado: {PERFIS[a.perfil_investidor].nome}</span>

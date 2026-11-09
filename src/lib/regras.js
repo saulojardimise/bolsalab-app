@@ -21,9 +21,12 @@ const r2 = (v) => Math.round(v * 100) / 100;
  * @param {number} p.qtdComprada   ações que o aluno tem desta empresa
  * @param {object|null} p.vendida  posição vendida desta empresa ({ quantidade, garantia })
  * @param {number} p.exposicao     soma das vendas a descoberto abertas, a preço atual
+ * @param {boolean} p.etf          ETF: a unidade é a cota
  * @returns {{ linhas: {rotulo:string, valor:number, destaque?:boolean}[], maximo:number, erro:string|null, efeitoSaldo:number }}
  */
-export function previa({ tipo, quantidade, preco, saldo, config, qtdComprada = 0, vendida = null, exposicao = 0 }) {
+export function previa({ tipo, quantidade, preco, saldo, config, qtdComprada = 0, vendida = null, exposicao = 0, etf = false }) {
+  const un = etf ? 'cotas' : 'ações';
+  const deste = etf ? 'deste ETF' : 'desta empresa';
   const q = Math.floor(Number(quantidade) || 0);
   const corretagem = Number(config.corretagem);
   const bruto = r2(q * preco);
@@ -36,7 +39,7 @@ export function previa({ tipo, quantidade, preco, saldo, config, qtdComprada = 0
     maximo = Math.max(0, Math.floor((saldo - corretagem) / preco));
     efeitoSaldo = -(bruto + corretagem);
     linhas = [
-      { rotulo: 'Valor das ações', valor: bruto },
+      { rotulo: `Valor das ${un}`, valor: bruto },
       { rotulo: 'Corretagem', valor: corretagem },
       { rotulo: 'Sai do seu saldo', valor: bruto + corretagem, destaque: true },
     ];
@@ -45,11 +48,11 @@ export function previa({ tipo, quantidade, preco, saldo, config, qtdComprada = 0
     maximo = qtdComprada;
     efeitoSaldo = bruto - corretagem;
     linhas = [
-      { rotulo: 'Valor das ações', valor: bruto },
+      { rotulo: `Valor das ${un}`, valor: bruto },
       { rotulo: 'Corretagem', valor: -corretagem },
       { rotulo: 'Entra no seu saldo', valor: bruto - corretagem, destaque: true },
     ];
-    if (q > qtdComprada) erro = `Você tem ${qtdComprada} ações desta empresa.`;
+    if (q > qtdComprada) erro = `Você tem ${qtdComprada} ${un} ${deste}.`;
   } else if (tipo === 'venda_descoberto') {
     const limite = r2(saldo * Number(config.limite_descoberto));
     const livre = Math.max(0, limite - exposicao);
@@ -68,7 +71,7 @@ export function previa({ tipo, quantidade, preco, saldo, config, qtdComprada = 0
     if (q > 0 && exposicao + bruto > limite) {
       const pctLimite = Math.round(Number(config.limite_descoberto) * 100);
       erro = maximo > 0
-        ? `O limite é ${pctLimite}% do saldo. Você pode vender até ${maximo} ações.`
+        ? `O limite é ${pctLimite}% do saldo. Você pode vender até ${maximo} ${un}.`
         : `Você já usou todo o limite de vendas a descoberto (${pctLimite}% do saldo).`;
     }
     if (saldo < corretagem) erro = 'Saldo insuficiente para pagar a corretagem.';
@@ -84,7 +87,7 @@ export function previa({ tipo, quantidade, preco, saldo, config, qtdComprada = 0
       { rotulo: 'Corretagem', valor: -corretagem },
       { rotulo: 'Resultado no saldo', valor: resultado, destaque: true },
     ];
-    if (q > Q) erro = `Você está vendido em ${Q} ações desta empresa.`;
+    if (q > Q) erro = `Você está vendido em ${Q} ${un} ${deste}.`;
   }
 
   return { linhas, maximo, erro, efeitoSaldo };

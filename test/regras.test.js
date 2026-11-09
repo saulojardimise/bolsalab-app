@@ -90,3 +90,11 @@ test('status do pregão no horário de Brasília', () => {
   assert.match(sabado.detalhe, /segunda/);
   assert.match(textoStatus({ liberada: true, pausada: true }).titulo, /pausada/);
 });
+
+test('ETF: mensagens falam em cotas, não em ações', () => {
+  const config = { corretagem: 15, limite_descoberto: 0.5, aluguel_anual: 0.05 };
+  const v = previa({ tipo: 'venda', quantidade: 5, preco: 100, saldo: 1000, config, qtdComprada: 3, etf: true });
+  assert.equal(v.erro, 'Você tem 3 cotas deste ETF.');
+  assert.equal(v.linhas[0].rotulo, 'Valor das cotas');
+  assert.equal(previa({ tipo: 'venda', quantidade: 5, preco: 100, saldo: 1000, config, qtdComprada: 3 }).erro, 'Você tem 3 ações desta empresa.');
+});

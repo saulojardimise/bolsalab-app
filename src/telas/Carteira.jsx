@@ -8,6 +8,7 @@ import { numero, pct, reais, reaisComSinal, tendencia } from '../lib/formato.js'
 import Logo from '../componentes/Logo.jsx';
 import Icone from '../componentes/Icone.jsx';
 import Termo from '../componentes/Termo.jsx';
+import { setorExibido, tickersEtf, unidade } from '../lib/etf.js';
 
 // Cores das fatias por setor (na ordem do maior para o menor)
 const CORES_SETOR = ['var(--verde)', 'var(--azul)', 'var(--ambar)', 'var(--verde-claro-forte)', 'var(--azul-claro)', 'var(--suave)'];
@@ -27,8 +28,16 @@ export default function Carteira({ uid, dados, resumo, versao, aoEscolher, irPar
   const stop = Number(config.stop_prejuizo ?? 0.8);
   const vazia = carteira.length === 0 && vendidas.length === 0;
 
+  const etfs = tickersEtf(dados.mercado);
+  const ehEtf = (t) => etfs.has(t);
+  const compradasAcoes = carteira.filter((p) => !ehEtf(p.ticker));
+  const compradasEtfs = carteira.filter((p) => ehEtf(p.ticker));
+  const totalEtfs = compradasEtfs.reduce((s, p) => s + Number(p.valor_atual || 0), 0);
+  const totalAcoes = resumo.acoes - totalEtfs;
+
   const porSetor = Object.entries(carteira.reduce((s, p) => {
-    s[p.setor ?? 'Outros'] = (s[p.setor ?? 'Outros'] ?? 0) + Number(p.valor_atual);
+    const k = setorExibido(p.setor, ehEtf(p.ticker));
+    s[k] = (s[k] ?? 0) + Number(p.valor_atual);
     return s;
   }, {})).sort((a, b) => b[1] - a[1]);
 
@@ -48,7 +57,8 @@ export default function Carteira({ uid, dados, resumo, versao, aoEscolher, irPar
         <LinhaHoje oscilacao={oscilacaoHoje({ ...dados })} patrimonio={resumo.patrimonio} />
         <dl className="resumo-linhas">
           <div><dt><Termo id="saldo">Saldo disponível</Termo></dt><dd className="num">{reais(resumo.saldo)}</dd></div>
-          <div><dt>Ações compradas</dt><dd className="num">{reais(resumo.acoes)}</dd></div>
+          {(totalAcoes > 0 || compradasEtfs.length === 0) && <div><dt>Ações compradas</dt><dd className="num">{reais(totalAcoes)}</dd></div>}
+          {compradasEtfs.length > 0 && <div><dt><Termo id="etf">ETFs</Termo></dt><dd className="num">{reais(totalEtfs)}</dd></div>}
           {vendidas.length > 0 && (
             <div><dt><Termo id="venda_descoberto">Vendas a descoberto</Termo></dt><dd className={`num ${tendencia(resumo.vendido)}`}>{reaisComSinal(resumo.vendido)}</dd></div>
           )}
@@ -94,7 +104,7 @@ export default function Carteira({ uid, dados, resumo, versao, aoEscolher, irPar
             ))}
           </ul>
           {porSetor.length === 1 && (
-            <p className="nota">Todas as suas ações estão num setor só. Diversificar reduz o risco.</p>
+            <p className="nota">Todos os seus investimentos estão num setor só. Diversificar reduz o risco.</p>
           )}
         </section>
       )}
@@ -102,27 +112,11 @@ export default function Carteira({ uid, dados, resumo, versao, aoEscolher, irPar
       </div>
 
       <div className="coluna coluna-b">
-      {carteira.length > 0 && (
-        <section aria-labelledby="titulo-compradas">
-          <h2 id="titulo-compradas" className="secao-titulo">Ações compradas <Termo id="preco_medio" /></h2>
-          <ul className="cartao cartao-lista posicoes">
-            {carteira.map((p) => (
-              <li key={p.ticker}>
-                <button className="posicao" onClick={() => aoEscolher(p.ticker, 'venda')}>
-                  <Logo ticker={p.ticker} url={p.logo_url} />
-                  <span className="posicao-id">
-                    <strong>{p.ticker}</strong>
-                    <span>{numero(p.quantidade)} ações, preço médio {reais(p.preco_medio)}</span>
-                  </span>
-                  <span className="posicao-valor">
-                    <strong className="num">{reais(p.valor_atual)}</strong>
-                    <span className={`num ${tendencia(p.resultado)}`}>{reaisComSinal(p.resultado)} ({pct(p.resultado_pct)})</span>
-                  </span>
-                </button>
-              </li>
-            ))}
-          </ul>
-        </section>
+      {compradasAcoes.length > 0 && (
+        <ListaPosicoes id="titulo-compradas" titulo="Ações compradas" posicoes={compradasAcoes} etf={false} aoEscolher={aoEscolher} />
+      )}
+      {compradasEtfs.length > 0 && (
+        <ListaPosicoes id="titulo-etfs" titulo="ETFs" posicoes={compradasEtfs} etf aoEscolher={aoEscolher} />
       )}
 
       {vendidas.length > 0 && (
@@ -137,7 +131,7 @@ export default function Carteira({ uid, dados, resumo, versao, aoEscolher, irPar
                     <Logo ticker={v.ticker} url={v.logo_url} />
                     <span className="posicao-id">
                       <strong>{v.ticker}</strong>
-                      <span>{numero(v.quantidade)} vendidas a {reais(v.preco_venda)}, hoje {reais(v.preco_atual)}</span>
+                      <span>{numero(v.quantidade)} {unidade(ehEtf(v.ticker), Number(v.quantidade))} vendidas a {reais(v.preco_venda)}, hoje {reais(v.preco_atual)}</span>
                     </span>
                     <span className="posicao-valor">
                       <strong className="num">{reais(v.custo_recompra)}</strong>
@@ -164,7 +158,7 @@ export default function Carteira({ uid, dados, resumo, versao, aoEscolher, irPar
             })}
           </ul>
           <p className="nota">
-            Resultado = valor da venda − custo para recomprar hoje (sem custos, como nas ações compradas).
+            Resultado = valor da venda − custo para recomprar hoje (sem custos, como nas posições compradas).
             {' '}O <Termo id="resultado_acumulado">prejuízo com custos</Termo> soma também aluguel e corretagem.
             {' '}<Termo id="garantia">Garantia bloqueada</Termo>: {reais(resumo.garantias)}.
             {' '}<Termo id="encerramento">Encerramento automático</Termo> com prejuízo de {Math.round(stop * 100)}% do saldo.
@@ -203,5 +197,31 @@ export default function Carteira({ uid, dados, resumo, versao, aoEscolher, irPar
       )}
       </div>
     </div>
+  );
+}
+
+// Posições compradas (ações ou ETFs)
+function ListaPosicoes({ id, titulo, posicoes, etf, aoEscolher }) {
+  return (
+    <section aria-labelledby={id}>
+      <h2 id={id} className="secao-titulo">{titulo} <Termo id="preco_medio" /></h2>
+      <ul className="cartao cartao-lista posicoes">
+        {posicoes.map((p) => (
+          <li key={p.ticker}>
+            <button className="posicao" onClick={() => aoEscolher(p.ticker, 'venda')}>
+              <Logo ticker={p.ticker} url={p.logo_url} />
+              <span className="posicao-id">
+                <strong>{p.ticker}</strong>
+                <span>{numero(p.quantidade)} {unidade(etf, Number(p.quantidade))}, preço médio {reais(p.preco_medio)}</span>
+              </span>
+              <span className="posicao-valor">
+                <strong className="num">{reais(p.valor_atual)}</strong>
+                <span className={`num ${tendencia(p.resultado)}`}>{reaisComSinal(p.resultado)} ({pct(p.resultado_pct)})</span>
+              </span>
+            </button>
+          </li>
+        ))}
+      </ul>
+    </section>
   );
 }

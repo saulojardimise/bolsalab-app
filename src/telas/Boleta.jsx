@@ -26,7 +26,7 @@ export default function Boleta({ ticker, empresa, comprada, vendida, operacaoIni
   const quantidade = Math.floor(Number(qtd) || 0);
   const p = previa({
     tipo, quantidade, preco: Number(empresa.preco), saldo: Number(dados.perfil.saldo), config: dados.config,
-    qtdComprada, vendida, exposicao,
+    qtdComprada, vendida, exposicao, etf,
   });
 
   const suspensa = empresa.situacao === 'suspensa';

@@ -4,6 +4,7 @@ import { fluxoDeCaixa, GRUPOS } from '../lib/fluxo.js';
 import { dataHora, diaMes, numero, reais, reaisComSinal, tendencia } from '../lib/formato.js';
 import Icone from '../componentes/Icone.jsx';
 import Termo from '../componentes/Termo.jsx';
+import { tickersEtf, unidade } from '../lib/etf.js';
 
 // Extrato: o fluxo de caixa completo do aluno. No topo, quanto entrou e saiu
 // por tipo (ações, corretagem, aluguel...); embaixo, cada lançamento com o
@@ -26,6 +27,7 @@ export default function Extrato({ uid, dados, resumo, versao, aoVoltar }) {
   const fluxo = useMemo(() => mov && fluxoDeCaixa({
     ...mov, saldoInicial: Number(dados.config.saldo_inicial), inicio: dados.perfil.criado_em ?? null,
   }), [mov, dados.config.saldo_inicial, dados.perfil.criado_em]);
+  const etfs = useMemo(() => tickersEtf(dados.mercado), [dados.mercado]);
 
   const lista = fluxo?.lancamentos.filter((l) => !grupo || l.grupo === grupo || (grupo === 'custos' && l.corretagem));
   const t = fluxo?.totais;
@@ -48,8 +50,8 @@ export default function Extrato({ uid, dados, resumo, versao, aoVoltar }) {
           <h2 id="titulo-fluxo"><Termo id="fluxo_caixa">Fluxo de caixa</Termo></h2>
           <dl className="fluxo">
             <Linha rotulo="Saldo inicial" valor={t.inicial} sinal={false} />
-            <Linha rotulo="Pago na compra de ações" valor={t.compras} />
-            <Linha rotulo="Recebido na venda de ações" valor={t.vendas} />
+            <Linha rotulo="Pago na compra de ações e ETFs" valor={t.compras} />
+            <Linha rotulo="Recebido na venda de ações e ETFs" valor={t.vendas} />
             {t.descoberto !== 0 && <Linha rotulo="Resultado das vendas a descoberto" valor={t.descoberto} termo="venda_descoberto" />}
             <Linha rotulo={`Corretagens (${numero(t.ordens)} ${t.ordens === 1 ? 'ordem' : 'ordens'})`} valor={t.corretagens} termo="corretagem" />
             {t.aluguel !== 0 && <Linha rotulo="Aluguel de ações" valor={t.aluguel} termo="aluguel" />}
@@ -85,7 +87,7 @@ export default function Extrato({ uid, dados, resumo, versao, aoVoltar }) {
             ? <p className="cartao vazio">Nenhum lançamento deste tipo ainda.</p>
             : (
               <ul className="cartao cartao-lista extrato">
-                {lista.map((l) => <Lancamento key={l.id} l={l} />)}
+                {lista.map((l) => <Lancamento key={l.id} l={l} etfs={etfs} />)}
               </ul>
             )}
         </section>
@@ -103,7 +105,7 @@ function Linha({ rotulo, valor, sinal = true, termo }) {
   );
 }
 
-function Lancamento({ l }) {
+function Lancamento({ l, etfs }) {
   const classe = l.automatica ? 'extrato-automatica' : l.origem === 'ajuste' ? 'extrato-ajuste' : undefined;
   return (
     <li className={classe}>
@@ -118,7 +120,7 @@ function Lancamento({ l }) {
 
       {l.detalhe && <p className="extrato-detalhe"><span>{l.detalhe}</span></p>}
       {!l.detalhe && l.quantidade > 0 && (
-        <p className="extrato-detalhe"><span>{numero(l.quantidade)} ações × {reais(l.preco)}</span></p>
+        <p className="extrato-detalhe"><span>{numero(l.quantidade)} {unidade(etfs.has(l.ticker), Number(l.quantidade))} × {reais(l.preco)}</span></p>
       )}
       {l.partes.length > 1 && (
         <dl className="extrato-partes">

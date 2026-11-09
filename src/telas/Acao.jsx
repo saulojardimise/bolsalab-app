@@ -157,7 +157,7 @@ export default function Acao({ ticker, operacaoInicial, dados, aoVoltar, aoExecu
           )}
           {vendida && (
             <p>
-              Você está <Termo id="venda_descoberto">vendido</Termo> em <strong>{numero(vendida.quantidade)}</strong> ações a {reais(vendida.preco_venda)}.{' '}
+              Você está <Termo id="venda_descoberto">vendido</Termo> em <strong>{numero(vendida.quantidade)}</strong> {empresa.tipo === 'etf' ? 'cotas' : 'ações'} a {reais(vendida.preco_venda)}.{' '}
               <span className={tendencia(vendida.resultado)}>
                 {reaisComSinal(vendida.resultado)} ({pct(resultadoPct(vendida))})
               </span>
