@@ -52,7 +52,7 @@ function deOrdem(o) {
       const liberada = r2(v + c + recompra);
       return { ...base, tipo: 'recompra', grupo: 'descoberto', titulo: o.automatica ? 'Recompra automática' : 'Recompra',
                efeito: v,
-               partes: [{ rotulo: 'Garantia liberada', valor: liberada }, { rotulo: 'Recompra das ações', valor: -recompra },
+               partes: [{ rotulo: 'Garantia liberada', valor: liberada }, { rotulo: 'Recompra', valor: -recompra },
                         { rotulo: 'Corretagem', valor: -c }],
                totais: { descoberto: r2(liberada - recompra), corretagens: -c } };
     }

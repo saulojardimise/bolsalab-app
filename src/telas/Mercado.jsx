@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { diaMes, numero, pct, tendencia } from '../lib/formato.js';
+import { diaMes, pct, tendencia } from '../lib/formato.js';
 import { lado, pontos } from '../lib/futuros.js';
 import { futuroAgora, horaBR, horarioDoDia, mercadoAgora } from '../lib/intradia.js';
 import Icone from '../componentes/Icone.jsx';
@@ -77,7 +77,7 @@ function ListaComFiltros({ dados, linhas, aoEscolher, tipo }) {
       // ETF: uma linha didática do que ele acompanha (o nome do fundo fica na página dele)
       const base = etf ? (e.resumo || e.nome) : e.nome;
       const qtd = tenho[e.ticker];
-      const tem = etf ? `${numero(qtd)} ${qtd === 1 ? 'cota' : 'cotas'}` : detalheQuantidade(qtd);
+      const tem = detalheQuantidade(qtd, etf);
       return { ...e, detalhe: qtd ? `Você tem ${tem} · ${base}` : base };
     });
 

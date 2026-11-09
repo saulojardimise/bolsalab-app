@@ -8,7 +8,7 @@ import Termo from '../componentes/Termo.jsx';
 
 const FILTROS = [
   ['', 'Capa'],
-  ['minhas', 'Minhas ações'],
+  ['minhas', 'Meus ativos'],
   ['mercado', 'Mercado'],
   ['fatos', 'Fatos relevantes'],
 ];

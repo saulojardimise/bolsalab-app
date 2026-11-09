@@ -63,7 +63,7 @@ export default function Inicio({ uid, dados, resumo, linhas, versao, aoEscolher,
   const hoje = oscilacaoHoje({ ...dados });
   const meus = dados.carteira.map((p) => {
     const m = mercadoHoje.find((e) => e.ticker === p.ticker);
-    return { ...m, detalhe: detalheQuantidade(p.quantidade) };
+    return { ...m, detalhe: detalheQuantidade(p.quantidade, m?.tipo === 'etf') };
   });
   const d = DICAS[dica];
 

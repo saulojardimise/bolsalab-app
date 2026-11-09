@@ -1,3 +1,4 @@
+import { unidade } from '../lib/etf.js';
 import Logo from './Logo.jsx';
 import Sparkline from './Sparkline.jsx';
 import { numero, pct, reais, tendencia } from '../lib/formato.js';
@@ -29,4 +30,5 @@ export default function ListaAtivos({ itens, linhas, aoEscolher }) {
   );
 }
 
-export const detalheQuantidade = (q) => `${numero(q)} ${q === 1 ? 'ação' : 'ações'}`;
+// ETF conta em cotas; ação, em ações
+export const detalheQuantidade = (q, etf = false) => `${numero(q)} ${unidade(etf, Number(q))}`;
