@@ -36,11 +36,14 @@ export const PERGUNTAS = [
   },
   {
     titulo: 'Em que você já investiu com dinheiro de verdade?',
+    dica: 'Pode marcar mais de uma.',
+    multipla: true,      // vale a experiência mais arrojada marcada
+    exclusiva: 1,        // "Nunca investi" não combina com as outras
     opcoes: [
       'Nunca investi, ou só na poupança',
       'Renda fixa, como CDB e Tesouro Direto',
-      'Fundos de investimento ou ações',
-      'Ações, opções, derivativos ou criptomoedas',
+      'Fundos de investimento, ações ou ETFs',
+      'Opções, derivativos ou criptomoedas',
     ],
   },
   {
@@ -74,6 +77,18 @@ export const PERFIS = {
       + 'você pode testar estratégias como a venda a descoberto, mas fique de olho no risco e no aluguel.',
   },
 };
+
+// Marca/desmarca uma opção numa pergunta de múltipla escolha (números de 1 a 4).
+// A opção exclusiva ("Nunca investi") apaga as outras, e marcar outra apaga a exclusiva.
+export function alternar(marcadas = [], n, exclusiva = null) {
+  if (marcadas.includes(n)) return marcadas.filter((x) => x !== n);
+  if (n === exclusiva) return [n];
+  return [...marcadas.filter((x) => x !== exclusiva), n].sort();
+}
+
+// Pontos que vão para o banco: na múltipla escolha, conta a resposta mais arrojada marcada.
+export const pontosDasRespostas = (respostas) =>
+  respostas.map((r) => (Array.isArray(r) ? (r.length ? Math.max(...r) : null) : r));
 
 export function classificar(pontos) {
   if (pontos <= 11) return 'conservador';

@@ -1187,3 +1187,4 @@ span.chip-topico-noticia { color: var(--texto); }
 .sobre-foto { width: 88px; height: 88px; border-radius: 50%; object-fit: cover; border: 3px solid var(--verde-fundo); }
 .sobre-foto-vazia { display: grid; place-items: center; background: var(--fundo); color: var(--suave); }
 .sobre-lista { margin: 0; padding-left: 20px; display: grid; gap: 8px; line-height: 1.5; }
+.pergunta-dica { margin: -4px 0 4px; font-size: 0.9rem; }

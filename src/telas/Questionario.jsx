@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { api } from '../api/index.js';
-import { PERFIS, PERGUNTAS } from '../lib/perfilInvestidor.js';
+import { alternar, PERFIS, PERGUNTAS, pontosDasRespostas } from '../lib/perfilInvestidor.js';
 import Icone from '../componentes/Icone.jsx';
 import Marca from '../componentes/Marca.jsx';
 import Termo from '../componentes/Termo.jsx';
@@ -15,17 +15,23 @@ export default function Questionario({ obrigatorio, perfilAtual, aoConcluir, aoV
   const [enviando, setEnviando] = useState(false);
 
   const ultima = etapa === PERGUNTAS.length - 1;
+  const q = PERGUNTAS[etapa];
   const escolhida = respostas[etapa];
+  const respondida = Array.isArray(escolhida) ? escolhida.length > 0 : Boolean(escolhida);
+  const marcada = (n) => (Array.isArray(escolhida) ? escolhida.includes(n) : escolhida === n);
 
   function escolher(i) {
-    setRespostas((r) => r.map((v, k) => (k === etapa ? i + 1 : v)));
+    setRespostas((r) => r.map((v, k) => {
+      if (k !== etapa) return v;
+      return q.multipla ? alternar(v ?? [], i + 1, q.exclusiva) : i + 1;
+    }));
   }
 
   async function avancar() {
     if (!ultima) { setEtapa(etapa + 1); window.scrollTo({ top: 0 }); return; }
     setEnviando(true); setErro('');
     try {
-      setResultado(await api.definirPerfilInvestidor(respostas));
+      setResultado(await api.definirPerfilInvestidor(pontosDasRespostas(respostas)));
       window.scrollTo({ top: 0 });
     } catch (e) {
       setErro(e.message);
@@ -93,7 +99,6 @@ export default function Questionario({ obrigatorio, perfilAtual, aoConcluir, aoV
     );
   }
 
-  const q = PERGUNTAS[etapa];
   return (
     <main className="questionario">
       <div className="questionario-topo">
@@ -110,16 +115,18 @@ export default function Questionario({ obrigatorio, perfilAtual, aoConcluir, aoV
 
       <fieldset className="cartao pergunta" key={etapa}>
         <legend><h1>{q.titulo}</h1></legend>
+        {q.dica && <p className="suave pergunta-dica">{q.dica}</p>}
         {q.opcoes.map((texto, i) => (
-          <label key={i} className={`opcao-resposta ${escolhida === i + 1 ? 'escolhida' : ''}`}>
-            <input type="radio" name={`pergunta-${etapa}`} checked={escolhida === i + 1} onChange={() => escolher(i)} />
+          <label key={i} className={`opcao-resposta ${marcada(i + 1) ? 'escolhida' : ''} ${q.multipla ? 'opcao-multipla' : ''}`}>
+            <input type={q.multipla ? 'checkbox' : 'radio'} name={`pergunta-${etapa}`}
+                   checked={marcada(i + 1)} onChange={() => escolher(i)} />
             <span>{texto}</span>
           </label>
         ))}
       </fieldset>
 
       {erro && <p className="aviso aviso-erro" role="alert">{erro}</p>}
-      <button className="botao botao-principal" onClick={avancar} disabled={!escolhida || enviando}>
+      <button className="botao botao-principal" onClick={avancar} disabled={!respondida || enviando}>
         {enviando ? 'Calculando…' : ultima ? 'Ver meu perfil' : 'Próxima'}
       </button>
     </main>
