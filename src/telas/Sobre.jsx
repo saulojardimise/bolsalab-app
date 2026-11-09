@@ -63,7 +63,7 @@ export default function Sobre({ aoVoltar }) {
           <li>Cada turma tem um grupo e um ranking próprio.</li>
           <li>As operações aparecem na comunidade, onde os alunos reagem, comentam e abrem discussões.</li>
           <li>Os termos técnicos têm explicação no próprio app: é só tocar no <strong>?</strong>.</li>
-          <li>O professor acompanha a turma, publica avisos e registra os eventos das empresas, como dividendos.</li>
+          <li>O professor acompanha a turma, publica avisos e registra os eventos das empresas, como troca de código e desdobramento de ações.</li>
         </ul>
       </section>
 
