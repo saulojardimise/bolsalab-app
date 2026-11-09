@@ -1176,9 +1176,7 @@ span.chip-topico-noticia { color: var(--texto); }
 .instalar-conteudo .botao { width: 100%; }
 
 /* ---------------------------------------------------------------- sobre o app e assinatura */
-.assinatura { text-align: center; padding: 28px 16px 8px; font-size: 0.85rem; color: var(--suave); }
-.assinatura .link { color: var(--suave); font-weight: 400; }
-.assinatura strong { color: var(--texto); font-weight: 600; }
+.sobre-assinatura { text-align: center; color: var(--suave); font-size: 0.9rem; margin: 4px 0 0; }
 .sobre .cartao p { margin: 0 0 10px; line-height: 1.55; }
 .sobre .cartao p:last-child { margin-bottom: 0; }
 .sobre-marca { display: grid; gap: 12px; }

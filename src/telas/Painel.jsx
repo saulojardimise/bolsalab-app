@@ -18,7 +18,6 @@ import Carteira from './Carteira.jsx';
 import Turma from './Turma.jsx';
 import Extrato from './Extrato.jsx';
 import Sobre from './Sobre.jsx';
-import Assinatura from '../componentes/Assinatura.jsx';
 import Questionario from './Questionario.jsx';
 import Noticias from './Noticias.jsx';
 import Futuro from './Futuro.jsx';
@@ -266,10 +265,7 @@ export default function Painel({ uid }) {
                              naoLidas={dados.naoLidas ?? 0} aoAbrirNotificacoes={abrirNotificacoes} />}
       {api.modoDemo && <p className="faixa-demo">Demonstração com preços fictícios</p>}
       {erro && <p className="aviso aviso-erro conteudo" role="alert">{erro}</p>}
-      <main className="conteudo">
-        {conteudo}
-        {sobreposta?.tipo !== 'sobre' && <Assinatura aoAbrir={abrirSobre} />}
-      </main>
+      <main className="conteudo">{conteudo}</main>
       <Navegacao aba={sobreposta?.tipo === 'acao' || sobreposta?.tipo === 'futuro' ? 'mercado' : sobreposta?.tipo === 'extrato' || sobreposta?.tipo === 'notificacoes' || sobreposta?.tipo === 'sobre' ? sobreposta.tipo : aba} aoTrocar={trocarAba}
                  aoAbrirExtrato={abrirExtrato} aoAbrirPerfil={() => setPerfilAberto(true)}
                  aoAbrirNotificacoes={abrirNotificacoes} naoLidas={dados.naoLidas ?? 0}

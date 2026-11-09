@@ -70,6 +70,7 @@ export default function Sobre({ aoVoltar }) {
       <p className="nota">
         O BolsaLab é uma ferramenta educacional. O dinheiro é virtual e nada aqui é recomendação de investimento.
       </p>
+      <p className="sobre-assinatura">Desenvolvido pelo <strong>Prof. Dr. Saulo Jardim</strong></p>
     </div>
   );
 }
