@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { diaMes, pct, tendencia } from '../lib/formato.js';
+import { diaMes, pct, reais, tendencia } from '../lib/formato.js';
 import { lado, pontos } from '../lib/futuros.js';
 import { futuroAgora, horaBR, horarioDoDia, mercadoAgora } from '../lib/intradia.js';
 import Icone from '../componentes/Icone.jsx';
@@ -89,7 +89,7 @@ function ListaComFiltros({ dados, linhas, aoEscolher, tipo }) {
       {etf && (
         <p className="suave intro-etf">
           Fundos negociados como ações: com uma cota você leva um índice inteiro, o ouro, o dólar ou títulos do Tesouro.
-          Mesmas regras das ações: corretagem de R$ 15 e lote de 1 cota.
+          Mesmas regras das ações: corretagem de {reais(dados.config.corretagem)} e lote de 1 cota.
         </p>
       )}
       <div className="filtros">

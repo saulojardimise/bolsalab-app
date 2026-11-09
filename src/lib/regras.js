@@ -90,7 +90,7 @@ export function previa({ tipo, quantidade, preco, saldo, config, qtdComprada = 0
     if (q > Q) erro = `Você está vendido em ${Q} ${un} ${deste}.`;
   }
 
-  return { linhas, maximo, erro, efeitoSaldo };
+  return { linhas, maximo, erro, efeitoSaldo: r2(efeitoSaldo) };
 }
 
 /** Totais da carteira (mesma conta do ranking no banco). */

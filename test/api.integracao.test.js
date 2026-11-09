@@ -9,6 +9,7 @@ import { execFileSync } from 'node:child_process';
 import { createClient } from '@supabase/supabase-js';
 import { criarApi } from '../src/api/supabase.js';
 import { previa } from '../src/lib/regras.js';
+const r2 = (v) => Math.round(v * 100) / 100;   // centavos (7,90 não é exato em ponto flutuante)
 
 const { POSTGREST_URL, JWT_SECRET, PGDATABASE } = process.env;
 const pular = !POSTGREST_URL || !JWT_SECRET || !PGDATABASE;
@@ -72,7 +73,7 @@ test('aluno lê perfil, config e mercado', { skip: pular }, async () => {
   assert.equal(Number(perfil.saldo), 10000);
 
   const config = await apis.ana.config();
-  assert.equal(Number(config.corretagem), 15);
+  assert.equal(Number(config.corretagem), 7.9);
   assert.equal(Number(config.limite_descoberto), 0.4);
 
   const mercado = await apis.ana.mercado();
@@ -93,7 +94,7 @@ test('a prévia da boleta bate com o que o banco executa', { skip: pular }, asyn
   // compra
   let p = previa({ tipo: 'compra', quantidade: 100, preco: 40, saldo, config: cfg });
   let o = await apis.ana.executarOrdem('PETR4', 'compra', 100);
-  assert.equal(Number(o.saldo_apos), saldo + p.efeitoSaldo);
+  assert.equal(Number(o.saldo_apos), r2(saldo + p.efeitoSaldo));
   saldo = Number(o.saldo_apos);
 
   const carteira = await apis.ana.carteira(ANA);
@@ -104,25 +105,25 @@ test('a prévia da boleta bate com o que o banco executa', { skip: pular }, asyn
   // venda parcial
   p = previa({ tipo: 'venda', quantidade: 30, preco: 40, saldo, config: cfg, qtdComprada: 100 });
   o = await apis.ana.executarOrdem('PETR4', 'venda', 30);
-  assert.equal(Number(o.saldo_apos), saldo + p.efeitoSaldo);
+  assert.equal(Number(o.saldo_apos), r2(saldo + p.efeitoSaldo));
   saldo = Number(o.saldo_apos);
 
   // venda a descoberto dentro do limite
   p = previa({ tipo: 'venda_descoberto', quantidade: 10, preco: 60, saldo, config: cfg });
   assert.equal(p.erro, null);
   o = await apis.ana.executarOrdem('VALE3', 'venda_descoberto', 10);
-  assert.equal(Number(o.saldo_apos), saldo + p.efeitoSaldo);
+  assert.equal(Number(o.saldo_apos), r2(saldo + p.efeitoSaldo));
   saldo = Number(o.saldo_apos);
 
   const vendidas = await apis.ana.vendidas(ANA);
   assert.equal(vendidas.length, 1);
   assert.equal(Number(vendidas[0].garantia), 600);
-  assert.equal(Number(vendidas[0].resultado_acumulado), -15);
+  assert.equal(Number(vendidas[0].resultado_acumulado), -7.9);
 
   // recompra parcial
   p = previa({ tipo: 'recompra', quantidade: 4, preco: 60, saldo, config: cfg, vendida: vendidas[0] });
   o = await apis.ana.executarOrdem('VALE3', 'recompra', 4);
-  assert.equal(Number(o.saldo_apos), saldo + p.efeitoSaldo);
+  assert.equal(Number(o.saldo_apos), r2(saldo + p.efeitoSaldo));
 
   // limite de 40%: a prévia e o banco recusam juntos
   saldo = Number(o.saldo_apos);
@@ -137,7 +138,7 @@ test('a prévia da boleta bate com o que o banco executa', { skip: pular }, asyn
 });
 
 test('mensagens de erro do banco chegam em português', { skip: pular }, async () => {
-  await assert.rejects(apis.bruno.executarOrdem('PETR4', 'compra', 100000), /Saldo insuficiente: a ordem custa R\$ 4\.000\.015,00/);
+  await assert.rejects(apis.bruno.executarOrdem('PETR4', 'compra', 100000), /Saldo insuficiente: a ordem custa R\$ 4\.000\.007,90/);
   await assert.rejects(apis.bruno.executarOrdem('PETR4', 'venda', 1), /Você tem 0 ações de PETR4/);
   await assert.rejects(apis.bruno.executarOrdem('XXXX3', 'compra', 1), /não está disponível/);
 });

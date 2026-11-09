@@ -6,7 +6,7 @@ export const DICAS = [
   },
   {
     titulo: 'A corretagem pesa nas ordens pequenas',
-    texto: 'R$ 15 numa ordem de R$ 150 já são 10% de custo. Ordens maiores e menos frequentes custam menos.',
+    texto: 'R$ 7,90 numa ordem de R$ 79 já são 10% de custo. Ordens maiores e menos frequentes custam menos.',
   },
   {
     titulo: 'A corretagem conta no resultado',

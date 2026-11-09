@@ -26,7 +26,7 @@ export const GLOSSARIO = {
   },
   corretagem: {
     titulo: 'Corretagem',
-    texto: 'Taxa que a corretora cobra por cada ordem executada, de compra ou de venda. No simulador é R$ 15 por ordem de ações e R$ 10 por ordem de minicontratos, '
+    texto: 'Taxa que a corretora cobra por cada ordem executada, de compra ou de venda. No simulador é R$ 7,90 por ordem de ações e ETFs e R$ 10 por ordem de minicontratos, '
       + 'qualquer que seja a quantidade. Por isso, muitas ordens pequenas saem caro.',
   },
   venda_descoberto: {
@@ -61,8 +61,8 @@ export const GLOSSARIO = {
     texto: 'Na venda a descoberto, o resultado mostrado é só o efeito do preço: valor da venda menos o custo para recomprar hoje. '
       + 'Para o encerramento automático, o simulador soma também o aluguel e a corretagem já pagos, '
       + 'porque eles também saíram do seu saldo.',
-    exemplo: 'Vendeu por R$ 2.000, recomprar hoje custa R$ 2.100 (−R$ 100) e já pagou R$ 15 de corretagem e R$ 6 de aluguel: '
-      + 'prejuízo com custos de R$ 121.',
+    exemplo: 'Vendeu por R$ 2.000, recomprar hoje custa R$ 2.100 (−R$ 100) e já pagou R$ 7,90 de corretagem e R$ 6 de aluguel: '
+      + 'prejuízo com custos de R$ 113,90.',
   },
   encerramento: {
     titulo: 'Encerramento automático',
