@@ -73,13 +73,6 @@ export default function Entrada() {
   const exemploEmail = turma?.dominio_email ? `seu.nome@${turma.dominio_email}` : 'seu.nome@email.com';
 
   return (
-      <main className="entrada entrada-sobre">
-        <Sobre aoVoltar={() => setSobreAberto(false)} />
-      </main>
-    );
-  }
-
-  return (
     <main className="entrada">
       <div className="entrada-marca">
         <Marca altura={52} subtitulo />
