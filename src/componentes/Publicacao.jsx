@@ -50,7 +50,6 @@ export default function Publicacao({ p, aoEscolher, aoMudar, moderar = false, av
   }
 
   async function reagir(tipo) {
-    if (moderar) return;
     const anterior = p.minha_reacao;
     const nova = anterior === tipo ? null : tipo;
     const contagem = { ...p.reacoes };
@@ -170,7 +169,7 @@ export default function Publicacao({ p, aoEscolher, aoMudar, moderar = false, av
           const n = Number(p.reacoes?.[r.id] ?? 0);
           return (
             <button key={r.id} className="reacao" aria-pressed={p.minha_reacao === r.id}
-                    onClick={() => reagir(r.id)} disabled={moderar} aria-label={`${r.rotulo}${n ? `, ${n}` : ''}`}>
+                    onClick={() => reagir(r.id)} aria-label={`${r.rotulo}${n ? `, ${n}` : ''}`}>
               <span aria-hidden="true">{r.emoji}</span>{n > 0 && <span className="num">{n}</span>}
             </button>
           );
