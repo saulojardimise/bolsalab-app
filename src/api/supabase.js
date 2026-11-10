@@ -113,8 +113,10 @@ export function criarApi(supabase, { urlRetorno } = {}) {
       return checar(await supabase.rpc('definir_perfil_investidor', { p_respostas: respostas }));
     },
 
-    async sair() {
-      await supabase.auth.signOut();
+    // local = só neste aparelho (serve também quando a conta já não existe no servidor)
+    async sair(local = false) {
+      const { error } = await supabase.auth.signOut(local ? { scope: 'local' } : undefined);
+      if (error) await supabase.auth.signOut({ scope: 'local' });
     },
 
     async recuperarSenha(email) {
@@ -137,7 +139,14 @@ export function criarApi(supabase, { urlRetorno } = {}) {
       return error ? null : data;
     },
     async perfil(uid) {
-      return checar(await supabase.from('perfis').select('*').eq('user_id', uid).single());
+      const perfil = checar(await supabase.from('perfis').select('*').eq('user_id', uid).maybeSingle());
+      if (!perfil) {
+        // o login ainda está guardado no aparelho, mas a conta foi excluída
+        const e = new Error('Esta conta não existe mais.');
+        e.contaExcluida = true;
+        throw e;
+      }
+      return perfil;
     },
 
     async config() {

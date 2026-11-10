@@ -79,6 +79,11 @@ export default function Painel({ uid }) {
       setErro(''); setSemConexao(false);
       return mercado;
     } catch (e) {
+      if (e.contaExcluida) {
+        try { sessionStorage.setItem('bolsalab:aviso-entrada', 'Esta conta foi excluída do BolsaLab. Entre com outra conta ou crie uma nova.'); } catch { /* sem armazenamento */ }
+        await api.sair(true).catch(() => {});
+        return;
+      }
       setErro(e.message); setSemConexao(Boolean(e.semConexao));
       return null;
     }

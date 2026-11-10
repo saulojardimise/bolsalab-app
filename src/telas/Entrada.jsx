@@ -19,7 +19,13 @@ export default function Entrada() {
   const [lendoTermos, setLendoTermos] = useState(false);
   const [turma, setTurma] = useState(null);     // { turma, dominio_email } | false (inválido) | null (não conferido)
   const [erro, setErro] = useState('');
-  const [aviso, setAviso] = useState('');
+  const [aviso, setAviso] = useState(() => {
+    try {
+      const a = sessionStorage.getItem('bolsalab:aviso-entrada');
+      if (a) sessionStorage.removeItem('bolsalab:aviso-entrada');
+      return a ?? '';
+    } catch { return ''; }
+  });
   const [enviando, setEnviando] = useState(false);
   // convite para instalar o app logo que a pessoa abre o site (celular, fora do app instalado)
   const [instalarVisto, setInstalarVisto] = useState(false);
