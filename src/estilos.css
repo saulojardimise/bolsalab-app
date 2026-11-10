@@ -185,7 +185,7 @@ button:disabled { cursor: not-allowed; }
 .campo { display: grid; gap: 6px; }
 .campo span { font-weight: 650; font-size: 0.92rem; color: var(--marinho); }
 .campo small { color: var(--suave); }
-input:not([type=radio]), select {
+input:not([type=radio]):not([type=checkbox]), select {
   width: 100%; min-height: 50px; padding: 0 14px;
   background: var(--cartao); border: 1.5px solid var(--linha); border-radius: var(--raio);
 }
