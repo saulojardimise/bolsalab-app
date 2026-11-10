@@ -219,7 +219,7 @@ export const GLOSSARIO = {
 export const TERMO_DO_ROTULO = {
   Corretagem: 'corretagem',
   'Corretagem (sai do saldo)': 'corretagem',
-  'Aluguel estimado por dia': 'aluguel',
+  'Aluguel estimado por dia útil': 'aluguel',
   'Limite livre para vender a descoberto': 'limite_descoberto',
   'Fica bloqueado como garantia': 'garantia',
   'Garantia liberada': 'garantia',

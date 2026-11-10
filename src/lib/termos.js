@@ -80,9 +80,9 @@ export const TERMOS = [
     titulo: '8. Quem vê o quê',
     itens: [
       'Os outros participantes veem: seu nome, sua foto, seu curso e sua universidade, seus grupos, há quanto tempo você está no app, seu desempenho em '
-      + 'percentual, sua posição no ranking, seu ativo favorito, as operações que você faz (ativo, tipo, quantidade e preço) '
+      + 'percentual, sua posição e seu patrimônio no ranking, seu ativo favorito, as operações que você faz (ativo, tipo, quantidade e preço) '
       + 'e o que você publica na comunidade.',
-      'Só o professor vê: seu e-mail, sua escolaridade e a situação do curso, patrimônio e saldo em reais, perfil de investidor e os detalhes da sua carteira.',
+      'Só o professor vê: seu e-mail, sua escolaridade e a situação do curso, seu saldo em reais, seu perfil de investidor e os detalhes da sua carteira.',
       'Ninguém vê a sua senha.',
       'Não vendemos nem compartilhamos seus dados com terceiros para fins comerciais.',
     ],

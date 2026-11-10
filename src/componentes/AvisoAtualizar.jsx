@@ -14,7 +14,7 @@ export default function AvisoAtualizar() {
 
   useEffect(() => aoTerVersaoNova(setVersao), []);
   useEffect(() => {
-    if (!versao) return undefined;
+    if (!versao) { setFalta(ESPERA); setIndo(false); return undefined; }
     dialogo.current?.showModal?.();
     const t = setInterval(() => setFalta((f) => f - 1), 1000);
     return () => clearInterval(t);

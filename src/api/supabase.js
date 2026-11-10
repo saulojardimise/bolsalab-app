@@ -209,6 +209,11 @@ export function criarApi(supabase, { urlRetorno } = {}) {
       return checar(await supabase.rpc('ranking', { p_turma_id: turmaId }));
     },
 
+    async feriados() {
+      const hoje = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Sao_Paulo' });
+      const linhas = checar(await supabase.from('feriados').select('data').gte('data', hoje).order('data').limit(40));
+      return linhas.map((l) => l.data);
+    },
     async negociacaoLiberada() {
       return checar(await supabase.rpc('negociacao_liberada'));
     },

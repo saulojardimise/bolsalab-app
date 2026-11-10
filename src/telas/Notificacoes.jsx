@@ -9,7 +9,7 @@ const EMOJI = Object.fromEntries(REACOES.map((r) => [r.id, r.emoji]));
 
 // Notificações: reações e comentários de colegas e operações automáticas na conta.
 // Abrir a tela marca tudo como lido.
-export default function Notificacoes({ versao, aoVoltar, aoLer, aoAbrirPublicacao, aoAbrirTopico, aoAbrirExtrato }) {
+export default function Notificacoes({ versao, etfs, aoVoltar, aoLer, aoAbrirPublicacao, aoAbrirTopico, aoAbrirExtrato }) {
   const [lista, setLista] = useState(null);
   const [erro, setErro] = useState('');
 
@@ -63,7 +63,12 @@ export default function Notificacoes({ versao, aoVoltar, aoLer, aoAbrirPublicaca
                 <span className="notificacao-texto">
                   <span>{frase(n)}</span>
                   {n.texto && n.tipo !== 'automatica' && n.tipo !== 'sistema' && <span className="notificacao-citacao">“{n.texto}”</span>}
-                  {(n.tipo === 'automatica' || n.tipo === 'sistema') && <span className="suave">{n.texto}</span>}
+                  {(n.tipo === 'automatica' || n.tipo === 'sistema') && (
+                    <span className="suave">
+                      {/* o banco escreve "ações"; em ETF são cotas */}
+                      {n.tipo === 'automatica' && etfs?.has(n.operacao?.ativo) ? n.texto.replace(/ ações a R\$/, ' cotas a R$') : n.texto}
+                    </span>
+                  )}
                   <small className="suave">{quando(n.criado_em)}{!n.lida && <span className="sr-only"> · nova</span>}</small>
                 </span>
                 {!n.lida && <span className="ponto-novo" aria-hidden="true" />}

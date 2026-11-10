@@ -15,7 +15,7 @@ const pwa = VitePWA({
   manifest: {
     name: 'BolsaLab',
     short_name: 'BolsaLab',
-    description: 'Simulador de investimentos dos alunos de Administração do ISECENSA',
+    description: 'Simulador de investimentos para a sala de aula, com dinheiro virtual e preços reais da B3',
     lang: 'pt-BR',
     start_url: base,
     scope: base,

@@ -138,7 +138,7 @@ export default function RegrasBolsaLab({ config = {}, mercado = [], aoFechar }) 
           <li>O <strong>ranking</strong> ordena pelo patrimônio: saldo mais o valor dos seus ativos. Como todos começam com {reais(c.saldo)}, é o mesmo que comparar a rentabilidade.</li>
           <li>Não há dividendos nem impostos. Os custos são a corretagem e o aluguel.</li>
           <li>Eventos das empresas, como troca de código e desdobramento, são registrados pelo professor e ajustam sua carteira.</li>
-          <li>Suas operações aparecem na comunidade (ativo, tipo, quantidade e preço). Valores em reais ficam só para você e o professor.</li>
+          <li>Suas operações aparecem na comunidade (ativo, tipo, quantidade e preço) e seu patrimônio aparece no ranking. Saldo e carteira ficam só para você e o professor.</li>
           <li>Uma conta por pessoa. Nada aqui é recomendação de investimento.</li>
         </ul>
 

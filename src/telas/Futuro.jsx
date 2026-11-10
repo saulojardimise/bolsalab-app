@@ -217,7 +217,7 @@ export default function Futuro({ ativo, dados, aoVoltar, aoExecutar, discussoes 
           <p className="aviso" role="status">
             {dados.config.negociacao_pausada
               ? 'O professor pausou as ordens por enquanto.'
-              : 'Negociação fechada agora. Você pode simular a ordem e enviá-la a partir das 19h.'}
+              : `Negociação fechada agora. Você pode simular a ordem e enviá-la a partir das ${dados.config.hora_abre ?? 19}h.`}
           </p>
         )}
         <button className={`botao botao-principal ${operacao === 'venda' ? 'botao-venda' : ''}`} disabled={!podeEnviar}>

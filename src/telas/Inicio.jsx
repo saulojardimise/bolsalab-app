@@ -71,7 +71,8 @@ export default function Inicio({ uid, dados, resumo, linhas, versao, aoEscolher,
     <div className="pilha pilha-dupla">
       <section className="saudacao">
         <h1>Olá, {nome}!</h1>
-        <StatusPregao liberada={dados.liberada} pausada={dados.config.negociacao_pausada} demo={api.modoDemo} />
+        <StatusPregao liberada={dados.liberada} pausada={dados.config.negociacao_pausada} demo={api.modoDemo}
+                      feriados={dados.feriados} abre={dados.config.hora_abre ?? 19} fecha={dados.config.hora_fecha ?? 9} />
       </section>
       <AvisoEndereco perfil={dados.perfil} />
 

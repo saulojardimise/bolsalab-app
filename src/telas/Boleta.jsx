@@ -124,8 +124,8 @@ export default function Boleta({ ticker, empresa, comprada, vendida, operacaoIni
       {tipo === 'venda_descoberto' && (
         <p className="nota">
           Você ganha se o preço cair. O valor da venda fica bloqueado como <Termo id="garantia">garantia</Termo>,
-          o <Termo id="aluguel">aluguel</Termo> é cobrado todo dia e a posição é{' '}
-          <Termo id="encerramento">encerrada sozinha</Termo> se o prejuízo acumulado chegar a 80% do seu saldo disponível.
+          o <Termo id="aluguel">aluguel</Termo> é cobrado em cada dia útil e a posição é{' '}
+          <Termo id="encerramento">encerrada sozinha</Termo> se o prejuízo acumulado chegar a {Math.round(Number(dados.config.stop_prejuizo ?? 0.8) * 100)}% do seu saldo disponível.
         </p>
       )}
 
@@ -138,7 +138,7 @@ export default function Boleta({ ticker, empresa, comprada, vendida, operacaoIni
             ? `A negociação de ${ticker} está suspensa. Você continua com a posição, pelo último preço.`
             : dados.config.negociacao_pausada
             ? 'O professor pausou as ordens por enquanto.'
-            : 'Negociação fechada agora. Você pode simular a ordem e enviá-la a partir das 19h.'}
+            : `Negociação fechada agora. Você pode simular a ordem e enviá-la a partir das ${dados.config.hora_abre ?? 19}h.`}
         </p>
       )}
 

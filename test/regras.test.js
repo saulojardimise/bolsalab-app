@@ -3,7 +3,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { efeitoNoSaldo, previa, resumoCarteira, usoDoStop } from '../src/lib/regras.js';
 import { agoraEmSaoPaulo, pct, reais, reaisComSinal } from '../src/lib/formato.js';
-import { textoStatus } from '../src/lib/pregao.js';
+import { ateProximaVirada, textoStatus } from '../src/lib/pregao.js';
 
 const config = { corretagem: 15, limite_descoberto: 0.4, aluguel_mensal: 0.03 };
 const total = (p) => p.linhas.find((l) => l.destaque).valor;
@@ -89,6 +89,25 @@ test('status do pregão no horário de Brasília', () => {
   const sabado = textoStatus({ liberada: true, agora: new Date('2026-10-31T15:00:00Z') });
   assert.match(sabado.detalhe, /segunda/);
   assert.match(textoStatus({ liberada: true, pausada: true }).titulo, /pausada/);
+  assert.match(textoStatus({ liberada: true, agora: new Date('2026-10-28T11:00:00Z') }).detalhe, /até as 9h/);   // quarta 8h
+});
+
+test('status do pregão: feriados esticam o horário aberto', () => {
+  const feriados = ['2026-11-02', '2026-11-20'];
+  // sexta 20h, e segunda é Finados: aberta até terça
+  assert.match(textoStatus({ liberada: true, feriados, agora: new Date('2026-10-30T23:00:00Z') }).detalhe, /Aberta até terça, às 9h/);
+  // quinta 20h, véspera de feriado na sexta: aberta até segunda (e não "até amanhã")
+  assert.match(textoStatus({ liberada: true, feriados, agora: new Date('2026-11-19T23:00:00Z') }).detalhe, /Aberta até segunda, às 9h/);
+  // sexta de feriado, 10h
+  assert.equal(textoStatus({ liberada: true, feriados, agora: new Date('2026-11-20T13:00:00Z') }).detalhe, 'Hoje é feriado na B3. Aberta até segunda, às 9h.');
+  // madrugada de feriado (2h): não fecha às 9h
+  assert.match(textoStatus({ liberada: true, feriados, agora: new Date('2026-11-20T05:00:00Z') }).detalhe, /até segunda/);
+  // feriado que a lista não tem: o banco liberou em horário de pregão
+  assert.match(textoStatus({ liberada: true, agora: new Date('2026-10-27T18:00:00Z') }).detalhe, /feriado na B3/);
+  // horário configurado pelo professor
+  assert.match(textoStatus({ liberada: false, abre: 18, agora: new Date('2026-10-27T18:00:00Z') }).detalhe, /Abre às 18h/);
+  assert.equal(ateProximaVirada({ agora: new Date('2026-10-27T21:59:30Z') }), 30000);          // 18:59:30 -> 19h
+  assert.equal(ateProximaVirada({ agora: new Date('2026-10-27T23:00:00Z') }), 13 * 3600e3);     // 20h -> 9h
 });
 
 test('ETF: mensagens falam em cotas, não em ações', () => {

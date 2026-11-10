@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { api } from '../api/index.js';
 import { resumoCarteira } from '../lib/regras.js';
 import { diasAtras } from '../lib/formato.js';
@@ -24,6 +24,8 @@ import SemConexao, { AvisoOffline } from '../componentes/SemConexao.jsx';
 import Questionario from './Questionario.jsx';
 import CompletarCadastro from './CompletarCadastro.jsx';
 import { precisaCompletarCadastro } from '../lib/termos.js';
+import { ateProximaVirada } from '../lib/pregao.js';
+import { tickersEtf } from '../lib/etf.js';
 import Noticias from './Noticias.jsx';
 import Futuro from './Futuro.jsx';
 import InstalarApp from '../componentes/InstalarApp.jsx';
@@ -49,6 +51,7 @@ export default function Painel({ uid }) {
   const [sobreposta, setSobreposta] = useState(null);   // { tipo: 'acao', ticker, operacao }
   const [perfilAberto, setPerfilAberto] = useState(false);
   const [dados, setDados] = useState(null);
+  const feriadosRef = useRef([]);
   const [linhas, setLinhas] = useState({});              // ticker -> fechamentos do último mês
   const [erro, setErro] = useState('');
   const [semConexao, setSemConexao] = useState(false);
@@ -76,7 +79,7 @@ export default function Painel({ uid }) {
         api.meusGrupos().catch(() => null),
       ]);
       const grupos = gruposBanco ?? (perfil.turma_id ? [{ id: perfil.turma_id, nome: perfil.turma }] : []);
-      setDados({ perfil, config, mercado, carteira, vendidas, liberada, futurosMercado, futuros, intradia, naoLidas, grupos });
+      setDados((antes) => ({ perfil, config, mercado, carteira, vendidas, liberada, futurosMercado, futuros, intradia, naoLidas, grupos, feriados: antes?.feriados ?? feriadosRef.current }));
       setErro(''); setSemConexao(false);
       return mercado;
     } catch (e) {
@@ -102,7 +105,13 @@ export default function Painel({ uid }) {
     const aoVoltar = () => document.visibilityState === 'visible' && carregar();
     document.addEventListener('visibilitychange', aoVoltar);
     const relogio = setInterval(carregar, 5 * 60 * 1000);
-    return () => { document.removeEventListener('visibilitychange', aoVoltar); clearInterval(relogio); };
+    // feriados da B3: para dizer até quando a negociação fica aberta
+    api.feriados?.().then((f) => { feriadosRef.current = f; setDados((d) => (d ? { ...d, feriados: f } : d)); }).catch(() => {});
+    // na virada do horário (19h e 9h) a faixa "aberta/fechada" muda na hora, sem esperar os 5 minutos
+    let virada;
+    const agendar = () => { virada = setTimeout(() => { carregar(); agendar(); }, ateProximaVirada() + 3000); };
+    agendar();
+    return () => { document.removeEventListener('visibilitychange', aoVoltar); clearInterval(relogio); clearTimeout(virada); };
   }, [carregar, carregarLinhas]);
 
   // botão voltar do aparelho
@@ -245,7 +254,7 @@ export default function Painel({ uid }) {
     conteudo = <Questionario perfilAtual={dados.perfil.perfil_investidor} aoVoltar={fechar}
                              aoConcluir={async () => { await carregar(); fechar(); setRecado('Perfil de investidor atualizado.'); }} />;
   } else if (sobreposta?.tipo === 'notificacoes') {
-    conteudo = <Notificacoes versao={versao} aoVoltar={fechar} aoLer={zerarNaoLidas}
+    conteudo = <Notificacoes versao={versao} etfs={tickersEtf(dados.mercado)} aoVoltar={fechar} aoLer={zerarNaoLidas}
                              aoAbrirPublicacao={(id, comentario) => abrir({ tipo: 'publicacao', id, comentario })}
                              aoAbrirTopico={(id, resposta) => abrir({ tipo: 'topico', id, destaque: resposta })}
                              aoAbrirExtrato={() => trocarSobreposta({ tipo: 'extrato' })} />

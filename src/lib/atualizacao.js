@@ -31,7 +31,7 @@ export async function atualizarAgora(versao = pendente) {
   const chave = `bolsalab:atualizando:${versao}`;
   try {
     const n = Number(sessionStorage.getItem(chave) || 0);
-    if (n >= 2) { pendente = null; return; }
+    if (n >= 2) { pendente = null; ouvintes.forEach((f) => f(null)); return; }   // desiste e libera o app
     sessionStorage.setItem(chave, String(n + 1));
   } catch { /* sem armazenamento */ }
   try {
@@ -45,6 +45,14 @@ export async function atualizarAgora(versao = pendente) {
   location.replace(url.toString());
 }
 
+// há um comentário, discussão ou quantidade pela metade na tela?
+function digitando() {
+  try {
+    return [...document.querySelectorAll('textarea, input:not([type=checkbox]):not([type=radio]):not([type=file])')]
+      .some((e) => e.value && e.value.trim() !== '' && e.offsetParent !== null);
+  } catch { return false; }
+}
+
 let checando = false;
 export async function checarVersao({ emSegundoPlano = false } = {}) {
   if (!VERSAO || checando || !navigator.onLine) return;
@@ -53,7 +61,8 @@ export async function checarVersao({ emSegundoPlano = false } = {}) {
     const publicada = await versaoPublicada();
     if (!publicada || publicada <= VERSAO) return;
     pendente = publicada;
-    if (emSegundoPlano) { await atualizarAgora(publicada); return; }
+    // voltou para o app sem nada digitado: recarrega direto. Com texto pela metade, avisa antes.
+    if (emSegundoPlano && !digitando()) { await atualizarAgora(publicada); return; }
     ouvintes.forEach((f) => f(publicada));
   } catch { /* sem rede: tenta de novo depois */ } finally { checando = false; }
 }

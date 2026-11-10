@@ -524,6 +524,7 @@ export function criarApiDemo() {
         user_id: eu ? estado.perfil.user_id : nome,
       }));
     },
+    async feriados() { return []; },
     async negociacaoLiberada() { return !gestao.pausada && !params.has('fechado'); },
     async souAdmin() { return gestor; },
     async executarOrdem(ticker, tipo, quantidade) {
