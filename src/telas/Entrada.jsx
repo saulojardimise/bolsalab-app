@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import InstalarApp from '../componentes/InstalarApp.jsx';
+import { dominioExiste, sugerirEmail } from '../lib/email.js';
 import { deveSugerirInstalar, ouvirInstalacao } from '../lib/instalar.js';
 import { api } from '../api/index.js';
 import { emailAceito } from '../api/supabase.js';
@@ -20,6 +21,10 @@ export default function Entrada() {
   useEffect(() => ouvirInstalacao(() => setTique((n) => n + 1)), []);
 
   const mudar = (e) => setCampos({ ...campos, [e.target.name]: e.target.value });
+  // e-mail com cara de erro de digitação ("gamil.com"): sugere a correção, só no cadastro
+  const [emailConferido, setEmailConferido] = useState('');   // e-mail que a pessoa confirmou estar certo
+  const sugestao = modo === 'cadastrar' && campos.email.trim().toLowerCase() !== emailConferido ? sugerirEmail(campos.email) : null;
+  const [mostrarSugestao, setMostrarSugestao] = useState(false);
   const trocar = (m) => { setModo(m); setErro(''); setAviso(''); };
 
   // confere o token assim que ele parece completo (8 letras/números)
@@ -37,6 +42,7 @@ export default function Entrada() {
     setErro(''); setAviso('');
     if (modo === 'cadastrar') {
       if (!campos.nome.trim()) { setErro('Digite seu nome.'); return; }
+      if (sugestao) { setMostrarSugestao(true); return; }
       if (temToken) {
         if (!campos.token.trim()) { setErro('Digite o token do grupo ou desmarque a opção "Tenho um token".'); return; }
         if (turma === false) { setErro('Token inválido ou grupo fechado. Confira o código com o professor.'); return; }
@@ -51,6 +57,10 @@ export default function Entrada() {
       if (modo === 'entrar') {
         await api.entrar(campos.email, campos.senha);
       } else if (modo === 'cadastrar') {
+        if (await dominioExiste(campos.email) === false) {
+          setErro(`O endereço "@${campos.email.trim().split('@')[1]}" não existe. Confira o seu e-mail.`);
+          return;
+        }
         const r = await api.cadastrar({ ...campos, token: temToken ? campos.token : '' });
         if (r.precisaConfirmar) {
           setAviso(`Conta criada${r.turma ? ` no grupo ${r.turma}` : ''}. Enviamos um link para ${campos.email.trim()}: abra-o para ativar e depois entre aqui.`);
@@ -119,8 +129,22 @@ export default function Entrada() {
         <label className="campo">
           <span>E-mail</span>
           <input name="email" type="email" inputMode="email" autoComplete="email" required
-                 value={campos.email} onChange={mudar} placeholder={exemploEmail} />
+                 value={campos.email} onChange={mudar} placeholder={exemploEmail}
+                 onBlur={() => sugestao && setMostrarSugestao(true)} aria-describedby={sugestao && mostrarSugestao ? 'sugestao-email' : undefined} />
         </label>
+        {sugestao && mostrarSugestao && (
+          <div className="sugestao-email" id="sugestao-email" role="alert">
+            <p>Você quis dizer <strong>{sugestao}</strong>?</p>
+            <div className="botoes-linha">
+              <button type="button" className="botao botao-principal" onClick={() => { setCampos({ ...campos, email: sugestao }); setMostrarSugestao(false); }}>
+                Sim, corrigir
+              </button>
+              <button type="button" className="botao" onClick={() => { setEmailConferido(campos.email.trim().toLowerCase()); setMostrarSugestao(false); }}>
+                Não, está certo
+              </button>
+            </div>
+          </div>
+        )}
 
         {modo !== 'recuperar' && (
           <label className="campo">

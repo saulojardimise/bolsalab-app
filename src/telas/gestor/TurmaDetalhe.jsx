@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { api } from '../../api/index.js';
+import { sugerirEmail } from '../../lib/email.js';
 import { dataHora, pct, reais, tendencia } from '../../lib/formato.js';
 import Icone from '../../componentes/Icone.jsx';
 import Copiar from '../../componentes/Copiar.jsx';
@@ -132,6 +133,9 @@ export default function TurmaDetalhe({ id, aoVoltar, avisar }) {
                       <strong className={`num ${tendencia(a.rentabilidade_pct)}`}>{pct(a.rentabilidade_pct)}</strong>
                     </span>
                     <small className="aluno-email">{a.email}</small>
+                    {sugerirEmail(a.email) && (
+                      <small className="email-suspeito">E-mail pode estar errado. Será {sugerirEmail(a.email)}?</small>
+                    )}
                     <small>
                       Patrimônio <span className="num">{reais(a.patrimonio)}</span>
                       {' · '}{a.ordens} {Number(a.ordens) === 1 ? 'ordem' : 'ordens'}

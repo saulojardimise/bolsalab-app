@@ -1198,3 +1198,11 @@ span.chip-topico-noticia { color: var(--texto); }
   background: var(--fundo-alerta, var(--azul-fundo)); color: var(--azul); }
 .faixa-offline { display: flex; gap: 8px; align-items: center; justify-content: center; margin: 0;
   padding: 8px 16px; font-size: 0.85rem; font-weight: 600; background: #3B2A0B; color: #FFD27A; }
+
+/* ---------------------------------------------------------------- sugestão de e-mail no cadastro */
+.sugestao-email { display: grid; gap: 10px; margin-top: -4px; padding: 12px 14px; border-radius: 12px;
+  background: var(--ambar-fundo); color: var(--ambar-texto); border: 1px solid var(--ambar); }
+.sugestao-email p { margin: 0; }
+.sugestao-email .botoes-linha { display: flex; gap: 8px; flex-wrap: wrap; }
+.sugestao-email .botao { flex: 1 1 auto; min-height: 40px; }
+.email-suspeito { display: block; color: var(--ambar-texto); font-weight: 600; }

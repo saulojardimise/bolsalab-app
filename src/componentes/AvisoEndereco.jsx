@@ -3,15 +3,17 @@ import { api } from '../api/index.js';
 import Icone from './Icone.jsx';
 
 // Aviso da mudança de endereço (saulojardimise.github.io/bolsalab -> bolsalab.app).
-// Aparece no Início até 08/12/2026 ou até o aluno fechar.
+// Aparece no Início até 08/12/2026 ou até o aluno fechar, só para contas criadas antes da mudança.
 export const AVISO_ENDERECO = 'endereco-bolsalab-app';
 const ATE = '2026-12-08';
+const MUDANCA = '2026-11-08T17:00:00-03:00';   // contas criadas depois já nasceram no endereço novo
 const hojeBR = () => new Date().toLocaleDateString('en-CA', { timeZone: 'America/Sao_Paulo' });
 const chave = (uid) => `bolsalab:aviso:${AVISO_ENDERECO}:${uid}`;
 
 export default function AvisoEndereco({ perfil }) {
   const [fechado, setFechado] = useState(() => {
     if (hojeBR() > ATE || perfil.avisos_vistos?.includes(AVISO_ENDERECO)) return true;
+    if (perfil.criado_em && new Date(perfil.criado_em) >= new Date(MUDANCA)) return true;
     try { return Boolean(localStorage.getItem(chave(perfil.user_id))); } catch { return false; }
   });
   if (fechado) return null;
