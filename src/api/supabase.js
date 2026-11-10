@@ -63,7 +63,7 @@ export function criarApi(supabase, { urlRetorno } = {}) {
     },
 
     // token é opcional: sem ele a pessoa simula sem grupo e pode entrar num grupo depois
-    async cadastrar({ email, senha, nome, token = '', escolaridade = '', situacao = '', universidade = '', termosVersao = null }) {
+    async cadastrar({ email, senha, nome, token = '', escolaridade = '', situacao = '', curso = '', universidade = '', termosVersao = null }) {
       let turma = null;
       if (token.trim()) {
         turma = await this.verificarToken(token);
@@ -80,7 +80,7 @@ export function criarApi(supabase, { urlRetorno } = {}) {
         options: {
           data: {
             nome: nome.trim(), ...(turma ? { token: token.trim() } : {}),
-            escolaridade, escolaridade_situacao: situacao, universidade: universidade.trim(), termos_versao: termosVersao,
+            escolaridade, escolaridade_situacao: situacao, curso: curso.trim(), universidade: universidade.trim(), termos_versao: termosVersao,
           },
           emailRedirectTo: urlRetorno,
         },
@@ -101,9 +101,9 @@ export function criarApi(supabase, { urlRetorno } = {}) {
       if (error) throw traduzir(error);
     },
 
-    async completarCadastro({ escolaridade, situacao, universidade, termosVersao }) {
+    async completarCadastro({ escolaridade, situacao, curso, universidade, termosVersao }) {
       return checar(await supabase.rpc('completar_cadastro', {
-        p_escolaridade: escolaridade, p_situacao: situacao || null, p_universidade: universidade, p_termos_versao: termosVersao,
+        p_escolaridade: escolaridade, p_situacao: situacao || null, p_curso: curso || null, p_universidade: universidade, p_termos_versao: termosVersao,
       }));
     },
     async cadastrosGestor(turmaId) {

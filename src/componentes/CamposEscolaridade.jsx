@@ -1,7 +1,7 @@
-import { ESCOLARIDADES, pedeSituacao, pedeUniversidade, SITUACOES, UNIVERSIDADES_SUGERIDAS } from '../lib/termos.js';
+import { CURSOS_SUGERIDOS, ESCOLARIDADES, pedeSituacao, pedeUniversidade, SITUACOES, UNIVERSIDADES_SUGERIDAS } from '../lib/termos.js';
 
 // Escolaridade, situação do curso (graduação, mestrado e doutorado) e universidade.
-// valor = { escolaridade, situacao, universidade }
+// valor = { escolaridade, situacao, curso, universidade }
 export default function CamposEscolaridade({ valor, aoMudar }) {
   const mudar = (campo, v) => aoMudar({ ...valor, [campo]: v });
   return (
@@ -24,6 +24,17 @@ export default function CamposEscolaridade({ valor, aoMudar }) {
             ))}
           </div>
         </fieldset>
+      )}
+
+      {pedeUniversidade(valor.escolaridade) && (
+        <label className="campo">
+          <span>Curso</span>
+          <input value={valor.curso ?? ''} onChange={(e) => mudar('curso', e.target.value)} maxLength={80}
+                 list="lista-cursos" autoComplete="off" placeholder="Ex.: Administração" required />
+          <datalist id="lista-cursos">
+            {CURSOS_SUGERIDOS.map((c) => <option key={c} value={c} />)}
+          </datalist>
+        </label>
       )}
 
       {pedeUniversidade(valor.escolaridade) && (

@@ -58,7 +58,7 @@ export const TERMOS = [
     titulo: '6. Quais dados coletamos',
     itens: [
       'No cadastro: nome, e-mail, senha (guardada de forma criptografada; ninguém consegue lê-la), escolaridade, '
-      + 'situação do curso e universidade.',
+      + 'situação do curso, curso e universidade.',
       'Se você quiser informar: foto de perfil e respostas do questionário de perfil de investidor.',
       'Do uso do app: ordens, carteira, patrimônio, grupos, publicações, reações, comentários e discussões, com as datas em que aconteceram.',
       'No seu aparelho: o app guarda a sessão de login e algumas preferências (como o tipo de gráfico) no armazenamento do navegador. '
@@ -79,10 +79,10 @@ export const TERMOS = [
   {
     titulo: '8. Quem vê o quê',
     itens: [
-      'Os outros participantes veem: seu nome, sua foto, seus grupos, há quanto tempo você está no app, seu desempenho em '
+      'Os outros participantes veem: seu nome, sua foto, seu curso e sua universidade, seus grupos, há quanto tempo você está no app, seu desempenho em '
       + 'percentual, sua posição no ranking, seu ativo favorito, as operações que você faz (ativo, tipo, quantidade e preço) '
       + 'e o que você publica na comunidade.',
-      'Só o professor vê: seu e-mail, escolaridade, universidade, patrimônio e saldo em reais, perfil de investidor e os detalhes da sua carteira.',
+      'Só o professor vê: seu e-mail, sua escolaridade e a situação do curso, patrimônio e saldo em reais, perfil de investidor e os detalhes da sua carteira.',
       'Ninguém vê a sua senha.',
       'Não vendemos nem compartilhamos seus dados com terceiros para fins comerciais.',
     ],
@@ -132,24 +132,30 @@ export const ESCOLARIDADES = [
 export const SITUACOES = [['em_andamento', 'Em andamento'], ['concluido', 'Concluído'], ['trancado', 'Trancado']];
 export const pedeSituacao = (e) => ['graduacao', 'mestrado', 'doutorado'].includes(e);
 export const pedeUniversidade = (e) => Boolean(e) && e !== 'medio';
+export const CURSOS_SUGERIDOS = ['Administração', 'Economia', 'Ciências Contábeis', 'Engenharia de Produção', 'Direito', 'Engenharia Civil', 'Gestão Financeira', 'Finanças'];
 export const UNIVERSIDADES_SUGERIDAS = ['ISECENSA', 'UFF', 'UENF', 'IFF', 'UCAM', 'UNIFLU', 'Estácio', 'UFRJ', 'UERJ', 'UNIRIO'];
 
+// o que os colegas veem no perfil: "Administração · ISECENSA"
+export const cursoEUniversidade = (p) => [p?.curso, p?.universidade].filter(Boolean).join(' · ');
+
 // texto curto para o professor: "Graduação em andamento · ISECENSA"
-export function descreverEscolaridade({ escolaridade, escolaridade_situacao: sit, universidade } = {}) {
+export function descreverEscolaridade({ escolaridade, escolaridade_situacao: sit, curso, universidade } = {}) {
   if (!escolaridade) return '';
   const nivel = ESCOLARIDADES.find(([id]) => id === escolaridade)?.[1] ?? escolaridade;
   const s = SITUACOES.find(([id]) => id === sit)?.[1]?.toLowerCase();
-  return [s ? `${nivel} ${s}` : nivel, universidade].filter(Boolean).join(' · ');
+  return [s ? `${nivel} ${s}` : nivel, curso, universidade].filter(Boolean).join(' · ');
 }
 
 // precisa (re)aceitar os termos ou completar a escolaridade?
 export const precisaCompletarCadastro = (perfil) =>
-  Boolean(perfil) && (!perfil.termos_aceitos_em || (perfil.termos_versao ?? 0) < TERMOS_VERSAO || !perfil.escolaridade);
+  Boolean(perfil) && (!perfil.termos_aceitos_em || (perfil.termos_versao ?? 0) < TERMOS_VERSAO || !perfil.escolaridade
+    || (pedeUniversidade(perfil.escolaridade) && !perfil.curso));
 
 // mensagem de erro, ou '' se está tudo respondido
-export function conferirEscolaridade({ escolaridade, situacao, universidade }) {
+export function conferirEscolaridade({ escolaridade, situacao, curso = '', universidade }) {
   if (!escolaridade) return 'Escolha sua escolaridade.';
   if (pedeSituacao(escolaridade) && !situacao) return 'Diga se o curso está em andamento, concluído ou trancado.';
+  if (pedeUniversidade(escolaridade) && !curso.trim()) return 'Digite o nome do seu curso.';
   if (pedeUniversidade(escolaridade) && !universidade.trim()) return 'Digite o nome da sua universidade ou faculdade.';
   return '';
 }

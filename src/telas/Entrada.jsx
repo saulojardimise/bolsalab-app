@@ -14,7 +14,7 @@ export default function Entrada() {
   const [modo, setModo] = useState('entrar');   // entrar | cadastrar | recuperar
   const [campos, setCampos] = useState({ email: '', senha: '', nome: '', token: '' });
   const [temToken, setTemToken] = useState(false);
-  const [esc, setEsc] = useState({ escolaridade: '', situacao: '', universidade: '' });
+  const [esc, setEsc] = useState({ escolaridade: '', situacao: '', curso: '', universidade: '' });
   const [aceite, setAceite] = useState(false);
   const [lendoTermos, setLendoTermos] = useState(false);
   const [turma, setTurma] = useState(null);     // { turma, dominio_email } | false (inválido) | null (não conferido)

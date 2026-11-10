@@ -1250,3 +1250,4 @@ span.chip-topico-noticia { color: var(--texto); }
 .escolaridade-aluno { display: block; color: var(--suave); }
 .termos-pendente { display: inline-block; margin-top: 2px; font-size: 0.78rem; font-weight: 700; color: var(--ambar-texto); }
 .chips.chips-quebra { flex-wrap: wrap; overflow: visible; }
+.perfil-pessoa-curso { display: inline-flex; gap: 6px; align-items: center; font-weight: 600; color: var(--texto); }

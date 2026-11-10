@@ -8,13 +8,13 @@ import { TERMOS_VERSAO } from '../lib/termos.js';
 // Quem já tinha conta responde uma vez à escolaridade e aceita os Termos de Uso.
 export default function CompletarCadastro({ perfil, aoConcluir, aoSair }) {
   const [esc, setEsc] = useState({
-    escolaridade: perfil.escolaridade ?? '', situacao: perfil.escolaridade_situacao ?? '', universidade: perfil.universidade ?? '',
+    escolaridade: perfil.escolaridade ?? '', situacao: perfil.escolaridade_situacao ?? '', curso: perfil.curso ?? '', universidade: perfil.universidade ?? '',
   });
   const [aceite, setAceite] = useState(false);
   const [lendo, setLendo] = useState(false);
   const [erro, setErro] = useState('');
   const [enviando, setEnviando] = useState(false);
-  const soTermos = Boolean(perfil.escolaridade);   // já respondeu antes; só os termos mudaram
+  const soTermos = Boolean(perfil.escolaridade) && !(perfil.escolaridade !== 'medio' && !perfil.curso);   // já respondeu antes; só os termos mudaram
 
   async function enviar(e) {
     e.preventDefault();
@@ -36,7 +36,7 @@ export default function CompletarCadastro({ perfil, aoConcluir, aoSair }) {
         <p className="suave">
           {soTermos
             ? 'Atualizamos os Termos de Uso e a Política de Privacidade. Leia e aceite para continuar.'
-            : 'Três perguntas rápidas e o aceite dos Termos de Uso. É só desta vez.'}
+            : 'Algumas perguntas rápidas e o aceite dos Termos de Uso. É só desta vez.'}
         </p>
         <CamposEscolaridade valor={esc} aoMudar={setEsc} />
         <label className="aceite-termos">

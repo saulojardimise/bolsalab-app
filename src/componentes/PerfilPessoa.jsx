@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { api } from '../api/index.js';
 import { pct, tendencia } from '../lib/formato.js';
 import { tempoNoApp } from '../lib/pessoa.js';
+import { cursoEUniversidade } from '../lib/termos.js';
 import Avatar from './Avatar.jsx';
 import Icone from './Icone.jsx';
 import Logo from './Logo.jsx';
@@ -44,6 +45,9 @@ export default function PerfilPessoa({ id, aoFechar, aoAbrirAtivo }) {
               <Avatar foto={p.foto_url} tamanho={88} />
               <h2 id="titulo-pessoa">{p.nome || 'Sem nome'}{p.eu && <small className="suave"> (você)</small>}</h2>
               {p.professor && <span className="chip-professor">Professor</span>}
+              {cursoEUniversidade(p) && (
+                <p className="perfil-pessoa-curso"><Icone nome="capelo" tamanho={16} />{cursoEUniversidade(p)}</p>
+              )}
               <p className="suave">{tempoNoApp(p.criado_em)}{desde && ` · desde ${desde}`}</p>
             </header>
 
