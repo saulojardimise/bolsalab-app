@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { CURSOS_SUGERIDOS, ESCOLARIDADES, pedeSituacao, pedeUniversidade, SITUACOES, UNIVERSIDADES_SUGERIDAS } from '../lib/termos.js';
 
 // Escolaridade, situação do curso (graduação, mestrado e doutorado) e universidade.
@@ -27,27 +28,38 @@ export default function CamposEscolaridade({ valor, aoMudar }) {
       )}
 
       {pedeUniversidade(valor.escolaridade) && (
-        <label className="campo">
-          <span>Curso</span>
-          <input value={valor.curso ?? ''} onChange={(e) => mudar('curso', e.target.value)} maxLength={80}
-                 list="lista-cursos" autoComplete="off" placeholder="Ex.: Administração" required />
-          <datalist id="lista-cursos">
-            {CURSOS_SUGERIDOS.map((c) => <option key={c} value={c} />)}
-          </datalist>
-        </label>
+        <EscolhaOuOutro rotulo="Curso" opcoes={CURSOS_SUGERIDOS} valor={valor.curso ?? ''} aoMudar={(v) => mudar('curso', v)}
+                        dica="Qual é o seu curso?" maximo={80} />
       )}
-
       {pedeUniversidade(valor.escolaridade) && (
-        <label className="campo">
-          <span>Universidade ou faculdade</span>
-          <input value={valor.universidade} onChange={(e) => mudar('universidade', e.target.value)} maxLength={120}
-                 list="lista-universidades" autoComplete="organization" placeholder="Ex.: ISECENSA" required />
-          <datalist id="lista-universidades">
-            {UNIVERSIDADES_SUGERIDAS.map((u) => <option key={u} value={u} />)}
-          </datalist>
-        </label>
+        <EscolhaOuOutro rotulo="Universidade ou faculdade" opcoes={UNIVERSIDADES_SUGERIDAS} valor={valor.universidade ?? ''}
+                        aoMudar={(v) => mudar('universidade', v)} dica="Qual é a sua universidade ou faculdade?" maximo={120} />
       )}
     </>
+  );
+}
+
+// Lista de opções com "Outro" no fim: escolhendo "Outro", aparece um campo para escrever.
+function EscolhaOuOutro({ rotulo, opcoes, valor, aoMudar, dica, maximo }) {
+  const [outro, setOutro] = useState(Boolean(valor) && !opcoes.includes(valor));
+  const id = `campo-${rotulo.split(' ')[0].toLowerCase()}`;
+  return (
+    <div className="campo">
+      <label htmlFor={id}><span>{rotulo}</span></label>
+      <select id={id} value={outro ? '__outro' : valor} required
+              onChange={(e) => {
+                if (e.target.value === '__outro') { setOutro(true); aoMudar(''); }
+                else { setOutro(false); aoMudar(e.target.value); }
+              }}>
+        <option value="">Escolha</option>
+        {opcoes.map((o) => <option key={o} value={o}>{o}</option>)}
+        <option value="__outro">Outro</option>
+      </select>
+      {outro && (
+        <input aria-label={dica} value={valor} onChange={(e) => aoMudar(e.target.value)} maxLength={maximo}
+               placeholder={dica} autoFocus required className="campo-outro" />
+      )}
+    </div>
   );
 }
 

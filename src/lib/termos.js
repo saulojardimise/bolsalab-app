@@ -132,7 +132,7 @@ export const ESCOLARIDADES = [
 export const SITUACOES = [['em_andamento', 'Em andamento'], ['concluido', 'Concluído'], ['trancado', 'Trancado']];
 export const pedeSituacao = (e) => ['graduacao', 'mestrado', 'doutorado'].includes(e);
 export const pedeUniversidade = (e) => Boolean(e) && e !== 'medio';
-export const CURSOS_SUGERIDOS = ['Administração', 'Economia', 'Ciências Contábeis', 'Engenharia de Produção', 'Direito', 'Engenharia Civil', 'Gestão Financeira', 'Finanças'];
+export const CURSOS_SUGERIDOS = ['Administração', 'Ciências Contábeis', 'Direito', 'Economia', 'Engenharia Civil', 'Engenharia de Produção', 'Finanças', 'Gestão Financeira'];
 export const UNIVERSIDADES_SUGERIDAS = ['ISECENSA', 'UFF', 'UENF', 'IFF', 'UCAM', 'UNIFLU', 'Estácio', 'UFRJ', 'UERJ', 'UNIRIO'];
 
 // o que os colegas veem no perfil: "Administração · ISECENSA"

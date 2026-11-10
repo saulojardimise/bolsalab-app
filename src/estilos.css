@@ -1251,3 +1251,6 @@ span.chip-topico-noticia { color: var(--texto); }
 .termos-pendente { display: inline-block; margin-top: 2px; font-size: 0.78rem; font-weight: 700; color: var(--ambar-texto); }
 .chips.chips-quebra { flex-wrap: wrap; overflow: visible; }
 .perfil-pessoa-curso { display: inline-flex; gap: 6px; align-items: center; font-weight: 600; color: var(--texto); }
+.campo-outro { margin-top: 2px; }
+fieldset.campo { border: 0; padding: 0; margin: 0; min-width: 0; }
+fieldset.campo > legend { padding: 0; margin-bottom: 6px; font-weight: 650; font-size: 0.92rem; color: var(--marinho); }
