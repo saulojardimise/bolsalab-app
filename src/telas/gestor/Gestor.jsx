@@ -9,6 +9,8 @@ import Eventos from './Eventos.jsx';
 import Sistema from './Sistema.jsx';
 import Moderacao from './Moderacao.jsx';
 import { AvisoOffline } from '../../componentes/SemConexao.jsx';
+import PerfilPessoa from '../../componentes/PerfilPessoa.jsx';
+import { AbrirPerfilContexto } from '../../lib/pessoa.js';
 
 const ABAS = [
   ['turmas', 'Grupos', 'turma'],
@@ -25,6 +27,7 @@ export default function Gestor({ email }) {
   const [preenchido, setPreenchido] = useState(null);     // evento sugerido por um alerta
   const [nAlertas, setNAlertas] = useState(0);
   const [recado, setRecado] = useState('');
+  const [pessoaAberta, setPessoaAberta] = useState(null);
 
   const contarAlertas = useCallback(() => {
     api.alertas().then((a) => setNAlertas(a.length)).catch(() => {});
@@ -71,6 +74,7 @@ export default function Gestor({ email }) {
   else conteudo = <Sistema email={email} avisar={avisar} />;
 
   return (
+    <AbrirPerfilContexto.Provider value={setPessoaAberta}>
     <div className="painel gestor">
       {turmaAberta == null && (
         <header className="topo">
@@ -97,7 +101,9 @@ export default function Gestor({ email }) {
           </button>
         ))}
       </nav>
+      {pessoaAberta && <PerfilPessoa id={pessoaAberta} aoFechar={() => setPessoaAberta(null)} />}
       {recado && <p className="recado" role="status">{recado}</p>}
     </div>
+    </AbrirPerfilContexto.Provider>
   );
 }

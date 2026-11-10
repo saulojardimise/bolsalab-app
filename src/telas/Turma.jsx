@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { api } from '../api/index.js';
 import { pct, reais, tendencia } from '../lib/formato.js';
 import Avatar from '../componentes/Avatar.jsx';
+import BotaoPessoa from '../componentes/BotaoPessoa.jsx';
 
 // Grupos: ranking de cada grupo da pessoa e o ranking geral (todo mundo que simula),
 // entrar num grupo com o token e sair de um grupo.
@@ -74,11 +75,13 @@ export default function Turma({ grupos, versao, aoMudarGrupos, avisar }) {
           {lista.map((r, i) => (
             <li key={i} className={r.eu ? 'eu' : undefined}>
               <span className="ranking-pos num">{r.posicao}º</span>
-              <Avatar foto={r.foto_url} tamanho={40} />
-              <span className="ranking-nome">
-                <strong>{r.nome || 'Sem nome'}</strong>
-                {!grupo && r.turma && <small>{r.turma}</small>}
-              </span>
+              <BotaoPessoa id={r.user_id} nome={r.nome} className="ranking-pessoa">
+                <Avatar foto={r.foto_url} tamanho={40} />
+                <span className="ranking-nome">
+                  <strong>{r.nome || 'Sem nome'}</strong>
+                  {!grupo && r.turma && <small>{r.turma}</small>}
+                </span>
+              </BotaoPessoa>
               <span className="ranking-valor">
                 <strong className={`num ${tendencia(r.rentabilidade_pct)}`}>{pct(r.rentabilidade_pct)}</strong>
                 <small className="num">{reais(r.patrimonio)}</small>

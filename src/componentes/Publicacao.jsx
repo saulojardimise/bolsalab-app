@@ -4,6 +4,8 @@ import { quando } from '../lib/noticias.js';
 import { pct, tendencia } from '../lib/formato.js';
 import { REACOES, desdeOperacao, nomeCurto, partesOperacao, resumoReacoes } from '../lib/comunidade.js';
 import Avatar from './Avatar.jsx';
+import BotaoPessoa from './BotaoPessoa.jsx';
+import { idDaPessoa } from '../lib/pessoa.js';
 import Icone from './Icone.jsx';
 
 // Uma operação no mural: quem fez, o que fez, como está desde então,
@@ -107,10 +109,10 @@ export default function Publicacao({ p, aoEscolher, aoMudar, moderar = false, av
   const comentario = (c, resposta = false) => (
     <div key={c.id} id={`comentario-${c.id}`}
          className={`comentario ${resposta ? 'comentario-resposta' : ''} ${destaque === c.id ? 'comentario-destaque' : ''}`}>
-      <Avatar foto={c.foto_url} tamanho={resposta ? 26 : 30} />
+      <BotaoPessoa id={idDaPessoa(c) ?? c.nome} nome={c.nome}><Avatar foto={c.foto_url} tamanho={resposta ? 26 : 30} /></BotaoPessoa>
       <div className="comentario-corpo">
         <p>
-          <strong>{c.eu ? 'Você' : nomeCurto(c.nome)}</strong>
+          <BotaoPessoa id={idDaPessoa(c) ?? c.nome} nome={c.nome}><strong>{c.eu ? 'Você' : nomeCurto(c.nome)}</strong></BotaoPessoa>
           {c.professor && <span className="chip-professor">Professor</span>}
           <span className="suave">{!c.professor && c.grupo ? ` · ${c.grupo}` : ''} · {quando(c.criado_em)}</span>
         </p>
@@ -139,10 +141,10 @@ export default function Publicacao({ p, aoEscolher, aoMudar, moderar = false, av
   return (
     <article className="cartao publicacao">
       <header className="publicacao-topo">
-        <Avatar foto={p.foto_url} tamanho={40} />
+        <BotaoPessoa id={idDaPessoa(p) ?? p.nome} nome={p.nome}><Avatar foto={p.foto_url} tamanho={40} /></BotaoPessoa>
         <div>
           <p className="publicacao-autor">
-            <strong>{p.eu ? 'Você' : nomeCurto(p.nome)}</strong>
+            <BotaoPessoa id={idDaPessoa(p) ?? p.nome} nome={p.nome}><strong>{p.eu ? 'Você' : nomeCurto(p.nome)}</strong></BotaoPessoa>
             {p.grupo && <span className="suave"> · {p.grupo}</span>}
           </p>
           <p className="suave publicacao-quando">{quando(p.criado_em)}</p>

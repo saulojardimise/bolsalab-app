@@ -18,6 +18,8 @@ import Carteira from './Carteira.jsx';
 import Turma from './Turma.jsx';
 import Extrato from './Extrato.jsx';
 import Sobre from './Sobre.jsx';
+import PerfilPessoa from '../componentes/PerfilPessoa.jsx';
+import { AbrirPerfilContexto } from '../lib/pessoa.js';
 import SemConexao, { AvisoOffline } from '../componentes/SemConexao.jsx';
 import Questionario from './Questionario.jsx';
 import Noticias from './Noticias.jsx';
@@ -51,6 +53,7 @@ export default function Painel({ uid }) {
   const [versao, setVersao] = useState(0);
   const [fotoVista, setFotoVista] = useState(false);
   const [avisoFechado, setAvisoFechado] = useState(false);
+  const [pessoaAberta, setPessoaAberta] = useState(null);       // perfil de outra pessoa
   const [instalarAberto, setInstalarAberto] = useState(false);   // aberto pelo menu
   const [instalarVisto, setInstalarVisto] = useState(false);     // já apareceu sozinho nesta visita
   const [, setTiqueInstalar] = useState(0);
@@ -263,6 +266,7 @@ export default function Painel({ uid }) {
   }
 
   return (
+    <AbrirPerfilContexto.Provider value={setPessoaAberta}>
     <div className="painel">
       {!sobreposta && <Topo foto={dados.perfil.foto_url} aoAbrirPerfil={() => setPerfilAberto(true)}
                              naoLidas={dados.naoLidas ?? 0} aoAbrirNotificacoes={abrirNotificacoes} />}
@@ -291,7 +295,9 @@ export default function Painel({ uid }) {
         <AvisoNovidade futuros={dados.futurosMercado} aoFechar={fecharAvisoIrInicio} />
       )}
       {mostrarInstalar && !mostrarAviso && <InstalarApp aoFechar={fecharInstalar} avisar={setRecado} />}
+      {pessoaAberta && <PerfilPessoa id={pessoaAberta} aoFechar={() => setPessoaAberta(null)} aoAbrirAtivo={abrirAtivo} />}
       {recado && <p className="recado" role="status">{recado}</p>}
     </div>
+    </AbrirPerfilContexto.Provider>
   );
 }

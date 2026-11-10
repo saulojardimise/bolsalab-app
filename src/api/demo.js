@@ -504,6 +504,7 @@ export function criarApiDemo() {
       return lista.map(([nome, ts, patrimonio, eu], i) => ({
         posicao: i + 1, nome, turma: ts.map((t) => gestao.turmas.find((x) => x.id === t)?.nome).filter(Boolean).join(', '), patrimonio,
         rentabilidade_pct: r2((patrimonio / 10000 - 1) * 100), eu, foto_url: eu ? estado.perfil.foto_url ?? null : null,
+        user_id: eu ? estado.perfil.user_id : nome,
       }));
     },
     async negociacaoLiberada() { return !gestao.pausada && !params.has('fechado'); },
@@ -594,6 +595,28 @@ export function criarApiDemo() {
       const a = gestao.alunos.find((x) => x.user_id === userId);
       if (!a || a.turma_id !== grupoId) throw new Error('Essa pessoa não está no grupo.');
       a.turma_id = null;
+    },
+    async perfilPublico(id) {
+      await atraso();
+      const geral = await this.ranking(null);
+      const eu = id === estado.perfil.user_id || id === estado.perfil.nome;
+      const a = gestao.alunos.find((x) => x.user_id === id || x.nome === id);
+      const nome = eu ? estado.perfil.nome : a?.nome ?? id;
+      const professor = /Saulo/.test(nome);
+      const linha = geral.find((r) => r.nome === nome);
+      const grupos = eu ? estado.grupos : a?.turma_id != null ? [a.turma_id] : [];
+      const favs = ['PETR4', 'VALE3', 'ITUB4', 'BOVA11', 'WEGE3', 'WIN'];
+      const h = [...nome].reduce((s, c) => s + c.charCodeAt(0), 0);
+      const fav = favs[h % favs.length];
+      return {
+        user_id: id, nome, foto_url: eu ? estado.perfil.foto_url ?? null : null, professor, eu,
+        criado_em: eu ? estado.perfil.criado_em : a?.criado_em ?? horasAtras(24 * (10 + (h % 60))),
+        grupos: grupos.map((t) => gestao.turmas.find((x) => x.id === t)?.nome).filter(Boolean),
+        posicao: professor ? null : linha?.posicao ?? null, participantes: professor ? null : geral.length,
+        rentabilidade_pct: professor ? null : linha?.rentabilidade_pct ?? 0,
+        operacoes: professor ? 0 : a?.ordens ?? 3 + (h % 12),
+        favorito: professor ? null : { ativo: fav, ordens: 2 + (h % 5), nome: EMPRESAS.find((e) => e[0] === fav)?.[1] ?? 'Mini Ibovespa' },
+      };
     },
     async corrigirEmail(userId, email) {
       await atraso();

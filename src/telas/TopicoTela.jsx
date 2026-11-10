@@ -3,6 +3,8 @@ import { api } from '../api/index.js';
 import { quando } from '../lib/noticias.js';
 import { nomeCurto } from '../lib/comunidade.js';
 import Avatar from '../componentes/Avatar.jsx';
+import BotaoPessoa from '../componentes/BotaoPessoa.jsx';
+import { idDaPessoa } from '../lib/pessoa.js';
 import ChipTopico from '../componentes/ChipTopico.jsx';
 import Icone from '../componentes/Icone.jsx';
 
@@ -84,10 +86,10 @@ export default function TopicoTela({ id, destaque = null, aoVoltar, avisar, aoAb
   const resposta = (r, filha = false) => (
     <div key={r.id} id={`resposta-${r.id}`}
          className={`comentario ${filha ? 'comentario-resposta' : ''} ${destaque === r.id ? 'comentario-destaque' : ''}`}>
-      <Avatar foto={r.foto_url} tamanho={filha ? 26 : 32} />
+      <BotaoPessoa id={idDaPessoa(r) ?? r.nome} nome={r.nome}><Avatar foto={r.foto_url} tamanho={filha ? 26 : 32} /></BotaoPessoa>
       <div className="comentario-corpo">
         <p>
-          <strong>{r.eu ? 'Você' : nomeCurto(r.nome)}</strong>
+          <BotaoPessoa id={idDaPessoa(r) ?? r.nome} nome={r.nome}><strong>{r.eu ? 'Você' : nomeCurto(r.nome)}</strong></BotaoPessoa>
           {r.professor && <span className="chip-professor">Professor</span>}
           <span className="suave">{!r.professor && r.grupo ? ` · ${r.grupo}` : ''} · {quando(r.criado_em)}</span>
         </p>
@@ -128,8 +130,10 @@ export default function TopicoTela({ id, destaque = null, aoVoltar, avisar, aoAb
             <h2>{t.titulo}</h2>
             <ChipTopico t={t} grande aoAbrirAtivo={aoAbrirAtivo} />
             <p className="publicacao-autor">
-              <Avatar foto={t.foto_url} tamanho={28} />
-              <strong>{t.eu ? 'Você' : nomeCurto(t.nome)}</strong>
+              <BotaoPessoa id={idDaPessoa(t) ?? t.nome} nome={t.nome} className="pessoa-em-linha">
+                <Avatar foto={t.foto_url} tamanho={28} />
+                <strong>{t.eu ? 'Você' : nomeCurto(t.nome)}</strong>
+              </BotaoPessoa>
               {t.professor && <span className="chip-professor">Professor</span>}
               <span className="suave">{!t.professor && t.grupo ? ` · ${t.grupo}` : ''} · {quando(t.criado_em)}</span>
             </p>

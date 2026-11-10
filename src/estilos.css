@@ -514,7 +514,8 @@ input:focus-visible, select:focus-visible { outline: none; border-color: var(--f
 /* ---------------------------------------------------------------- turma */
 .destaque-posicao { display: block; background: var(--verde-fundo); color: var(--verde-texto); box-shadow: none; }
 .ranking { list-style: none; }
-.ranking li { display: grid; grid-template-columns: 30px 40px 1fr auto; gap: 10px; align-items: center; padding: 12px 0; }
+.ranking li { display: grid; grid-template-columns: 30px 1fr auto; gap: 10px; align-items: center; padding: 12px 0; }
+.ranking-pessoa { display: grid; grid-template-columns: 40px 1fr; gap: 10px; align-items: center; min-width: 0; text-align: left; }
 .ranking li.eu { background: var(--verde-fundo); margin: 0 -16px; padding: 12px 16px; }
 .ranking li.eu + li { border-top-color: transparent; }
 .ranking-pos { font-weight: 800; font-size: 1.15rem; color: var(--marinho); }
@@ -1206,3 +1207,26 @@ span.chip-topico-noticia { color: var(--texto); }
 .sugestao-email .botoes-linha { display: flex; gap: 8px; flex-wrap: wrap; }
 .sugestao-email .botao { flex: 1 1 auto; min-height: 40px; }
 .email-suspeito { display: block; color: var(--ambar-texto); font-weight: 600; }
+
+/* ---------------------------------------------------------------- perfil de outra pessoa */
+.botao-pessoa { background: none; border: 0; padding: 0; margin: 0; font: inherit; color: inherit; cursor: pointer; text-align: left; border-radius: 10px; }
+.botao-pessoa:hover strong { text-decoration: underline; text-underline-offset: 3px; }
+.botao-pessoa:focus-visible { outline: 2px solid var(--verde); outline-offset: 2px; }
+.pessoa-em-linha { display: inline-flex; gap: 8px; align-items: center; }
+.perfil-pessoa-conteudo { position: relative; display: grid; gap: 18px; padding: 24px 20px calc(24px + env(safe-area-inset-bottom)); }
+.perfil-pessoa-fechar { position: absolute; top: 10px; right: 10px; }
+.perfil-pessoa-topo { display: grid; justify-items: center; gap: 6px; text-align: center; }
+.perfil-pessoa-topo h2 { margin: 6px 0 0; font-size: 1.35rem; }
+.perfil-pessoa-topo p { margin: 0; }
+.perfil-pessoa-numeros { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 0; }
+.perfil-pessoa-numeros > div { background: var(--fundo); border-radius: 14px; padding: 12px 8px; text-align: center; }
+.perfil-pessoa-numeros dt { font-size: 0.78rem; color: var(--suave); }
+.perfil-pessoa-numeros dd { margin: 4px 0 0; font-size: 1.15rem; font-weight: 800; }
+.perfil-pessoa-numeros dd small { font-size: 0.75rem; font-weight: 500; }
+.perfil-pessoa-bloco h3 { margin: 0 0 8px; font-size: 0.9rem; color: var(--suave); font-weight: 600; }
+.perfil-pessoa-bloco p { margin: 0; }
+.perfil-pessoa-fav { display: grid; grid-template-columns: auto 1fr auto; gap: 12px; align-items: center; width: 100%;
+  background: var(--fundo); border: 0; border-radius: 14px; padding: 10px 12px; font: inherit; color: inherit; text-align: left; cursor: pointer; }
+.perfil-pessoa-fav span { display: grid; }
+.perfil-pessoa-grupos { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip-grupo { font-size: 0.82rem; font-weight: 600; padding: 4px 10px; border-radius: 999px; background: var(--verde-fundo); color: var(--verde-texto); }
