@@ -1,9 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { api } from './api/index.js';
 import Entrada from './telas/Entrada.jsx';
 import NovaSenha from './telas/NovaSenha.jsx';
 import Painel from './telas/Painel.jsx';
 import Gestor from './telas/gestor/Gestor.jsx';
+import SemConexao from './componentes/SemConexao.jsx';
 
 export default function App() {
   const [sessao, setSessao] = useState(undefined);   // undefined = carregando
@@ -28,15 +29,15 @@ function Conta({ sessao }) {
   const [gestor, setGestor] = useState(null);
   const [erro, setErro] = useState('');
 
-  useEffect(() => {
-    api.souAdmin().then(setGestor).catch((e) => setErro(e.message));
-  }, []);
+  const verificar = useCallback(() => api.souAdmin().then((g) => { setErro(''); setGestor(g); }).catch((e) => setErro(e)), []);
+  useEffect(() => { verificar(); }, [verificar]);
 
+  if (erro?.semConexao) return <SemConexao aoTentar={verificar} />;
   if (erro) {
     return (
       <main className="carregando-tela">
         <div className="erro-geral" role="alert">
-          <p>{erro}</p>
+          <p>{erro.message}</p>
           <button className="botao" onClick={() => location.reload()}>Tentar de novo</button>
         </div>
       </main>

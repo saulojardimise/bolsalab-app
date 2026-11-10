@@ -2,6 +2,7 @@
 import { createClient } from '@supabase/supabase-js';
 import { criarApi } from './supabase.js';
 import { criarApiDemo } from './demo.js';
+import { comErrosTraduzidos } from '../lib/rede.js';
 
 const env = import.meta.env;
 const urlRetorno = window.location.origin + env.BASE_URL;
@@ -15,4 +16,4 @@ function montar() {
   return criarApi(cliente, { urlRetorno });
 }
 
-export const api = montar();
+export const api = comErrosTraduzidos(montar());

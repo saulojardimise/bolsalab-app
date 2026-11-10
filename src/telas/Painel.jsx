@@ -18,6 +18,7 @@ import Carteira from './Carteira.jsx';
 import Turma from './Turma.jsx';
 import Extrato from './Extrato.jsx';
 import Sobre from './Sobre.jsx';
+import SemConexao, { AvisoOffline } from '../componentes/SemConexao.jsx';
 import Questionario from './Questionario.jsx';
 import Noticias from './Noticias.jsx';
 import Futuro from './Futuro.jsx';
@@ -45,6 +46,7 @@ export default function Painel({ uid }) {
   const [dados, setDados] = useState(null);
   const [linhas, setLinhas] = useState({});              // ticker -> fechamentos do último mês
   const [erro, setErro] = useState('');
+  const [semConexao, setSemConexao] = useState(false);
   const [recado, setRecado] = useState('');
   const [versao, setVersao] = useState(0);
   const [fotoVista, setFotoVista] = useState(false);
@@ -69,10 +71,10 @@ export default function Painel({ uid }) {
       ]);
       const grupos = gruposBanco ?? (perfil.turma_id ? [{ id: perfil.turma_id, nome: perfil.turma }] : []);
       setDados({ perfil, config, mercado, carteira, vendidas, liberada, futurosMercado, futuros, intradia, naoLidas, grupos });
-      setErro('');
+      setErro(''); setSemConexao(false);
       return mercado;
     } catch (e) {
-      setErro(e.message);
+      setErro(e.message); setSemConexao(Boolean(e.semConexao));
       return null;
     }
   }, [uid]);
@@ -112,6 +114,7 @@ export default function Painel({ uid }) {
     saldoInicial: Number(dados.config.saldo_inicial),
   }), [dados]);
 
+  if (!dados && semConexao) return <SemConexao aoTentar={carregar} />;
   if (!dados) {
     return (
       <main className="carregando-tela" aria-busy={!erro}>
@@ -264,6 +267,7 @@ export default function Painel({ uid }) {
       {!sobreposta && <Topo foto={dados.perfil.foto_url} aoAbrirPerfil={() => setPerfilAberto(true)}
                              naoLidas={dados.naoLidas ?? 0} aoAbrirNotificacoes={abrirNotificacoes} />}
       {api.modoDemo && <p className="faixa-demo">Demonstração com preços fictícios</p>}
+      <AvisoOffline />
       {erro && <p className="aviso aviso-erro conteudo" role="alert">{erro}</p>}
       <main className="conteudo">{conteudo}</main>
       <Navegacao aba={sobreposta?.tipo === 'acao' || sobreposta?.tipo === 'futuro' ? 'mercado' : sobreposta?.tipo === 'extrato' || sobreposta?.tipo === 'notificacoes' || sobreposta?.tipo === 'sobre' ? sobreposta.tipo : aba} aoTrocar={trocarAba}
