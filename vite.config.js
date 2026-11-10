@@ -36,9 +36,18 @@ const pwa = VitePWA({
   },
 });
 
+// Cada build tem uma versão. O app compara a sua com a de versao.json (sempre lida da rede)
+// e, se estiver desatualizado, obriga a atualizar (ver lib/atualizacao.js).
+const VERSAO = new Date().toISOString();
+const arquivoVersao = {
+  name: 'versao-json',
+  generateBundle() { this.emitFile({ type: 'asset', fileName: 'versao.json', source: JSON.stringify({ versao: VERSAO }) }); },
+};
+
 export default defineConfig({
   base: arquivoUnico ? './' : base,
-  plugins: arquivoUnico ? [react(), viteSingleFile()] : [react(), pwa],
+  define: { __VERSAO__: JSON.stringify(arquivoUnico ? '' : VERSAO) },
+  plugins: arquivoUnico ? [react(), viteSingleFile()] : [react(), pwa, arquivoVersao],
   // na prévia (sem PWA) o registro do service worker vira um arquivo vazio
   resolve: arquivoUnico ? { alias: { 'virtual:pwa-register': '/src/sem-pwa.js' } } : {},
   build: arquivoUnico

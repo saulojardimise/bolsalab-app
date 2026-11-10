@@ -1269,3 +1269,8 @@ fieldset.campo > legend { padding: 0; margin-bottom: 6px; font-weight: 650; font
 .regras-ativo-topo strong { color: var(--marinho); }
 .regras-ativo-topo span { font-size: 0.8rem; color: var(--suave); }
 .regras .aviso-passos { list-style: disc; }
+
+/* Versão nova: atualização obrigatória */
+.aviso-atualizar .aviso-conteudo { text-align: center; justify-items: center; }
+.aviso-atualizar .botao { width: 100%; }
+.aviso-atualizar-icone { display: grid; place-items: center; width: 56px; height: 56px; border-radius: 50%; background: var(--verde-fundo); color: var(--verde-texto); }
