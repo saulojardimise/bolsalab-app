@@ -1254,3 +1254,18 @@ span.chip-topico-noticia { color: var(--texto); }
 .campo-outro { margin-top: 2px; }
 fieldset.campo { border: 0; padding: 0; margin: 0; min-width: 0; }
 fieldset.campo > legend { padding: 0; margin-bottom: 6px; font-weight: 650; font-size: 0.92rem; color: var(--marinho); }
+
+/* Guia das regras */
+.regras-resumo { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.regras-resumo > div { display: grid; gap: 2px; align-content: start; background: var(--fundo); border-radius: var(--raio); padding: 10px 12px; min-width: 0; }
+.regras-resumo .icone { color: var(--azul); margin-bottom: 2px; }
+.regras-resumo span { font-size: 0.8rem; color: var(--suave); }
+.regras-resumo strong { font-size: 1.02rem; color: var(--marinho); overflow-wrap: anywhere; }
+.regras-resumo small { font-size: 0.78rem; color: var(--suave); }
+.regras-resumo-largo { grid-column: 1 / -1; }
+.regras-ativo { background: var(--fundo); border-radius: var(--raio); padding: 10px 12px; display: grid; gap: 4px; }
+.regras-ativo p { margin: 0; line-height: 1.5; }
+.regras-ativo-topo { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 2px 10px; }
+.regras-ativo-topo strong { color: var(--marinho); }
+.regras-ativo-topo span { font-size: 0.8rem; color: var(--suave); }
+.regras .aviso-passos { list-style: disc; }

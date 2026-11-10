@@ -28,7 +28,7 @@ import Noticias from './Noticias.jsx';
 import Futuro from './Futuro.jsx';
 import InstalarApp from '../componentes/InstalarApp.jsx';
 import { deveSugerirInstalar, ouvirInstalacao } from '../lib/instalar.js';
-import AvisoNovidade, { AVISO_MINICONTRATOS, deveMostrarAviso, lembrarAvisoLocal } from '../componentes/AvisoNovidade.jsx';
+import RegrasBolsaLab, { AVISO_REGRAS, deveMostrarRegras, lembrarRegrasLocal } from '../componentes/RegrasBolsaLab.jsx';
 import CompletarFoto, { fotoAdiada } from './CompletarFoto.jsx';
 
 // Área logada: carrega os dados da conta e controla a navegação.
@@ -45,6 +45,7 @@ export default function Painel({ uid }) {
     try { sessionStorage.setItem('bolsalab:aba', id); } catch { /* sem armazenamento */ }
   };
   const [discussoesBusca, setDiscussoesBusca] = useState('');   // filtro ao abrir "Ver todas"
+  const [regrasAbertas, setRegrasAbertas] = useState(false);
   const [sobreposta, setSobreposta] = useState(null);   // { tipo: 'acao', ticker, operacao }
   const [perfilAberto, setPerfilAberto] = useState(false);
   const [dados, setDados] = useState(null);
@@ -206,13 +207,13 @@ export default function Painel({ uid }) {
     window.scrollTo({ top: 0 });
   };
 
-  // Aviso de novidade (uma vez por aluno; some depois de fechado)
-  const mostrarAviso = !avisoFechado && !sobreposta && !perfilAberto && deveMostrarAviso(dados.perfil);
+  // Guia das regras (uma vez por aluno; depois fica em Mais > Regras do BolsaLab)
+  const mostrarAviso = !avisoFechado && !sobreposta && !perfilAberto && deveMostrarRegras(dados.perfil);
   const fecharAviso = () => {
     setAvisoFechado(true);
-    lembrarAvisoLocal(uid);
-    api.marcarAvisoVisto(AVISO_MINICONTRATOS).catch(() => {});
-    setDados((d) => ({ ...d, perfil: { ...d.perfil, avisos_vistos: [...(d.perfil.avisos_vistos ?? []), AVISO_MINICONTRATOS] } }));
+    lembrarRegrasLocal(uid);
+    api.marcarAvisoVisto(AVISO_REGRAS).catch(() => {});
+    setDados((d) => ({ ...d, perfil: { ...d.perfil, avisos_vistos: [...(d.perfil.avisos_vistos ?? []), AVISO_REGRAS] } }));
   };
   // fechar o aviso leva sempre para a página inicial
   // Instalar o app: aparece sozinho depois do aviso de novidade (celular, fora do app instalado)
@@ -295,7 +296,7 @@ export default function Painel({ uid }) {
       <Navegacao aba={sobreposta?.tipo === 'acao' || sobreposta?.tipo === 'futuro' ? 'mercado' : sobreposta?.tipo === 'extrato' || sobreposta?.tipo === 'notificacoes' || sobreposta?.tipo === 'sobre' ? sobreposta.tipo : aba} aoTrocar={trocarAba}
                  aoAbrirExtrato={abrirExtrato} aoAbrirPerfil={() => setPerfilAberto(true)}
                  aoAbrirNotificacoes={abrirNotificacoes} naoLidas={dados.naoLidas ?? 0}
-                 aoInstalar={() => setInstalarAberto(true)} aoAbrirSobre={abrirSobre} />
+                 aoInstalar={() => setInstalarAberto(true)} aoAbrirSobre={abrirSobre} aoAbrirRegras={() => setRegrasAbertas(true)} />
 
       {perfilAberto && (
         <MenuPerfil
@@ -310,7 +311,10 @@ export default function Painel({ uid }) {
         />
       )}
       {mostrarAviso && (
-        <AvisoNovidade futuros={dados.futurosMercado} aoFechar={fecharAvisoIrInicio} />
+        <RegrasBolsaLab config={dados.config} mercado={dados.mercado} aoFechar={fecharAvisoIrInicio} />
+      )}
+      {regrasAbertas && !mostrarAviso && (
+        <RegrasBolsaLab config={dados.config} mercado={dados.mercado} aoFechar={() => setRegrasAbertas(false)} />
       )}
       {mostrarInstalar && !mostrarAviso && <InstalarApp aoFechar={fecharInstalar} avisar={setRecado} />}
       {pessoaAberta && <PerfilPessoa id={pessoaAberta} aoFechar={() => setPessoaAberta(null)} aoAbrirAtivo={abrirAtivo} />}
