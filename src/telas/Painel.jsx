@@ -22,6 +22,8 @@ import PerfilPessoa from '../componentes/PerfilPessoa.jsx';
 import { AbrirPerfilContexto } from '../lib/pessoa.js';
 import SemConexao, { AvisoOffline } from '../componentes/SemConexao.jsx';
 import Questionario from './Questionario.jsx';
+import CompletarCadastro from './CompletarCadastro.jsx';
+import { precisaCompletarCadastro } from '../lib/termos.js';
 import Noticias from './Noticias.jsx';
 import Futuro from './Futuro.jsx';
 import InstalarApp from '../componentes/InstalarApp.jsx';
@@ -128,6 +130,17 @@ export default function Painel({ uid }) {
           </div>
         )}
       </main>
+    );
+  }
+
+  // Conta antiga (ou termos novos): escolaridade e aceite dos termos vêm antes de tudo.
+  // Só exige depois que o banco tiver o SQL 039 (perfil com a coluna termos_aceitos_em).
+  if ('termos_aceitos_em' in dados.perfil && precisaCompletarCadastro(dados.perfil)) {
+    return (
+      <div className="painel">
+        {api.modoDemo && <p className="faixa-demo">Demonstração com preços fictícios</p>}
+        <CompletarCadastro perfil={dados.perfil} aoConcluir={carregar} aoSair={() => api.sair()} />
+      </div>
     );
   }
 

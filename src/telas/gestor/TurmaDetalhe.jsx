@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { api } from '../../api/index.js';
 import { sugerirEmail } from '../../lib/email.js';
+import { descreverEscolaridade } from '../../lib/termos.js';
 import { dataHora, pct, reais, tendencia } from '../../lib/formato.js';
 import Icone from '../../componentes/Icone.jsx';
 import Copiar from '../../componentes/Copiar.jsx';
@@ -12,6 +13,7 @@ import { PERFIS } from '../../lib/perfilInvestidor.js';
 export default function TurmaDetalhe({ id, aoVoltar, avisar }) {
   const [turma, setTurma] = useState(null);
   const [alunos, setAlunos] = useState(null);
+  const [cadastros, setCadastros] = useState({});   // escolaridade e termos de cada pessoa
   const [editando, setEditando] = useState(false);
   const [confirmarToken, setConfirmarToken] = useState(false);
   const [excluindo, setExcluindo] = useState(false);
@@ -20,6 +22,7 @@ export default function TurmaDetalhe({ id, aoVoltar, avisar }) {
 
   useEffect(() => {
     // id 0 = pessoas cadastradas sem nenhum grupo
+    api.cadastrosGestor?.(id).then((l) => setCadastros(Object.fromEntries(l.map((c) => [c.user_id, c])))).catch(() => setCadastros({}));
     Promise.all([id === 0 ? Promise.resolve(null) : api.turmas(), api.alunosTurma(id)])
       .then(([ts, as]) => { setTurma(id === 0 ? { id: 0, nome: 'Sem grupo', virtual: true } : ts.find((t) => t.id === id)); setAlunos(as); })
       .catch((e) => setErro(e.message));
@@ -135,6 +138,12 @@ export default function TurmaDetalhe({ id, aoVoltar, avisar }) {
                     <small className="aluno-email">{a.email}</small>
                     {sugerirEmail(a.email) && (
                       <small className="email-suspeito">E-mail pode estar errado. Será {sugerirEmail(a.email)}?</small>
+                    )}
+                    {descreverEscolaridade(cadastros[a.user_id]) && (
+                      <small className="escolaridade-aluno">{descreverEscolaridade(cadastros[a.user_id])}</small>
+                    )}
+                    {cadastros[a.user_id] && !cadastros[a.user_id].termos_aceitos_em && (
+                      <small className="termos-pendente">Ainda não aceitou os Termos de Uso</small>
                     )}
                     <small>
                       Patrimônio <span className="num">{reais(a.patrimonio)}</span>

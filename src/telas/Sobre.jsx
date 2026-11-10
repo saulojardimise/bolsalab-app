@@ -2,10 +2,12 @@ import { useEffect, useState } from 'react';
 import { api } from '../api/index.js';
 import Icone from '../componentes/Icone.jsx';
 import Marca from '../componentes/Marca.jsx';
+import Termos from '../componentes/Termos.jsx';
 
 // Sobre o app: quem criou, para quê e como o BolsaLab é usado nas aulas.
 export default function Sobre({ aoVoltar }) {
   const [foto, setFoto] = useState(null);
+  const [termos, setTermos] = useState(false);
 
   useEffect(() => {
     let vivo = true;
@@ -70,6 +72,8 @@ export default function Sobre({ aoVoltar }) {
       <p className="nota">
         O BolsaLab é uma ferramenta educacional. O dinheiro é virtual e nada aqui é recomendação de investimento.
       </p>
+      <button className="botao" onClick={() => setTermos(true)}>Termos de Uso e Política de Privacidade</button>
+      {termos && <Termos aoFechar={() => setTermos(false)} />}
       <p className="sobre-assinatura">Desenvolvido pelo <strong>Prof. Dr. Saulo Jardim</strong></p>
     </div>
   );

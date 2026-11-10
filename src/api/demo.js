@@ -104,7 +104,8 @@ function criarEstado() {
   const precos = Object.fromEntries(EMPRESAS.map(([t, , , p, a]) => [t, { preco: p, anterior: a }]));
   const s = {
     uid: 'demo-aluno',
-    perfil: { user_id: 'demo-aluno', email: 'ana.souza@isecensa.edu.br', nome: 'Ana Souza', turma: 'ADM 3º período', turma_id: 1, saldo: 10000, criado_em: horasAtras(170), perfil_investidor: null },
+    perfil: { user_id: 'demo-aluno', email: 'ana.souza@isecensa.edu.br', nome: 'Ana Souza', turma: 'ADM 3º período', turma_id: 1, saldo: 10000, criado_em: horasAtras(170), perfil_investidor: null,
+      escolaridade: 'graduacao', escolaridade_situacao: 'em_andamento', universidade: 'ISECENSA', termos_versao: 1, termos_aceitos_em: horasAtras(170) },
     precos,
     posicoes: {},   // ticker -> { quantidade, preco_medio }
     vendidas: {},   // ticker -> { quantidade, preco_medio, garantia, aluguel_pago, corretagem_paga, aberta_em }
@@ -229,6 +230,8 @@ export function criarApiDemo() {
   let gestao = criarGestao();
   const params = new URLSearchParams(location.search);
   let gestor = params.has('gestor');
+  // ?completar: demonstra a tela "Complete seu cadastro" (conta antiga, sem escolaridade e sem termos)
+  if (params.has('completar')) Object.assign(estado.perfil, { escolaridade: null, escolaridade_situacao: null, universidade: null, termos_versao: null, termos_aceitos_em: null });
   let logado = params.has('entrar') || gestor;
   const ouvintes = new Set();
   const sessaoAtual = () => (logado ? { id: gestor ? 'demo-gestor' : estado.uid, email: gestor ? EMAIL_GESTOR : estado.perfil.email } : null);
@@ -338,6 +341,19 @@ export function criarApiDemo() {
     async trocarSenha(email, atual, nova) {
       await atraso(300);
       if (atual.length < 6) throw new Error('A senha atual está incorreta.');
+    },
+    async completarCadastro({ escolaridade, situacao, universidade, termosVersao }) {
+      await atraso();
+      Object.assign(estado.perfil, { escolaridade, escolaridade_situacao: situacao || null, universidade, termos_versao: termosVersao, termos_aceitos_em: new Date().toISOString() });
+    },
+    async cadastrosGestor() {
+      await atraso();
+      const unis = ['ISECENSA', 'ISECENSA', 'UFF', 'UENF'];
+      return gestao.alunos.map((a, i) => ({
+        user_id: a.user_id, escolaridade: i % 5 === 4 ? 'especializacao' : 'graduacao',
+        escolaridade_situacao: i % 5 === 4 ? null : ['em_andamento', 'em_andamento', 'concluido', 'trancado'][i % 4],
+        universidade: unis[i % unis.length], termos_versao: i % 6 === 5 ? null : 1, termos_aceitos_em: i % 6 === 5 ? null : horasAtras(10),
+      }));
     },
     async definirPerfilInvestidor(respostas) {
       await atraso(300);

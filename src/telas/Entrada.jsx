@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react';
 import InstalarApp from '../componentes/InstalarApp.jsx';
 import { dominioExiste, sugerirEmail } from '../lib/email.js';
+import CamposEscolaridade, { conferirEscolaridade } from '../componentes/CamposEscolaridade.jsx';
+import Termos from '../componentes/Termos.jsx';
+import { TERMOS_VERSAO } from '../lib/termos.js';
 import { deveSugerirInstalar, ouvirInstalacao } from '../lib/instalar.js';
 import { api } from '../api/index.js';
 import { emailAceito } from '../api/supabase.js';
@@ -11,6 +14,9 @@ export default function Entrada() {
   const [modo, setModo] = useState('entrar');   // entrar | cadastrar | recuperar
   const [campos, setCampos] = useState({ email: '', senha: '', nome: '', token: '' });
   const [temToken, setTemToken] = useState(false);
+  const [esc, setEsc] = useState({ escolaridade: '', situacao: '', universidade: '' });
+  const [aceite, setAceite] = useState(false);
+  const [lendoTermos, setLendoTermos] = useState(false);
   const [turma, setTurma] = useState(null);     // { turma, dominio_email } | false (inválido) | null (não conferido)
   const [erro, setErro] = useState('');
   const [aviso, setAviso] = useState('');
@@ -43,6 +49,9 @@ export default function Entrada() {
     if (modo === 'cadastrar') {
       if (!campos.nome.trim()) { setErro('Digite seu nome.'); return; }
       if (sugestao) { setMostrarSugestao(true); return; }
+      const faltaEsc = conferirEscolaridade(esc);
+      if (faltaEsc) { setErro(faltaEsc); return; }
+      if (!aceite) { setErro('Para criar a conta, aceite os Termos de Uso e a Política de Privacidade.'); return; }
       if (temToken) {
         if (!campos.token.trim()) { setErro('Digite o token do grupo ou desmarque a opção "Tenho um token".'); return; }
         if (turma === false) { setErro('Token inválido ou grupo fechado. Confira o código com o professor.'); return; }
@@ -61,7 +70,7 @@ export default function Entrada() {
           setErro(`O endereço "@${campos.email.trim().split('@')[1]}" não existe. Confira o seu e-mail.`);
           return;
         }
-        const r = await api.cadastrar({ ...campos, token: temToken ? campos.token : '' });
+        const r = await api.cadastrar({ ...campos, token: temToken ? campos.token : '', ...esc, termosVersao: TERMOS_VERSAO });
         if (r.precisaConfirmar) {
           setAviso(`Conta criada${r.turma ? ` no grupo ${r.turma}` : ''}. Enviamos um link para ${campos.email.trim()}: abra-o para ativar e depois entre aqui.`);
           setModo('entrar');
@@ -156,6 +165,19 @@ export default function Entrada() {
           </label>
         )}
 
+        {modo === 'cadastrar' && (
+          <>
+            <CamposEscolaridade valor={esc} aoMudar={setEsc} />
+            <label className="aceite-termos">
+              <input type="checkbox" checked={aceite} onChange={(e) => setAceite(e.target.checked)} />
+              <span>
+                Li e aceito os{' '}
+                <button type="button" className="link" onClick={() => setLendoTermos(true)}>Termos de Uso e a Política de Privacidade</button>
+              </span>
+            </label>
+          </>
+        )}
+
         {erro && <p className="aviso aviso-erro" role="alert">{erro}</p>}
 
         <button className="botao botao-principal" disabled={enviando}>
@@ -180,6 +202,7 @@ export default function Entrada() {
           </p>
         )}
       </form>
+      {lendoTermos && <Termos aoFechar={() => setLendoTermos(false)} aoAceitar={() => { setAceite(true); setLendoTermos(false); }} />}
       {!instalarVisto && deveSugerirInstalar() && <InstalarApp aoFechar={() => setInstalarVisto(true)} />}
     </main>
   );
