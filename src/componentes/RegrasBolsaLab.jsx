@@ -7,8 +7,12 @@ import Icone from './Icone.jsx';
 export const AVISO_REGRAS = 'regras-2026-11';
 const chaveLocal = (uid) => `bolsalab:aviso:${AVISO_REGRAS}:${uid}`;
 
-export function deveMostrarRegras(perfil) {
+// só para quem criou a conta depois que o guia entrou no ar; quem já usava o app não recebe
+const GUIA_DESDE = '2026-11-10T01:48:00-03:00';
+
+export function deveMostrarRegras(perfil, { demo = false } = {}) {
   if (!perfil || perfil.avisos_vistos?.includes(AVISO_REGRAS)) return false;
+  if (!demo && !(perfil.criado_em && new Date(perfil.criado_em) >= new Date(GUIA_DESDE))) return false;
   try { if (localStorage.getItem(chaveLocal(perfil.user_id))) return false; } catch { /* sem armazenamento */ }
   return true;
 }

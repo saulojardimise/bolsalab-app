@@ -208,7 +208,7 @@ export default function Painel({ uid }) {
   };
 
   // Guia das regras (uma vez por aluno; depois fica em Mais > Regras do BolsaLab)
-  const mostrarAviso = !avisoFechado && !sobreposta && !perfilAberto && deveMostrarRegras(dados.perfil);
+  const mostrarAviso = !avisoFechado && !sobreposta && !perfilAberto && deveMostrarRegras(dados.perfil, { demo: api.modoDemo });
   const fecharAviso = () => {
     setAvisoFechado(true);
     lembrarRegrasLocal(uid);
