@@ -26,6 +26,7 @@ import CompletarCadastro from './CompletarCadastro.jsx';
 import { precisaCompletarCadastro } from '../lib/termos.js';
 import { ateProximaVirada } from '../lib/pregao.js';
 import { tickersEtf } from '../lib/etf.js';
+import { carteiraAgora } from '../lib/intradia.js';
 import Noticias from './Noticias.jsx';
 import Futuro from './Futuro.jsx';
 import InstalarApp from '../componentes/InstalarApp.jsx';
@@ -133,6 +134,16 @@ export default function Painel({ uid }) {
     saldo: dados.perfil.saldo, carteira: dados.carteira, vendidas: dados.vendidas, futuros: dados.futuros,
     saldoInicial: Number(dados.config.saldo_inicial),
   }), [dados]);
+  // Durante o dia, Início e Carteira mostram a carteira estimada com a cotação do dia.
+  // Boleta, limites, extrato e ranking seguem pelo fechamento (dados e resumo).
+  const aoVivo = useMemo(() => {
+    const agora = dados && carteiraAgora(dados);
+    if (!agora) return null;
+    const dadosAgora = { ...dados, carteira: agora.carteira, vendidas: agora.vendidas, futuros: agora.futuros };
+    const r = resumoCarteira({ saldo: dados.perfil.saldo, carteira: agora.carteira, vendidas: agora.vendidas, futuros: agora.futuros,
+                               saldoInicial: Number(dados.config.saldo_inicial) });
+    return { dados: dadosAgora, resumo: { ...r, estimadoAs: agora.horario, noFechamento: resumo.patrimonio } };
+  }, [dados, resumo]);
 
   if (!dados && semConexao) return <SemConexao aoTentar={carregar} />;
   if (!dados) {
@@ -273,7 +284,7 @@ export default function Painel({ uid }) {
   } else if (sobreposta?.tipo === 'extrato') {
     conteudo = <Extrato uid={uid} dados={dados} resumo={resumo} versao={versao} aoVoltar={fechar} />;
   } else if (aba === 'inicio') {
-    conteudo = <Inicio uid={uid} dados={dados} resumo={resumo} linhas={linhas} versao={versao}
+    conteudo = <Inicio uid={uid} dados={aoVivo?.dados ?? dados} resumo={aoVivo?.resumo ?? resumo} linhas={linhas} versao={versao}
                        aoEscolher={abrirAcao} irPara={trocarAba} aoAbrirExtrato={abrirExtrato} />;
   } else if (aba === 'mercado') {
     conteudo = <Mercado dados={dados} linhas={linhas} aoEscolher={abrirAcao} aoAbrirFuturo={abrirFuturo} />;
@@ -287,7 +298,7 @@ export default function Painel({ uid }) {
     conteudo = <Noticias dados={dados} aoEscolher={abrirAcao}
                          aoDiscutir={(n) => novoTopico({ noticia: { id: n.id, titulo: n.titulo, link: n.link } })} />;
   } else if (aba === 'carteira') {
-    conteudo = <Carteira uid={uid} dados={dados} resumo={resumo} versao={versao}
+    conteudo = <Carteira uid={uid} dados={aoVivo?.dados ?? dados} resumo={aoVivo?.resumo ?? resumo} versao={versao}
                          aoEscolher={abrirAcao} irPara={trocarAba} aoAbrirExtrato={abrirExtrato} aoAbrirFuturo={abrirFuturo} />;
   } else {
     conteudo = <Turma grupos={dados.grupos} versao={versao} aoMudarGrupos={carregar} avisar={setRecado} />;

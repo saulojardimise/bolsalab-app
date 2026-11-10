@@ -3,7 +3,7 @@ import { api } from '../api/index.js';
 import { usoDoStop } from '../lib/regras.js';
 import { lado, pontos } from '../lib/futuros.js';
 import { oscilacaoHoje } from '../lib/intradia.js';
-import { LinhaHoje } from '../componentes/Hoje.jsx';
+import { LinhaHoje, NotaEstimado } from '../componentes/Hoje.jsx';
 import { numero, pct, reais, reaisComSinal, tendencia } from '../lib/formato.js';
 import Logo from '../componentes/Logo.jsx';
 import Icone from '../componentes/Icone.jsx';
@@ -55,6 +55,7 @@ export default function Carteira({ uid, dados, resumo, versao, aoEscolher, irPar
           <Termo id="rentabilidade" />
         </p>
         <LinhaHoje oscilacao={oscilacaoHoje({ ...dados })} patrimonio={resumo.patrimonio} />
+        <NotaEstimado resumo={resumo} />
         <dl className="resumo-linhas">
           <div><dt><Termo id="saldo">Saldo disponível</Termo></dt><dd className="num">{reais(resumo.saldo)}</dd></div>
           {(totalAcoes > 0 || compradasEtfs.length === 0) && <div><dt>Ações compradas</dt><dd className="num">{reais(totalAcoes)}</dd></div>}
@@ -64,6 +65,9 @@ export default function Carteira({ uid, dados, resumo, versao, aoEscolher, irPar
           )}
           {resumo.margemFuturos > 0 && (
             <div><dt><Termo id="margem_garantia">Margem em minicontratos</Termo></dt><dd className="num">{reais(resumo.margemFuturos)}</dd></div>
+          )}
+          {resumo.ajusteFuturos !== 0 && resumo.ajusteFuturos != null && (
+            <div><dt><Termo id="ajuste_diario">Ajuste de hoje dos minicontratos (estimado)</Termo></dt><dd className={`num ${tendencia(resumo.ajusteFuturos)}`}>{reaisComSinal(resumo.ajusteFuturos)}</dd></div>
           )}
           {corretagens > 0 && (
             <div><dt><Termo id="corretagem">Corretagens pagas</Termo></dt><dd className="num">{reais(corretagens)}</dd></div>
@@ -178,7 +182,7 @@ export default function Carteira({ uid, dados, resumo, versao, aoEscolher, irPar
                     <span className={`selo-futuro selo-${f.ativo.toLowerCase()}`} aria-hidden="true">{f.ativo}</span>
                     <span className="posicao-id">
                       <strong>{f.contrato}</strong>
-                      <span>{lado(f.quantidade).texto}, aberto a {pontos(f.preco_medio, f.ativo)} pt{m ? `, hoje ${pontos(m.preco, f.ativo)} pt` : ''}</span>
+                      <span>{lado(f.quantidade).texto}, aberto a {pontos(f.preco_medio, f.ativo)} pt{f.preco_agora ? `, agora ${pontos(f.preco_agora, f.ativo)} pt` : m ? `, hoje ${pontos(m.preco, f.ativo)} pt` : ''}</span>
                     </span>
                     <span className="posicao-valor">
                       <strong className={`num ${tendencia(f.resultado)}`}>{reaisComSinal(f.resultado)}</strong>

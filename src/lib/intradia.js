@@ -1,7 +1,8 @@
 // Cotação do dia (coletada a cada 1h30 no pregão, com cerca de 30 min de atraso).
-// Só para acompanhar: as ordens, o patrimônio e o ranking continuam pelo fechamento.
+// As ordens e o ranking continuam pelo fechamento. Na tela, o patrimônio e a carteira do aluno
+// são estimados com essa cotação durante o dia (carteiraAgora).
 
-const diaBR = (d) => new Date(d).toLocaleDateString('en-CA', { timeZone: 'America/Sao_Paulo' });
+export const diaBR = (d) => new Date(d).toLocaleDateString('en-CA', { timeZone: 'America/Sao_Paulo' });
 export const horaBR = (iso) => new Date(iso).toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit' }).replace(':', 'h');
 const r2 = (v) => Math.round(v * 100) / 100;
 
@@ -78,4 +79,46 @@ export function oscilacaoHoje({ carteira = [], vendidas = [], futuros = [], merc
   }
   if (!horario) return null;
   return { valor: r2(valor), horario };
+}
+
+/**
+ * Carteira estimada com a cotação do dia: mesmas linhas de carteira, vendidas e minicontratos,
+ * com preço, valor e resultado recalculados. Devolve null se não há cotação do dia para nenhuma posição.
+ * É só para mostrar: ordens, limites e ranking usam o fechamento.
+ */
+export function carteiraAgora({ carteira = [], vendidas = [], futuros = [], mercado = [], futurosMercado = [], intradia = [] }) {
+  if (!intradia?.length) return null;
+  const porTicker = Object.fromEntries(mercado.map((e) => [e.ticker, e]));
+  let horario = null;
+  const marca = (h) => { if (!horario || h > horario) horario = h; };
+  const agoraDe = (ticker) => { const e = porTicker[ticker]; return e ? acaoAgora(intradia, e) : null; };
+
+  const c2 = carteira.map((p) => {
+    const a = agoraDe(p.ticker);
+    if (!a) return p;
+    marca(a.horario);
+    const q = Number(p.quantidade); const pm = Number(p.preco_medio);
+    return { ...p, preco_atual: a.preco, valor_atual: r2(q * a.preco), resultado: r2(q * (a.preco - pm)),
+             resultado_pct: pm > 0 ? r2((a.preco / pm - 1) * 100) : p.resultado_pct, estimado: true };
+  });
+  const v2 = vendidas.map((v) => {
+    const a = agoraDe(v.ticker);
+    if (!a) return v;
+    marca(a.horario);
+    const custo = r2(Number(v.quantidade) * a.preco);
+    const dif = custo - Number(v.custo_recompra || 0);
+    return { ...v, preco_atual: a.preco, custo_recompra: custo, resultado: r2(Number(v.garantia) - custo),
+             resultado_acumulado: r2(Number(v.resultado_acumulado || 0) - dif), estimado: true };
+  });
+  const f2 = futuros.map((f) => {
+    const c = futurosMercado.find((x) => x.ativo === f.ativo);
+    const a = c && futuroAgora(intradia, c);
+    if (!a) return f;
+    marca(a.horario);
+    // ganho ou perda desde o último ajuste: ainda não entrou no saldo
+    const ajuste = r2(Number(f.quantidade) * (a.preco - Number(f.preco_ajuste)) * Number(c.valor_ponto));
+    return { ...f, preco_agora: a.preco, ajuste_hoje: ajuste, resultado: r2(Number(f.resultado || 0) + ajuste), estimado: true };
+  });
+  if (!horario) return null;
+  return { carteira: c2, vendidas: v2, futuros: f2, horario };
 }

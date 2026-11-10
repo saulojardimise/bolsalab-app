@@ -30,3 +30,13 @@ export function PrecoAgora({ agora, formatar = reais }) {
     </p>
   );
 }
+
+// "Valor estimado com a cotação das 14h00. Ordens e ranking usam o fechamento: R$ 10.512,16."
+export function NotaEstimado({ resumo }) {
+  if (!resumo?.estimadoAs) return null;
+  return (
+    <p className="nota-estimado">
+      Valor estimado com a cotação das {horaBR(resumo.estimadoAs)}. Ordens e ranking usam o fechamento: <span className="num">{reais(resumo.noFechamento)}</span>.
+    </p>
+  );
+}

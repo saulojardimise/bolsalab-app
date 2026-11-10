@@ -1274,3 +1274,4 @@ fieldset.campo > legend { padding: 0; margin-bottom: 6px; font-weight: 650; font
 .aviso-atualizar .aviso-conteudo { text-align: center; justify-items: center; }
 .aviso-atualizar .botao { width: 100%; }
 .aviso-atualizar-icone { display: grid; place-items: center; width: 56px; height: 56px; border-radius: 50%; background: var(--verde-fundo); color: var(--verde-texto); }
+.nota-estimado { margin: 2px 0 0; font-size: 0.8rem; line-height: 1.45; color: var(--suave); }

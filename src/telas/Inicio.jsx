@@ -11,8 +11,8 @@ import ListaAtivos, { detalheQuantidade } from '../componentes/ListaAtivos.jsx';
 import Termo from '../componentes/Termo.jsx';
 import { montarCapa, quando } from '../lib/noticias.js';
 import { comparar } from '../lib/comparacao.js';
-import { mercadoAgora, oscilacaoHoje } from '../lib/intradia.js';
-import { LinhaHoje } from '../componentes/Hoje.jsx';
+import { diaBR, mercadoAgora, oscilacaoHoje } from '../lib/intradia.js';
+import { LinhaHoje, NotaEstimado } from '../componentes/Hoje.jsx';
 import Comparativo, { extrasComparacao } from '../componentes/Comparativo.jsx';
 import Avatar from '../componentes/Avatar.jsx';
 import AvisoEndereco from '../componentes/AvisoEndereco.jsx';
@@ -55,7 +55,14 @@ export default function Inicio({ uid, dados, resumo, linhas, versao, aoEscolher,
   }, [serie, periodo, resumo.patrimonio, dados.perfil.criado_em, dados.config.saldo_inicial]);
 
   const variacao = pontos ? variacaoSerie(pontos) : 0;
-  const comparacao = useMemo(() => pontos && comparar(pontos, indices), [pontos, indices]);
+  // com o patrimônio estimado, o Ibovespa de hoje também entra na comparação
+  const indicesHoje = useMemo(() => {
+    const i = resumo.estimadoAs && dados.intradia?.find((x) => x.codigo === 'IBOV');
+    const hojeBR = diaBR(new Date());
+    if (!i || diaBR(i.horario) !== hojeBR || indices.some((x) => x.serie === 'IBOV' && x.data >= hojeBR)) return indices;
+    return [...indices, { serie: 'IBOV', data: hojeBR, valor: Number(i.preco) }];
+  }, [indices, dados.intradia, resumo.estimadoAs]);
+  const comparacao = useMemo(() => pontos && comparar(pontos, indicesHoje), [pontos, indicesHoje]);
   const temIndices = comparacao && (comparacao.final.ibov != null || comparacao.final.cdi != null);
   const extras = useMemo(() => (temIndices ? extrasComparacao(comparacao, pontos[0].valor) : []), [temIndices, comparacao, pontos]);
   const nome = dados.perfil.nome.split(' ')[0] || 'aluno';
@@ -85,6 +92,7 @@ export default function Inicio({ uid, dados, resumo, linhas, versao, aoEscolher,
           <strong className="num">{pct(variacao)}</strong> <span className="suave">no período</span>
         </p>
         <LinhaHoje oscilacao={hoje} patrimonio={resumo.patrimonio} />
+        <NotaEstimado resumo={resumo} />
         {periodo !== 'TUDO' && (
           <p className="suave desde-inicio">
             Desde o início ({reais(dados.config.saldo_inicial)}):{' '}

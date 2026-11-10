@@ -5,7 +5,8 @@ export const GLOSSARIO = {
   patrimonio: {
     titulo: 'Patrimônio virtual',
     texto: 'Tudo o que a sua conta vale hoje: o saldo em dinheiro, mais as ações compradas pelo preço de fechamento, '
-      + 'mais o resultado das vendas a descoberto. É ele que decide a sua posição no ranking.',
+      + 'mais o resultado das vendas a descoberto. É ele que decide a sua posição no ranking. Durante o pregão, o valor '
+      + 'na tela é uma estimativa com a cotação do dia; o ranking usa sempre o fechamento.',
     exemplo: 'Saldo de R$ 4.000 + ações que valem R$ 6.200 = patrimônio de R$ 10.200.',
   },
   saldo: {
@@ -79,8 +80,8 @@ export const GLOSSARIO = {
   cotacao_do_dia: {
     titulo: 'Cotação do dia',
     texto: 'Durante o pregão, o simulador atualiza os preços a cada 1h30 (11h, 12h30, 14h, 15h30 e 17h), com cerca de '
-      + '30 minutos de atraso. Serve para você acompanhar como a sua carteira está oscilando. As ordens continuam '
-      + 'sendo feitas à noite e no fim de semana, pelo preço de fechamento, e o patrimônio e o ranking só mudam com o fechamento.',
+      + '30 minutos de atraso. Com eles, o app estima o seu patrimônio e a sua carteira ao longo do dia. As ordens continuam '
+      + 'sendo feitas à noite e no fim de semana, pelo preço de fechamento, e o ranking só muda com o fechamento.',
   },
   fechamento: {
     titulo: 'Preço de fechamento',

@@ -101,11 +101,14 @@ export function resumoCarteira({ saldo, carteira, vendidas, futuros = [], saldoI
   const garantias = vendidas.reduce((s, v) => s + Number(v.garantia || 0), 0);
   const custoRecompra = vendidas.reduce((s, v) => s + Number(v.custo_recompra || 0), 0);
   const vendido = garantias - custoRecompra;     // quanto as vendas a descoberto valem hoje
-  const patrimonio = Number(saldo) + acoes + vendido + margemFuturos;
+  // ajuste do dia dos minicontratos, estimado com a cotação do dia (só existe na carteira estimada)
+  const ajusteFuturos = futuros.reduce((s, f) => s + Number(f.ajuste_hoje || 0), 0);
+  const patrimonio = Number(saldo) + acoes + vendido + margemFuturos + ajusteFuturos;
   return {
     saldo: Number(saldo),
     acoes,
     margemFuturos,
+    ajusteFuturos,
     garantias,
     vendido,
     patrimonio,
