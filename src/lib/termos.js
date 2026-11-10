@@ -10,6 +10,8 @@ export const TERMOS = [
     texto: [
       'O BolsaLab é um simulador de investimentos com fins exclusivamente educacionais, criado e mantido pelo '
       + 'Prof. Dr. Saulo Jardim para apoiar disciplinas de Economia, Administração e Finanças. O uso é gratuito.',
+      'O BolsaLab é um projeto independente do Prof. Saulo Jardim e não é oferecido por nenhuma instituição de ensino. '
+      + 'O responsável pelo app e pelos seus dados é o próprio professor.',
       'Ao criar uma conta ou continuar usando o app, você declara que leu e concorda com estes termos.',
     ],
   },

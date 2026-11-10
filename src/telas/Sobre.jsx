@@ -44,6 +44,9 @@ export default function Sobre({ aoVoltar }) {
           O BolsaLab foi criado pelo professor Saulo Jardim para apoiar as disciplinas de
           <strong> Economia, Administração e Finanças</strong>.
         </p>
+        <p className="suave">
+          É um projeto independente do Prof. Saulo Jardim e não é oferecido por nenhuma instituição de ensino.
+        </p>
       </section>
 
       <section className="cartao" aria-labelledby="titulo-proposta">
