@@ -386,6 +386,9 @@ export function criarApi(supabase, { urlRetorno } = {}) {
       return checar(await supabase.rpc('gestor_remover_do_grupo', { p_turma_id: grupoId, p_user: userId }));
     },
     // apaga a conta da pessoa do app (login, carteira, ordens, publicações)
+    async corrigirEmail(userId, email) {
+      return checar(await supabase.rpc('gestor_corrigir_email', { p_user: userId, p_email: email }));
+    },
     async excluirUsuario(userId) {
       return checar(await supabase.rpc('gestor_excluir_usuario', { p_user: userId }));
     },

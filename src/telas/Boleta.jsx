@@ -18,7 +18,13 @@ export default function Boleta({ ticker, empresa, comprada, vendida, operacaoIni
   const inicial = operacaoInicial ?? (vendida ? 'recompra' : 'compra');
   const [lado, setLado] = useState(inicial === 'compra' || inicial === 'recompra' ? 'comprar' : 'vender');
   const [tipo, setTipo] = useState(inicial);
-  const [qtd, setQtd] = useState('');
+  // recomprar / vender as minhas: a quantidade já vem preenchida com tudo o que há na posição
+  const qtdPadrao = (t) => {
+    if (t === 'recompra' && vendida) return String(vendida.quantidade);
+    if (t === 'venda' && qtdComprada > 0) return String(qtdComprada);
+    return '';
+  };
+  const [qtd, setQtd] = useState(() => qtdPadrao(inicial));
   const [enviando, setEnviando] = useState(false);
   const [erroServidor, setErroServidor] = useState('');
 
@@ -36,8 +42,9 @@ export default function Boleta({ ticker, empresa, comprada, vendida, operacaoIni
   function trocarLado(novo) {
     setLado(novo);
     setErroServidor('');
-    if (novo === 'comprar') setTipo('compra');
-    else setTipo(qtdComprada > 0 ? 'venda' : 'venda_descoberto');
+    const t = novo === 'comprar' ? 'compra' : qtdComprada > 0 ? 'venda' : 'venda_descoberto';
+    setTipo(t);
+    setQtd(qtdPadrao(t));
   }
 
   async function confirmar(e) {
@@ -77,7 +84,7 @@ export default function Boleta({ ticker, empresa, comprada, vendida, operacaoIni
           {opcoes.map(([id, rotulo, desativada]) => (
             <label key={id} className={`forma ${tipo === id ? 'ativa' : ''} ${desativada ? 'desativada' : ''}`}>
               <input type="radio" name="forma" value={id} checked={tipo === id} disabled={desativada}
-                     onChange={() => { setTipo(id); setErroServidor(''); }} />
+                     onChange={() => { setTipo(id); setQtd(qtdPadrao(id)); setErroServidor(''); }} />
               {rotulo}
               {id === 'venda_descoberto' && <Termo id="venda_descoberto" />}
               {id === 'recompra' && <Termo id="recompra" />}

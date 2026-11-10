@@ -265,7 +265,8 @@ function EditarTurma({ turma, aoCancelar, aoSalvar }) {
 
 // Remover a pessoa deste grupo (com confirmação) ou, na lista "Sem grupo", pôr num grupo
 function AcoesMembro({ grupoId, grupoNome, pessoa, avisar, aoMudar }) {
-  const [confirmando, setConfirmando] = useState(null);   // 'remover' | 'excluir'
+  const [confirmando, setConfirmando] = useState(null);   // 'remover' | 'excluir' | 'email'
+  const [novoEmail, setNovoEmail] = useState('');
   const [grupos, setGrupos] = useState(null);
   const [destino, setDestino] = useState('');
   const [erro, setErro] = useState('');
@@ -297,6 +298,34 @@ function AcoesMembro({ grupoId, grupoNome, pessoa, avisar, aoMudar }) {
     avisar(`${quem} entrou no grupo ${nome}.`);
   });
 
+  async function corrigir(e) {
+    e.preventDefault();
+    setEnviando(true); setErro('');
+    try {
+      const email = await api.corrigirEmail(pessoa.user_id, novoEmail);
+      avisar(`E-mail de ${pessoa.nome || email} corrigido para ${email}. A senha continua a mesma.`);
+      setConfirmando(null);
+      aoMudar();
+    } catch (err) { setErro(err.message); } finally { setEnviando(false); }   // o formulário continua aberto
+  }
+
+  if (confirmando === 'email') {
+    return (
+      <form className="acoes-membro confirmacao-membro" onSubmit={corrigir}>
+        <label className="campo">
+          <span>Novo e-mail de {quem}</span>
+          <input type="email" inputMode="email" autoComplete="off" value={novoEmail} autoFocus
+                 onChange={(e) => setNovoEmail(e.target.value)} />
+        </label>
+        <small>A pessoa passa a entrar com esse e-mail, com a mesma senha.</small>
+        <span className="botoes-membro">
+          <button className="link" disabled={enviando || !novoEmail.trim()}>{enviando ? 'Salvando…' : 'Salvar e-mail'}</button>
+          <button type="button" className="link" onClick={() => setConfirmando(null)} disabled={enviando}>Cancelar</button>
+        </span>
+        {erro && <small className="token-erro">{erro}</small>}
+      </form>
+    );
+  }
   if (confirmando === 'excluir') {
     return (
       <span className="acoes-membro confirmacao-membro" role="alert">
@@ -339,6 +368,9 @@ function AcoesMembro({ grupoId, grupoNome, pessoa, avisar, aoMudar }) {
         {grupoId !== 0 && (
           <button className="link link-discreto" onClick={() => setConfirmando('remover')}>Remover do grupo</button>
         )}
+        <button className="link" onClick={() => { setNovoEmail(sugerirEmail(pessoa.email) || pessoa.email || ''); setErro(''); setConfirmando('email'); }}>
+          Corrigir e-mail
+        </button>
         <button className="link link-perigo" onClick={() => setConfirmando('excluir')}>Excluir conta</button>
       </span>
       {erro && <small className="token-erro">{erro}</small>}

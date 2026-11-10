@@ -595,6 +595,16 @@ export function criarApiDemo() {
       if (!a || a.turma_id !== grupoId) throw new Error('Essa pessoa não está no grupo.');
       a.turma_id = null;
     },
+    async corrigirEmail(userId, email) {
+      await atraso();
+      const novo = String(email ?? '').trim().toLowerCase();
+      if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(novo)) throw new Error('Digite um e-mail válido.');
+      if (gestao.alunos.some((x) => x.user_id !== userId && x.email === novo)) throw new Error(`Já existe uma conta com o e-mail ${novo}.`);
+      const a = gestao.alunos.find((x) => x.user_id === userId);
+      if (!a) throw new Error('Pessoa não encontrada.');
+      a.email = novo;
+      return novo;
+    },
     async excluirUsuario(userId) {
       await atraso();
       const a = gestao.alunos.find((x) => x.user_id === userId);
