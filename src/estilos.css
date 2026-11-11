@@ -354,7 +354,7 @@ input:focus-visible, select:focus-visible { outline: none; border-color: var(--f
   background: var(--cartao); border: 1.5px solid var(--linha); border-radius: var(--raio); color: var(--suave);
 }
 .busca:focus-within { border-color: var(--foco); box-shadow: 0 0 0 3px var(--azul-fundo); }
-.busca input { border: 0; padding-left: 0; background: transparent; box-shadow: none !important; }
+.busca input, .busca input[type] { border: 0; padding-left: 0; background: transparent; box-shadow: none !important; }
 .chips { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
 .chips::-webkit-scrollbar { display: none; }
 .chips button, .alternar button {
@@ -1275,3 +1275,9 @@ fieldset.campo > legend { padding: 0; margin-bottom: 6px; font-weight: 650; font
 .aviso-atualizar .botao { width: 100%; }
 .aviso-atualizar-icone { display: grid; place-items: center; width: 56px; height: 56px; border-radius: 50%; background: var(--verde-fundo); color: var(--verde-texto); }
 .nota-estimado { margin: 2px 0 0; font-size: 0.8rem; line-height: 1.45; color: var(--suave); }
+
+/* Grupos: busca e filtro do ranking */
+.ranking-filtros { display: grid; gap: 8px; }
+.ranking-filtro-grupo select { width: 100%; }
+.ranking-contagem { margin: 0; font-size: 0.85rem; }
+@media (min-width: 700px) { .ranking-filtros { grid-template-columns: 1fr minmax(200px, 280px); align-items: center; } .ranking-contagem { grid-column: 1 / -1; } }

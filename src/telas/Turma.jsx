@@ -1,8 +1,14 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { api } from '../api/index.js';
 import { pct, reais, tendencia } from '../lib/formato.js';
 import Avatar from '../componentes/Avatar.jsx';
 import BotaoPessoa from '../componentes/BotaoPessoa.jsx';
+import Icone from '../componentes/Icone.jsx';
+
+// busca sem diferenciar maiúsculas nem acentos
+const simples = (t) => (t ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+const gruposDe = (r) => (r.turma ? r.turma.split(', ').filter(Boolean) : []);
+const SEM_GRUPO = '__sem__';
 
 // Grupos: ranking de cada grupo da pessoa e o ranking geral (todo mundo que simula),
 // entrar num grupo com o token e sair de um grupo.
@@ -11,6 +17,8 @@ export default function Turma({ grupos, versao, aoMudarGrupos, avisar }) {
   const [lista, setLista] = useState(null);
   const [erro, setErro] = useState('');
   const [saindo, setSaindo] = useState(false);
+  const [busca, setBusca] = useState('');
+  const [filtroGrupo, setFiltroGrupo] = useState('');   // só no ranking geral
 
   // se a pessoa sair do grupo que estava aberto, volta para o primeiro (ou geral)
   useEffect(() => {
@@ -28,6 +36,23 @@ export default function Turma({ grupos, versao, aoMudarGrupos, avisar }) {
 
   const grupo = grupos.find((g) => g.id === selecionado);
   const eu = lista?.find((r) => r.eu);
+
+  // grupos que aparecem no ranking geral, para o filtro
+  const gruposNoRanking = useMemo(() => {
+    const n = new Map();
+    (lista ?? []).forEach((r) => gruposDe(r).forEach((g) => n.set(g, (n.get(g) ?? 0) + 1)));
+    return [...n.entries()].sort((a, b) => a[0].localeCompare(b[0], 'pt-BR'));
+  }, [lista]);
+  const semGrupo = (lista ?? []).filter((r) => !r.turma).length;
+  useEffect(() => { setFiltroGrupo(''); }, [selecionado]);
+
+  const termo = simples(busca);
+  const filtrada = (lista ?? []).filter((r) => {
+    if (!grupo && filtroGrupo === SEM_GRUPO && r.turma) return false;
+    if (!grupo && filtroGrupo && filtroGrupo !== SEM_GRUPO && !gruposDe(r).includes(filtroGrupo)) return false;
+    return !termo || simples(r.nome).includes(termo);
+  });
+  const filtrando = Boolean(termo || (!grupo && filtroGrupo));
 
   async function sair() {
     try {
@@ -70,9 +95,35 @@ export default function Turma({ grupos, versao, aoMudarGrupos, avisar }) {
       {!lista && !erro && <p className="carregando" aria-busy="true">Carregando…</p>}
       {lista?.length === 0 && <p className="cartao vazio">Ninguém no ranking ainda.</p>}
 
-      {lista?.length > 0 && (
+      {lista?.length > 1 && (
+        <div className="ranking-filtros">
+          <label className="busca">
+            <Icone nome="busca" tamanho={20} />
+            <input type="search" placeholder="Buscar pelo nome" aria-label="Buscar pessoa pelo nome"
+                   value={busca} onChange={(e) => setBusca(e.target.value)} />
+          </label>
+          {!grupo && (gruposNoRanking.length > 0) && (
+            <label className="campo ranking-filtro-grupo">
+              <span className="sr-only">Filtrar por grupo</span>
+              <select value={filtroGrupo} onChange={(e) => setFiltroGrupo(e.target.value)}>
+                <option value="">Todos os grupos ({lista.length})</option>
+                {gruposNoRanking.map(([g, n]) => <option key={g} value={g}>{g} ({n})</option>)}
+                {semGrupo > 0 && <option value={SEM_GRUPO}>Sem grupo ({semGrupo})</option>}
+              </select>
+            </label>
+          )}
+          {filtrando && (
+            <p className="suave ranking-contagem" aria-live="polite">
+              {filtrada.length === 0 ? 'Ninguém encontrado.' : `${filtrada.length} ${filtrada.length === 1 ? 'pessoa' : 'pessoas'}`}
+              {!grupo && filtroGrupo ? '. A posição é a do ranking geral.' : ''}
+            </p>
+          )}
+        </div>
+      )}
+
+      {filtrada.length > 0 && (
         <ol className="cartao cartao-lista ranking">
-          {lista.map((r, i) => (
+          {filtrada.map((r, i) => (
             <li key={i} className={r.eu ? 'eu' : undefined}>
               <span className="ranking-pos num">{r.posicao}º</span>
               <BotaoPessoa id={r.user_id} nome={r.nome} className="ranking-pessoa">
