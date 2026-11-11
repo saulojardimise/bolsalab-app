@@ -1,8 +1,9 @@
+import { dataSP } from './formato.js';
 // Cotação do dia (coletada a cada 1h30 no pregão, com cerca de 30 min de atraso).
 // As ordens e o ranking continuam pelo fechamento. Na tela, o patrimônio e a carteira do aluno
 // são estimados com essa cotação durante o dia (carteiraAgora).
 
-export const diaBR = (d) => new Date(d).toLocaleDateString('en-CA', { timeZone: 'America/Sao_Paulo' });
+export const diaBR = (d) => dataSP(d);
 export const horaBR = (iso) => new Date(iso).toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit' }).replace(':', 'h');
 const r2 = (v) => Math.round(v * 100) / 100;
 

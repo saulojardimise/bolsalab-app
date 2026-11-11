@@ -1281,3 +1281,6 @@ fieldset.campo > legend { padding: 0; margin-bottom: 6px; font-weight: 650; font
 .ranking-filtro-grupo select { width: 100%; }
 .ranking-contagem { margin: 0; font-size: 0.85rem; }
 @media (min-width: 700px) { .ranking-filtros { grid-template-columns: 1fr minmax(200px, 280px); align-items: center; } .ranking-contagem { grid-column: 1 / -1; } }
+.erro-detalhe { margin: 0; font-size: 0.72rem; color: var(--suave); overflow-wrap: anywhere; font-family: ui-monospace, monospace; }
+.erro-pilha summary { cursor: pointer; font-size: 0.8rem; color: var(--suave); }
+.erro-pilha pre { white-space: pre-wrap; overflow-wrap: anywhere; font-size: 0.7rem; margin: 6px 0 0; max-height: 220px; overflow: auto; }

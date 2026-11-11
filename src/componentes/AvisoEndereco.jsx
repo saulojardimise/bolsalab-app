@@ -1,3 +1,4 @@
+import { dataSP } from '../lib/formato.js';
 import { useState } from 'react';
 import { api } from '../api/index.js';
 import Icone from './Icone.jsx';
@@ -7,7 +8,7 @@ import Icone from './Icone.jsx';
 export const AVISO_ENDERECO = 'endereco-bolsalab-app';
 const ATE = '2026-12-08';
 const MUDANCA = '2026-11-08T17:00:00-03:00';   // contas criadas depois já nasceram no endereço novo
-const hojeBR = () => new Date().toLocaleDateString('en-CA', { timeZone: 'America/Sao_Paulo' });
+const hojeBR = () => dataSP();
 const chave = (uid) => `bolsalab:aviso:${AVISO_ENDERECO}:${uid}`;
 
 export default function AvisoEndereco({ perfil }) {

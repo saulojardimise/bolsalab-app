@@ -11,11 +11,13 @@ export default function Sistema({ email, avisar }) {
   const [erro, setErro] = useState('');
   const [versao, setVersao] = useState(0);
   const [trocandoSenha, setTrocandoSenha] = useState(false);
+  const [errosApp, setErrosApp] = useState(null);   // null = carregando; false = SQL 041 não rodado
 
   useEffect(() => {
     Promise.all([api.config(), api.coletas()])
       .then(([c, k]) => { setConfig(c); setColetas(k); })
       .catch((e) => setErro(e.message));
+    api.errosApp?.().then(setErrosApp).catch(() => setErrosApp(false));
   }, [versao]);
 
   async function alternarPausa() {
@@ -75,6 +77,33 @@ export default function Sistema({ email, avisar }) {
         )}
       </section>
 
+      <section aria-labelledby="titulo-erros">
+        <h2 id="titulo-erros" className="secao-titulo">Erros nas telas</h2>
+        <p className="suave">Quando aparece "Algo deu errado nesta tela" para alguém, o erro fica registrado aqui (últimos 30 dias).</p>
+        {errosApp === false && <p className="cartao vazio">Para ver os erros, rode o SQL 041 (erros do app) no Supabase.</p>}
+        {Array.isArray(errosApp) && errosApp.length === 0 && <p className="cartao vazio">Nenhum erro registrado.</p>}
+        {Array.isArray(errosApp) && errosApp.length > 0 && (
+          <ul className="cartao cartao-lista extrato">
+            {errosApp.map((e) => (
+              <li key={e.id}>
+                <div className="extrato-linha">
+                  <span>{dataHora(e.criado_em)}</span>
+                  <span>{e.nome || e.email || 'Sem nome'}</span>
+                </div>
+                <div className="extrato-detalhe">
+                  <span>{e.tela || 'tela desconhecida'}</span>
+                  <span>{navegadorCurto(e.navegador)}</span>
+                </div>
+                <p className="extrato-obs erro-detalhe">{e.mensagem}</p>
+                {e.detalhe && (
+                  <details className="erro-pilha"><summary>Detalhes técnicos</summary><pre>{e.detalhe}</pre></details>
+                )}
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+
       <section className="cartao" aria-labelledby="titulo-conta">
         <h2 id="titulo-conta">Conta</h2>
         <p className="suave">{email}</p>
@@ -88,4 +117,14 @@ export default function Sistema({ email, avisar }) {
       </section>
     </div>
   );
+}
+
+// "iPhone · iOS 16.3 · Safari" a partir do user agent
+function navegadorCurto(ua = '') {
+  if (!ua) return '';
+  const ios = ua.match(/OS (\d+)[_.](\d+)/);
+  const android = ua.match(/Android (\d+)/);
+  const sistema = /iPhone|iPad/.test(ua) && ios ? `iOS ${ios[1]}.${ios[2]}` : android ? `Android ${android[1]}` : /Windows/.test(ua) ? 'Windows' : /Mac OS X/.test(ua) ? 'Mac' : '';
+  const nav = /CriOS|Chrome/.test(ua) ? 'Chrome' : /FxiOS|Firefox/.test(ua) ? 'Firefox' : /Instagram/.test(ua) ? 'Instagram' : /Safari/.test(ua) ? 'Safari' : '';
+  return [sistema, nav].filter(Boolean).join(' · ');
 }

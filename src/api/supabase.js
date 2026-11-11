@@ -210,7 +210,7 @@ export function criarApi(supabase, { urlRetorno } = {}) {
     },
 
     async feriados() {
-      const hoje = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Sao_Paulo' });
+      const hoje = dataSP();
       const linhas = checar(await supabase.from('feriados').select('data').gte('data', hoje).order('data').limit(40));
       return linhas.map((l) => l.data);
     },
@@ -272,6 +272,14 @@ export function criarApi(supabase, { urlRetorno } = {}) {
     async futurosAjustes(uid, limite = 100) {
       return checar(await supabase.from('futuros_ajustes').select('*').eq('user_id', uid)
         .order('criado_em', { ascending: false }).limit(limite));
+    },
+    async registrarErro({ tela, mensagem, detalhe, navegador, versao }) {
+      const { error } = await supabase.rpc('registrar_erro', { p_tela: tela, p_mensagem: mensagem, p_detalhe: detalhe,
+                                                                p_navegador: navegador, p_versao: versao });
+      if (error) throw error;
+    },
+    async errosApp(limite = 20) {
+      return checar(await supabase.rpc('gestor_erros', { p_limite: limite }));
     },
     async intradia() {
       return checar(await supabase.from('intradia').select('*'));

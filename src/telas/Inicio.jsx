@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { api } from '../api/index.js';
 import { DICAS, dicaDoDia } from '../lib/dicas.js';
 import { noPeriodo, variacaoSerie } from '../lib/periodos.js';
-import { diasAtras, pct, reais, tendencia } from '../lib/formato.js';
+import { dataSP, diasAtras, pct, reais, tendencia } from '../lib/formato.js';
 import Grafico from '../componentes/Grafico.jsx';
 import Periodos from '../componentes/Periodos.jsx';
 import Icone from '../componentes/Icone.jsx';
@@ -42,12 +42,12 @@ export default function Inicio({ uid, dados, resumo, linhas, versao, aoEscolher,
   const pontos = useMemo(() => {
     if (!serie) return null;
     const base = serie.map((p) => ({ data: p.data, valor: Number(p.patrimonio) }));
-    const hoje = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Sao_Paulo' });
+    const hoje = dataSP();
     const semHoje = base.filter((p) => p.data !== hoje);
     // ponto de partida: o saldo inicial na véspera da criação da conta. Sem ele, o primeiro
     // ponto já viria com as corretagens do primeiro dia e a variação começaria do lugar errado.
     const criada = dados.perfil.criado_em
-      ? new Date(new Date(dados.perfil.criado_em).getTime() - 86400e3).toLocaleDateString('en-CA', { timeZone: 'America/Sao_Paulo' })
+      ? dataSP(new Date(new Date(dados.perfil.criado_em).getTime() - 86400e3))
       : null;
     const inicio = criada && (!semHoje.length || semHoje[0].data > criada)
       ? [{ data: criada, valor: Number(dados.config.saldo_inicial) }] : [];

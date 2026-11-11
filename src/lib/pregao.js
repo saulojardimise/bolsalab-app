@@ -1,4 +1,4 @@
-import { agoraEmSaoPaulo } from './formato.js';
+import { agoraEmSaoPaulo, dataSP } from './formato.js';
 
 const FUSO = 'America/Sao_Paulo';
 const DIAS = ['segunda', 'terça', 'quarta', 'quinta', 'sexta', 'sábado', 'domingo'];
@@ -16,7 +16,7 @@ export function textoStatus({ liberada, pausada, demo = false, agora = new Date(
   if (liberada) {
     // a negociação fecha às {fecha}h do próximo dia útil
     const semPregao = new Set(feriados);
-    const hoje = new Date(`${agora.toLocaleDateString('en-CA', { timeZone: FUSO })}T12:00:00Z`);
+    const hoje = new Date(`${dataSP(agora)}T12:00:00Z`);
     const util = (d) => d.getUTCDay() !== 0 && d.getUTCDay() !== 6 && !semPregao.has(iso(d));
     const feriadoHoje = diaSemana <= 5 && semPregao.has(iso(hoje));
     let dias = util(hoje) && hora < fecha ? 0 : 1;

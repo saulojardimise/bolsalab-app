@@ -543,6 +543,8 @@ export function criarApiDemo() {
       if (p.erro) throw new Error(p.erro);
       return executar(estado, ticker, tipo, quantidade, preco);
     },
+    async registrarErro() {},
+    async errosApp() { return []; },
     async coletas() {
       return [0, 1, 24, 25, 72].map((h, i) => ({
         id: 20 - i, executada_em: horasAtras(h + 2.5), origem: i % 2 ? 'agendada 18h35' : 'agendada 18h50',

@@ -59,7 +59,7 @@ export function diaSemanaMes(dataISO) {
 
 // Data de hoje em São Paulo, menos N dias: "2026-09-27"
 export function diasAtras(n, d = new Date()) {
-  const hoje = d.toLocaleDateString('en-CA', { timeZone: FUSO });
+  const hoje = dataSP(d);
   const x = new Date(hoje + 'T12:00:00Z');
   x.setUTCDate(x.getUTCDate() - n);
   return x.toISOString().slice(0, 10);
@@ -75,4 +75,17 @@ export function agoraEmSaoPaulo(d = new Date()) {
     diaSemana: dias[partes.find((p) => p.type === 'weekday').value],
     hora: Number(partes.find((p) => p.type === 'hour').value),
   };
+}
+
+/**
+ * Data no fuso de São Paulo como "2026-11-10".
+ * Não usar toLocaleDateString('en-CA'): em alguns celulares ela devolve "11/10/2026"
+ * e quebra quem monta datas a partir dela.
+ */
+export function dataSP(d = new Date()) {
+  const dt = d instanceof Date ? d : new Date(d);
+  if (Number.isNaN(dt.getTime())) return '';
+  const p = new Intl.DateTimeFormat('en-US', { timeZone: 'America/Sao_Paulo', year: 'numeric', month: '2-digit', day: '2-digit' })
+    .formatToParts(dt).reduce((o, x) => ({ ...o, [x.type]: x.value }), {});
+  return `${p.year}-${p.month}-${p.day}`;
 }

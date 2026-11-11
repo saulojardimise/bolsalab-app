@@ -50,6 +50,10 @@ export default function Painel({ uid }) {
   const [discussoesBusca, setDiscussoesBusca] = useState('');   // filtro ao abrir "Ver todas"
   const [regrasAbertas, setRegrasAbertas] = useState(false);
   const [sobreposta, setSobreposta] = useState(null);   // { tipo: 'acao', ticker, operacao }
+  // tela atual, para o registro de erros (ProtecaoErro)
+  useEffect(() => {
+    try { document.body.dataset.tela = sobreposta ? `${sobreposta.tipo}${sobreposta.ticker ? ` ${sobreposta.ticker}` : ''}` : aba; } catch { /* nada */ }
+  }, [aba, sobreposta]);
   const [perfilAberto, setPerfilAberto] = useState(false);
   const [dados, setDados] = useState(null);
   const feriadosRef = useRef([]);
