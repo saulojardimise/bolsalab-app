@@ -1,3 +1,4 @@
+import { ehTesouro } from '../lib/tesouro.js';
 import { useEffect, useState } from 'react';
 import { api } from '../api/index.js';
 import { quando } from '../lib/noticias.js';
@@ -66,7 +67,8 @@ export default function Notificacoes({ versao, etfs, aoVoltar, aoLer, aoAbrirPub
                   {(n.tipo === 'automatica' || n.tipo === 'sistema') && (
                     <span className="suave">
                       {/* o banco escreve "ações"; em ETF são cotas */}
-                      {n.tipo === 'automatica' && etfs?.has(n.operacao?.ativo) ? n.texto.replace(/ ações a R\$/, ' cotas a R$') : n.texto}
+                      {n.tipo === 'automatica' && ehTesouro(n.operacao?.ativo) ? n.texto.replace(/ \d+ ações a R\$ [\d.,]+\.$/, '')
+                        : n.tipo === 'automatica' && etfs?.has(n.operacao?.ativo) ? n.texto.replace(/ ações a R\$/, ' cotas a R$') : n.texto}
                     </span>
                   )}
                   <small className="suave">{quando(n.criado_em)}{!n.lida && <span className="sr-only"> · nova</span>}</small>

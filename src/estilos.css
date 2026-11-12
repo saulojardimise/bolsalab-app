@@ -1284,3 +1284,15 @@ fieldset.campo > legend { padding: 0; margin-bottom: 6px; font-weight: 650; font
 .erro-detalhe { margin: 0; font-size: 0.72rem; color: var(--suave); overflow-wrap: anywhere; font-family: ui-monospace, monospace; }
 .erro-pilha summary { cursor: pointer; font-size: 0.8rem; color: var(--suave); }
 .erro-pilha pre { white-space: pre-wrap; overflow-wrap: anywhere; font-size: 0.7rem; margin: 6px 0 0; max-height: 220px; overflow: auto; }
+
+/* Tesouro Direto */
+.grupo-tesouro { display: grid; gap: 6px; }
+.grupo-tesouro + .grupo-tesouro { margin-top: 10px; }
+.grupo-tesouro-titulo { margin: 0; font-size: 1.05rem; }
+.grupo-tesouro-texto { margin: 0; font-size: 0.88rem; }
+.tesouro-taxas { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 4px 0 8px; }
+.tesouro-taxas > div { background: var(--fundo); border-radius: var(--raio); padding: 10px 12px; display: grid; gap: 2px; min-width: 0; }
+.tesouro-taxas dt { font-size: 0.8rem; color: var(--suave); }
+.tesouro-taxas dd { margin: 0; font-weight: 700; color: var(--marinho); overflow-wrap: anywhere; }
+.tesouro-taxas dd small { font-weight: 400; }
+.campo-valor input { grid-column: 1 / -1; }

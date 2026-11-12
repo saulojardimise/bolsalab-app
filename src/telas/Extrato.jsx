@@ -4,7 +4,7 @@ import { fluxoDeCaixa, GRUPOS } from '../lib/fluxo.js';
 import { dataHora, diaMes, numero, reais, reaisComSinal, tendencia } from '../lib/formato.js';
 import Icone from '../componentes/Icone.jsx';
 import Termo from '../componentes/Termo.jsx';
-import { tickersEtf, unidade } from '../lib/etf.js';
+import { tickersEtf, unidade, precoAtivo, quantidadeAtivo } from '../lib/etf.js';
 
 // Extrato: o fluxo de caixa completo do aluno. No topo, quanto entrou e saiu
 // por tipo (ações, corretagem, aluguel...); embaixo, cada lançamento com o
@@ -120,7 +120,7 @@ function Lancamento({ l, etfs }) {
 
       {l.detalhe && <p className="extrato-detalhe"><span>{l.detalhe}</span></p>}
       {!l.detalhe && l.quantidade > 0 && (
-        <p className="extrato-detalhe"><span>{numero(l.quantidade)} {unidade(etfs.has(l.ticker), Number(l.quantidade))} × {reais(l.preco)}</span></p>
+        <p className="extrato-detalhe"><span>{quantidadeAtivo(l.ticker, l.quantidade, etfs.has(l.ticker))} × {reais(precoAtivo(l.ticker, l.preco))}</span></p>
       )}
       {l.partes.length > 1 && (
         <dl className="extrato-partes">

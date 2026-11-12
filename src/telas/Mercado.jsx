@@ -5,11 +5,14 @@ import { futuroAgora, horaBR, horarioDoDia, mercadoAgora } from '../lib/intradia
 import Icone from '../componentes/Icone.jsx';
 import ListaAtivos, { detalheQuantidade } from '../componentes/ListaAtivos.jsx';
 import Termo from '../componentes/Termo.jsx';
+import Logo from '../componentes/Logo.jsx';
+import { INDEXADORES, mesAno, textoTaxa, titulos } from '../lib/tesouro.js';
 
 const SECOES = [
   ['acoes', 'Ações'],
   ['futuros', 'Futuros'],
   ['etfs', 'ETFs'],
+  ['tesouro', 'Tesouro'],
 ];
 
 const lerSecao = () => {
@@ -29,6 +32,7 @@ export default function Mercado({ dados, linhas, aoEscolher, aoAbrirFuturo }) {
   const dataRef = mercado.map((e) => e.data).filter(Boolean).sort().at(-1);
   const temFuturos = dados.futurosMercado?.some((f) => f.preco != null);
   const temEtfs = mercado.some((e) => e.tipo === 'etf');
+  const temTesouro = mercado.some((e) => e.tipo === 'tesouro' && e.preco != null);
 
   return (
     <div className="pilha pilha-larga">
@@ -40,16 +44,18 @@ export default function Mercado({ dados, linhas, aoEscolher, aoAbrirFuturo }) {
       </div>
 
       <div className="abas-mercado" role="tablist" aria-label="O que você quer ver">
-        {SECOES.filter(([id]) => id !== 'futuros' || temFuturos).filter(([id]) => id !== 'etfs' || temEtfs).map(([id, rotulo]) => (
+        {SECOES.filter(([id]) => id !== 'futuros' || temFuturos).filter(([id]) => id !== 'etfs' || temEtfs).filter(([id]) => id !== 'tesouro' || temTesouro).map(([id, rotulo]) => (
           <button key={id} role="tab" aria-selected={secao === id} onClick={() => setSecao(id)}>{rotulo}</button>
         ))}
       </div>
 
-      {horaHoje && (
+      {horaHoje && secao !== 'tesouro' && (
         <p className="nota nota-hoje">Preços do pregão de hoje, com cerca de 30 min de atraso, só para acompanhar. As ordens usam o fechamento de {diaMes(dataRef)}.</p>
       )}
 
-      {secao === 'futuros' && temFuturos
+      {secao === 'tesouro' && temTesouro
+        ? <ListaTesouro dados={dados} aoEscolher={aoEscolher} />
+        : secao === 'futuros' && temFuturos
         ? <Futuros dados={dados} aoAbrirFuturo={aoAbrirFuturo} />
         : secao === 'etfs' && temEtfs
           ? <ListaComFiltros key="etfs" dados={dados} linhas={linhas} aoEscolher={aoEscolher} tipo="etf" />
@@ -77,7 +83,7 @@ function ListaComFiltros({ dados, linhas, aoEscolher, tipo }) {
       // ETF: uma linha didática do que ele acompanha (o nome do fundo fica na página dele)
       const base = etf ? (e.resumo || e.nome) : e.nome;
       const qtd = tenho[e.ticker];
-      const tem = detalheQuantidade(qtd, etf);
+      const tem = detalheQuantidade(qtd, etf, e.ticker);
       return { ...e, detalhe: qtd ? `Você tem ${tem} · ${base}` : base };
     });
 
@@ -144,6 +150,53 @@ function Futuros({ dados, aoAbrirFuturo }) {
           );
         })}
       </ul></div>
+    </section>
+  );
+}
+
+// Tesouro Direto: os títulos por tipo, com a taxa de hoje, o preço do título e o investimento mínimo
+function ListaTesouro({ dados, aoEscolher }) {
+  const titulosTesouro = dados.mercado.filter((e) => e.tipo === 'tesouro' && e.preco != null);
+  const tenho = Object.fromEntries(dados.carteira.map((p) => [p.ticker, p.quantidade]));
+  const dataBase = titulosTesouro.map((e) => e.data).sort().at(-1);
+  return (
+    <section aria-labelledby="titulo-tesouro" className="secao-mercado">
+      <h2 id="titulo-tesouro" className="secao-titulo"><Termo id="tesouro_direto">Tesouro Direto</Termo></h2>
+      <p className="suave intro-etf">
+        Títulos públicos: você empresta dinheiro ao governo e recebe juros. Sem corretagem, a partir de 0,01 título.
+        Preços e taxas do Tesouro de {diaMes(dataBase)}.
+      </p>
+      {INDEXADORES.map((ix) => {
+        const lista = titulosTesouro.filter((e) => e.indexador === ix.id).sort((a, b) => (a.vencimento < b.vencimento ? -1 : 1));
+        if (!lista.length) return null;
+        return (
+          <div key={ix.id} className="grupo-tesouro">
+            <h3 className="grupo-tesouro-titulo"><Termo id={ix.termo}>{ix.titulo}</Termo></h3>
+            <p className="suave grupo-tesouro-texto">{ix.curto}</p>
+            <div className="cartao cartao-lista"><ul className="ativos">
+              {lista.map((e) => (
+                <li key={e.ticker}>
+                  <button className="ativo" onClick={() => aoEscolher(e.ticker)}>
+                    <Logo ticker={e.ticker} />
+                    <span className="ativo-id">
+                      <strong>{e.nome}</strong>
+                      <span>{tenho[e.ticker] ? `Você tem ${titulos(tenho[e.ticker])} · ` : ''}vence {mesAno(e.vencimento)}{e.a_venda === false ? ' · fora de oferta' : ''}</span>
+                    </span>
+                    <span className="ativo-preco">
+                      <strong className="num">{textoTaxa(e.indexador, e.taxa_compra)}</strong>
+                      <span className="suave num">mín. {reais(Math.round(Number(e.pu_compra)) / 100)}</span>
+                    </span>
+                  </button>
+                </li>
+              ))}
+            </ul></div>
+          </div>
+        );
+      })}
+      <p className="nota">
+        A compra é pelo preço de compra e a venda, pelo de venda. Antes do vencimento, o preço do Prefixado e do IPCA+ sobe e
+        desce com os juros: é a <Termo id="marcacao_mercado">marcação a mercado</Termo>.
+      </p>
     </section>
   );
 }

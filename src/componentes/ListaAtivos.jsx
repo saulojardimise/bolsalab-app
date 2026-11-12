@@ -1,4 +1,4 @@
-import { unidade } from '../lib/etf.js';
+import { precoAtivo, quantidadeAtivo } from '../lib/etf.js';
 import Logo from './Logo.jsx';
 import Sparkline from './Sparkline.jsx';
 import { numero, pct, reais, tendencia } from '../lib/formato.js';
@@ -18,7 +18,7 @@ export default function ListaAtivos({ itens, linhas, aoEscolher }) {
             </span>
             <Sparkline valores={linhas?.[e.ticker]} />
             <span className="ativo-preco">
-              <strong className="num">{e.preco == null ? 'Sem cotação' : reais(e.preco)}</strong>
+              <strong className="num">{e.preco == null ? 'Sem cotação' : reais(precoAtivo(e.ticker, e.preco))}</strong>
               {e.variacao_pct != null && (
                 <span className={`num ${tendencia(e.variacao_pct)}`}>{pct(e.variacao_pct)}</span>
               )}
@@ -31,4 +31,4 @@ export default function ListaAtivos({ itens, linhas, aoEscolher }) {
 }
 
 // ETF conta em cotas; ação, em ações
-export const detalheQuantidade = (q, etf = false) => `${numero(q)} ${unidade(etf, Number(q))}`;
+export const detalheQuantidade = (q, etf = false, ticker = '') => quantidadeAtivo(ticker, q, etf);

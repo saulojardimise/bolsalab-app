@@ -14,6 +14,8 @@ import MenuPerfil from '../componentes/MenuPerfil.jsx';
 import Inicio from './Inicio.jsx';
 import Mercado from './Mercado.jsx';
 import Acao from './Acao.jsx';
+import Tesouro from './Tesouro.jsx';
+import { ehTesouro } from '../lib/tesouro.js';
 import Carteira from './Carteira.jsx';
 import Turma from './Turma.jsx';
 import Extrato from './Extrato.jsx';
@@ -257,7 +259,12 @@ export default function Painel({ uid }) {
   };
 
   let conteudo;
-  if (sobreposta?.tipo === 'acao') {
+  if (sobreposta?.tipo === 'acao' && ehTesouro(sobreposta.ticker)) {
+    conteudo = (
+      <Tesouro key={sobreposta.ticker} ticker={sobreposta.ticker} operacaoInicial={sobreposta.operacao}
+               dados={dados} aoVoltar={fechar} aoExecutar={aoExecutar} discussoes={discussoes} />
+    );
+  } else if (sobreposta?.tipo === 'acao') {
     conteudo = (
       <Acao key={sobreposta.ticker} ticker={sobreposta.ticker} operacaoInicial={sobreposta.operacao}
             dados={dados} aoVoltar={fechar} aoExecutar={aoExecutar} discussoes={discussoes} />

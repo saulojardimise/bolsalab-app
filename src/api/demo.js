@@ -3,6 +3,7 @@ import { previaFuturo } from '../lib/futuros.js';
 // em memória e as mesmas regras do banco. Serve para ver as telas sem servidor.
 import { previa } from '../lib/regras.js';
 import { criarComunidadeDemo } from './demoComunidade.js';
+import { dataSP } from '../lib/formato.js';
 
 const CONFIG = {
   dominio_email: 'isecensa.edu.br', saldo_inicial: 10000, corretagem: 7.9,
@@ -46,8 +47,24 @@ const EMPRESAS = [
   ['DOLA11', 'Investo Dólar', 'Câmbio', 11.3, 11.25, 'etf', 'Acompanha a cotação do dólar. Sobe quando o real perde valor, por exemplo em crises ou incerteza com as contas do governo. Serve de proteção para quem tem gastos em dólar.', 'Dólar contra o real', 'Médio.'],
 ];
 
-const hojeISO = () => new Date().toLocaleDateString('en-CA', { timeZone: 'America/Sao_Paulo' });
+const hojeISO = () => dataSP();
 const r2 = (v) => Math.round(v * 100) / 100;
+
+// Tesouro Direto (demonstração): preço guardado por centésimo de título, como no banco
+const TESOURO_DEMO = {
+  SELIC2029: { nome: 'Tesouro Selic 2029', indexador: 'selic', vencimento: '2029-03-01', taxa_compra: 0.05, taxa_venda: 0.06, pu_compra: 20248.13, pu_venda: 20233.12, anterior: 20225.4 },
+  SELIC2031: { nome: 'Tesouro Selic 2031', indexador: 'selic', vencimento: '2031-03-01', taxa_compra: 0.11, taxa_venda: 0.12, pu_compra: 20180.58, pu_venda: 20161.59, anterior: 20153.9 },
+  PRE2029: { nome: 'Tesouro Prefixado 2029', indexador: 'prefixado', vencimento: '2029-01-01', taxa_compra: 14.59, taxa_venda: 14.71, pu_compra: 749.31, pu_venda: 747.24, anterior: 745.8 },
+  PRE2032: { nome: 'Tesouro Prefixado 2032', indexador: 'prefixado', vencimento: '2032-01-01', taxa_compra: 15.06, taxa_venda: 15.18, pu_compra: 488.48, pu_venda: 485.61, anterior: 487.9 },
+  IPCA2029: { nome: 'Tesouro IPCA+ 2029', indexador: 'ipca', vencimento: '2029-05-15', taxa_compra: 7.51, taxa_venda: 7.63, pu_compra: 3990.06, pu_venda: 3977.6, anterior: 3970.2 },
+  IPCA2035: { nome: 'Tesouro IPCA+ 2035', indexador: 'ipca', vencimento: '2035-05-15', taxa_compra: 7.71, taxa_venda: 7.83, pu_compra: 2549.56, pu_venda: 2524.76, anterior: 2530.1 },
+  IPCA2050: { nome: 'Tesouro IPCA+ 2050', indexador: 'ipca', vencimento: '2050-08-15', taxa_compra: 7.4, taxa_venda: 7.52, pu_compra: 884.97, pu_venda: 861.64, anterior: 868.3 },
+};
+for (const [t, x] of Object.entries(TESOURO_DEMO)) {
+  EMPRESAS.push([t, x.nome, 'Tesouro Direto', r2(x.pu_venda / 100), r2(x.anterior / 100), 'tesouro', null,
+    `Vence em ${x.vencimento.split('-').reverse().join('/')}`, null]);
+}
+
 
 // ---- histórico fictício, sempre igual para a mesma ação (gerador com semente)
 function semente(texto) {
@@ -81,8 +98,11 @@ function historicoDe(ticker, preco, anterior) {
   fech[datas.length - 1] = preco;
   fech[datas.length - 2] = anterior;
   const tendencia = (rnd() - 0.45) * 0.004;
+  // Tesouro: Selic sobe devagar todo dia; Prefixado e IPCA+ oscilam pouco
+  const vol = /^SELIC/.test(ticker) ? 0 : /^(PRE|IPCA)\d/.test(ticker) ? 0.006 : 0.035;
+  const tend = /^SELIC/.test(ticker) ? 0.00055 : /^(PRE|IPCA)\d/.test(ticker) ? 0.0004 : tendencia;
   for (let i = datas.length - 3; i >= 0; i--) {
-    fech[i] = fech[i + 1] / (1 + tendencia + (rnd() - 0.5) * 0.035);
+    fech[i] = fech[i + 1] / (1 + tend + (rnd() - 0.5) * vol);
   }
   const volumeBase = 5e6 + rnd() * 6e7;
   historicos[ticker] = datas.map((data, i) => {
@@ -129,7 +149,7 @@ function criarEstado() {
 }
 
 function executar(s, ticker, tipo, q, preco, quando = new Date().toISOString()) {
-  const c = CONFIG.corretagem;
+  const c = TESOURO_DEMO[ticker] ? 0 : CONFIG.corretagem;
   const bruto = r2(q * preco);
   let valor_total;
   let aluguel = 0;
@@ -379,7 +399,10 @@ export function criarApiDemo() {
         return { ticker, nome, setor, preco, data: ultimo.data, preco_anterior: anterior,
           variacao_pct: r2((preco / anterior - 1) * 100), logo_url: null,
           abertura: ultimo.abertura, maxima: ultimo.maxima, minima: ultimo.minima, volume: ultimo.volume, situacao: 'ativa',
-          tipo, descricao, resumo, risco };
+          tipo, descricao, resumo, risco,
+          ...(TESOURO_DEMO[ticker] ? { vencimento: TESOURO_DEMO[ticker].vencimento, indexador: TESOURO_DEMO[ticker].indexador,
+            taxa_compra: TESOURO_DEMO[ticker].taxa_compra, taxa_venda: TESOURO_DEMO[ticker].taxa_venda,
+            pu_compra: TESOURO_DEMO[ticker].pu_compra, pu_venda: TESOURO_DEMO[ticker].pu_venda, a_venda: true } : {}) };
       });
     },
     async historico(ticker, desde = null) {
@@ -445,7 +468,7 @@ export function criarApiDemo() {
       const ind = await this.indices();
       // na demonstração, a "cotação do dia" é sempre do pregão seguinte ao último fechamento, às 13h30
       const d = new Date(); d.setDate(d.getDate() + 1);
-      const horario = new Date(`${d.toLocaleDateString('en-CA', { timeZone: 'America/Sao_Paulo' })}T13:30:00-03:00`).toISOString();
+      const horario = new Date(`${dataSP(d)}T13:30:00-03:00`).toISOString();
       const rnd = semente('intradia');
       const ult = (serie) => ind.filter((i) => i.serie === serie).at(-1).valor;
       return [
@@ -535,10 +558,12 @@ export function criarApiDemo() {
       if (!(await this.negociacaoLiberada())) {
         throw new Error('Negociação fechada. Liberada em dias úteis das 19h às 9h, e o dia todo nos fins de semana e feriados.');
       }
-      const preco = precoDe(ticker);
+      const td = TESOURO_DEMO[ticker];
+      if (td && (tipo === 'venda_descoberto' || tipo === 'recompra')) throw new Error('Títulos do Tesouro não podem ser vendidos a descoberto.');
+      const preco = td && tipo === 'compra' ? Math.round(td.pu_compra) / 100 : precoDe(ticker);
       const exposicao = vendidas().reduce((s, v) => s + v.custo_recompra, 0);
       const p = previa({
-        tipo, quantidade, preco, saldo: estado.perfil.saldo, config: CONFIG,
+        tipo, quantidade, preco, saldo: estado.perfil.saldo, config: td ? { ...CONFIG, corretagem: 0 } : CONFIG,
         qtdComprada: estado.posicoes[ticker]?.quantidade ?? 0,
         vendida: estado.vendidas[ticker] ?? null, exposicao,
       });

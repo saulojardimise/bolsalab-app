@@ -1,6 +1,7 @@
 // Comunidade: textos e contas das publicações (operações dos alunos).
 import { numero, reais } from './formato.js';
 import { pontos } from './futuros.js';
+import { ehTesouro, precoTitulo, titulos } from './tesouro.js';
 
 export const REACOES = [
   { id: 'curtir', emoji: '👍', rotulo: 'Curtir' },
@@ -22,11 +23,15 @@ export const apostaNaAlta = (lado) => lado === 'compra' || lado === 'recompra';
 
 /** Preço no formato do ativo: R$ 30,00 (ação) ou 131.005 pts (minicontrato) */
 export function precoPublicacao(p, valor = p.preco) {
-  return p.origem === 'futuro' ? `${pontos(valor, p.base)} pts` : reais(valor);
+  if (p.origem === 'futuro') return `${pontos(valor, p.base)} pts`;
+  return ehTesouro(p.ativo) ? `${reais(precoTitulo(valor))} por título` : reais(valor);
 }
 
 /** Partes da frase, para destacar o ativo: { antes: 'comprou 100', ativo: 'PETR4', depois: 'a R$ 30,00' } */
 export function partesOperacao(p) {
+  if (ehTesouro(p.ativo)) {
+    return { antes: `${VERBOS[p.lado] ?? p.lado} ${titulos(p.quantidade)} de`, ativo: p.ativo, depois: `a ${precoPublicacao(p)}` };
+  }
   const unidade = p.origem === 'futuro' ? (Number(p.quantidade) === 1 ? ' contrato' : ' contratos') : '';
   return { antes: `${VERBOS[p.lado] ?? p.lado} ${numero(p.quantidade)}${unidade}`, ativo: p.ativo, depois: `a ${precoPublicacao(p)}` };
 }

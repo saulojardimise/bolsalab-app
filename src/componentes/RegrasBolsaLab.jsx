@@ -45,7 +45,7 @@ export default function RegrasBolsaLab({ config = {}, mercado = [], aoFechar }) 
     margemWdo: config.margem_wdo ?? 1500,
   };
   const nEtfs = mercado.filter((e) => e.tipo === 'etf').length;
-  const nAcoes = mercado.length - nEtfs;
+  const nAcoes = mercado.filter((e) => (e.tipo ?? 'acao') === 'acao').length;
 
   return (
     <dialog ref={dialogo} className="folha aviso-novidade regras" aria-labelledby="aviso-titulo"
@@ -113,6 +113,15 @@ export default function RegrasBolsaLab({ config = {}, mercado = [], aoFechar }) 
             o dólar (R$ 10 por ponto). Você não paga o contrato inteiro: deixa uma <strong>margem de garantia</strong> de
             {' '}{reais(c.margemWin)} (WIN) ou {reais(c.margemWdo)} (WDO). Por isso ele é <strong>alavancado</strong>:
             ganhos e perdas são grandes perto do dinheiro usado.
+          </p>
+        </div>
+        <div className="regras-ativo">
+          <p className="regras-ativo-topo"><strong>Tesouro Direto</strong><span>Selic, Prefixado e IPCA+</span></p>
+          <p>
+            Títulos públicos: você empresta dinheiro ao governo e recebe juros. O <strong>Selic</strong> rende os juros básicos,
+            o <strong>Prefixado</strong> tem taxa fixa e o <strong>IPCA+</strong> paga a inflação mais uma taxa. Sem corretagem,
+            a partir de 0,01 título. Compra pelo preço de compra e venda pelo de venda; no vencimento, o título é resgatado sozinho.
+            Não dá para vender a descoberto.
           </p>
         </div>
 

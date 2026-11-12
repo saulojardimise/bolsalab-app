@@ -2,6 +2,45 @@
 // Linguagem simples; quando ajuda, um exemplo com números redondos.
 
 export const GLOSSARIO = {
+  tesouro_direto: {
+    titulo: 'Tesouro Direto',
+    texto: 'Programa do governo federal para vender títulos públicos a pessoas físicas. Ao comprar um título, você empresta dinheiro '
+      + 'ao governo e recebe de volta com juros. É considerado o investimento mais seguro do país. Dá para comprar a partir de 0,01 título.',
+  },
+  tesouro_selic: {
+    titulo: 'Tesouro Selic',
+    texto: 'Título que rende a taxa Selic, os juros básicos da economia. O preço sobe um pouquinho todo dia e quase nunca cai, '
+      + 'por isso é usado como reserva de emergência.',
+    exemplo: 'Com a Selic a 15% ao ano, R$ 1.000 viram cerca de R$ 1.150 em um ano.',
+  },
+  tesouro_prefixado: {
+    titulo: 'Tesouro Prefixado',
+    texto: 'Título com taxa fixa, combinada na compra. No vencimento, paga R$ 1.000 por título. Antes disso, o preço muda com os juros: '
+      + 'se os juros do mercado sobem, o título cai; se caem, ele sobe.',
+    exemplo: 'Comprou a 14% ao ano e levou até o vencimento: recebe exatamente os 14% ao ano, aconteça o que acontecer com os juros.',
+  },
+  tesouro_ipca: {
+    titulo: 'Tesouro IPCA+',
+    texto: 'Título que paga a inflação (IPCA) mais uma taxa fixa. Protege o poder de compra: o dinheiro cresce acima da inflação '
+      + 'se for levado até o vencimento. Os prazos são longos e o preço oscila com os juros.',
+    exemplo: 'IPCA + 7% com inflação de 4% no ano: rende cerca de 11,3% naquele ano.',
+  },
+  taxa_tesouro: {
+    titulo: 'Rentabilidade do título',
+    texto: 'Quanto o título rende por ano se você comprar hoje e ficar com ele até o vencimento. No Selic, é a Selic mais um pouco; '
+      + 'no Prefixado, uma taxa fixa; no IPCA+, a inflação mais uma taxa.',
+  },
+  spread_tesouro: {
+    titulo: 'Preço de compra e de venda',
+    texto: 'O Tesouro vende o título um pouco mais caro do que paga para recomprá-lo. Por isso, logo depois de comprar, o título vale '
+      + 'um pouco menos do que você pagou. Essa diferença (o spread) é pequena no Selic e maior nos títulos longos.',
+  },
+  marcacao_mercado: {
+    titulo: 'Marcação a mercado',
+    texto: 'O preço dos títulos muda todo dia conforme os juros do mercado. Quando os juros sobem, títulos com taxa fixa (Prefixado e IPCA+) '
+      + 'perdem valor; quando caem, ganham. Quem leva até o vencimento recebe a taxa combinada; quem vende antes pode ganhar ou perder.',
+    exemplo: 'Você comprou um Prefixado a 13%. Os juros sobem para 15%: novos títulos pagam mais, então o seu vale menos se vendido hoje.',
+  },
   patrimonio: {
     titulo: 'Patrimônio virtual',
     texto: 'Tudo o que a sua conta vale hoje: o saldo em dinheiro, mais as ações compradas pelo preço de fechamento, '
