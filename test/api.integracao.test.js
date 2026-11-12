@@ -236,7 +236,7 @@ test('histórico diário, minigráficos e patrimônio do aluno', { skip: pular }
   assert.deepEqual((await apis.ana.historico('PETR4', h[1].data)).length, 1);
 
   const linhas = await apis.ana.linhasMercado(ontem);
-  assert.equal(Object.keys(linhas).length, 92);                  // ações do Ibovespa e ETFs
+  assert.equal(Object.keys(linhas).length, 107);                 // ações do Ibovespa, ETFs e BDRs
   assert.deepEqual(linhas.PETR4, [20, 40]);                      // em ordem de data, como números
   assert.deepEqual(await apis.ana.linhasMercado('2099-01-01'), {});
 

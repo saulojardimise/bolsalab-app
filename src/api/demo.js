@@ -50,6 +50,15 @@ const EMPRESAS = [
 const hojeISO = () => dataSP();
 const r2 = (v) => Math.round(v * 100) / 100;
 
+// BDRs (demonstração)
+for (const [t, nome, setor, preco, ant, resumo] of [
+  ['NVDC34', 'Nvidia', 'Tecnologia', 17.86, 17.4, 'Chips para inteligência artificial'],
+  ['AAPL34', 'Apple', 'Tecnologia', 100.01, 99.2, 'iPhone, Mac e serviços'],
+  ['ROXO34', 'Nubank', 'Bancos', 11.28, 11.5, 'Banco digital, listado em Nova York'],
+  ['MELI34', 'Mercado Livre', 'Comércio', 69.55, 68.1, 'Comércio eletrônico e Mercado Pago'],
+  ['TSLA34', 'Tesla', 'Veículos', 67.73, 70.2, 'Carros elétricos e energia'],
+]) EMPRESAS.push([t, nome, setor, preco, ant, 'bdr', `${nome}: ${resumo.toLowerCase()}.`, resumo, null]);
+
 // Tesouro Direto (demonstração): preço guardado por centésimo de título, como no banco
 const TESOURO_DEMO = {
   SELIC2029: { nome: 'Tesouro Selic 2029', indexador: 'selic', vencimento: '2029-03-01', taxa_compra: 0.05, taxa_venda: 0.06, pu_compra: 20248.13, pu_venda: 20233.12, anterior: 20225.4 },

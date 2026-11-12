@@ -4,6 +4,7 @@ import { previa, TIPOS } from '../lib/regras.js';
 import { numero, reais, reaisComSinal } from '../lib/formato.js';
 import Icone from '../componentes/Icone.jsx';
 import Termo from '../componentes/Termo.jsx';
+import { unidade } from '../lib/etf.js';
 import { TERMO_DO_ROTULO } from '../lib/glossario.js';
 
 // Boleta da página da ação.
@@ -13,7 +14,7 @@ import { TERMO_DO_ROTULO } from '../lib/glossario.js';
 export default function Boleta({ ticker, empresa, comprada, vendida, operacaoInicial, dados, aoExecutar }) {
   // ETF: a unidade é a cota
   const etf = empresa?.tipo === 'etf';
-  const un = etf ? 'cotas' : 'ações';
+  const un = unidade(etf, 2, ticker);
   const qtdComprada = comprada?.quantidade ?? 0;
   const inicial = operacaoInicial ?? (vendida ? 'recompra' : 'compra');
   const [lado, setLado] = useState(inicial === 'compra' || inicial === 'recompra' ? 'comprar' : 'vender');
@@ -32,7 +33,7 @@ export default function Boleta({ ticker, empresa, comprada, vendida, operacaoIni
   const quantidade = Math.floor(Number(qtd) || 0);
   const p = previa({
     tipo, quantidade, preco: Number(empresa.preco), saldo: Number(dados.perfil.saldo), config: dados.config,
-    qtdComprada, vendida, exposicao, etf,
+    qtdComprada, vendida, exposicao, etf, ticker,
   });
 
   const suspensa = empresa.situacao === 'suspensa';
@@ -65,7 +66,7 @@ export default function Boleta({ ticker, empresa, comprada, vendida, operacaoIni
   const ajustar = (delta) => setQtd(String(Math.max(0, quantidade + delta)));
   const opcoes = lado === 'comprar'
     ? (vendida ? [['compra', `Comprar ${un}`], ['recompra', `Recomprar vendidas (${numero(vendida.quantidade)})`]] : null)
-    : [['venda', `Das minhas ${un} (${numero(qtdComprada)})`, qtdComprada === 0], ['venda_descoberto', 'A descoberto']];
+    : [['venda', `${un.startsWith('BDR') ? 'Dos meus' : 'Das minhas'} ${un} (${numero(qtdComprada)})`, qtdComprada === 0], ['venda_descoberto', 'A descoberto']];
   const total = p.linhas.find((l) => l.destaque);
   const vende = tipo === 'venda' || tipo === 'venda_descoberto';
   const verbo = { compra: 'Comprar', recompra: 'Recomprar', venda: 'Vender', venda_descoberto: 'Vender a descoberto' }[tipo];
@@ -106,7 +107,7 @@ export default function Boleta({ ticker, empresa, comprada, vendida, operacaoIni
 
       <div className="boleta-totais">
         <div>
-          <span className="suave">Preço por {etf ? 'cota' : 'ação'} (<Termo id="fechamento">fechamento</Termo>)</span>
+          <span className="suave">Preço por {unidade(etf, 1, ticker)} (<Termo id="fechamento">fechamento</Termo>)</span>
           <strong className="num">{reais(empresa.preco)}</strong>
         </div>
         <div className="boleta-total">

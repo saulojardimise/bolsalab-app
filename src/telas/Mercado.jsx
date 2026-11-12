@@ -12,6 +12,7 @@ const SECOES = [
   ['acoes', 'Ações'],
   ['futuros', 'Futuros'],
   ['etfs', 'ETFs'],
+  ['bdrs', 'BDRs'],
   ['tesouro', 'Tesouro'],
 ];
 
@@ -33,6 +34,7 @@ export default function Mercado({ dados, linhas, aoEscolher, aoAbrirFuturo }) {
   const temFuturos = dados.futurosMercado?.some((f) => f.preco != null);
   const temEtfs = mercado.some((e) => e.tipo === 'etf');
   const temTesouro = mercado.some((e) => e.tipo === 'tesouro' && e.preco != null);
+  const temBdrs = mercado.some((e) => e.tipo === 'bdr' && e.preco != null);
 
   return (
     <div className="pilha pilha-larga">
@@ -44,7 +46,7 @@ export default function Mercado({ dados, linhas, aoEscolher, aoAbrirFuturo }) {
       </div>
 
       <div className="abas-mercado" role="tablist" aria-label="O que você quer ver">
-        {SECOES.filter(([id]) => id !== 'futuros' || temFuturos).filter(([id]) => id !== 'etfs' || temEtfs).filter(([id]) => id !== 'tesouro' || temTesouro).map(([id, rotulo]) => (
+        {SECOES.filter(([id]) => id !== 'futuros' || temFuturos).filter(([id]) => id !== 'etfs' || temEtfs).filter(([id]) => id !== 'tesouro' || temTesouro).filter(([id]) => id !== 'bdrs' || temBdrs).map(([id, rotulo]) => (
           <button key={id} role="tab" aria-selected={secao === id} onClick={() => setSecao(id)}>{rotulo}</button>
         ))}
       </div>
@@ -57,6 +59,8 @@ export default function Mercado({ dados, linhas, aoEscolher, aoAbrirFuturo }) {
         ? <ListaTesouro dados={dados} aoEscolher={aoEscolher} />
         : secao === 'futuros' && temFuturos
         ? <Futuros dados={dados} aoAbrirFuturo={aoAbrirFuturo} />
+        : secao === 'bdrs' && temBdrs
+          ? <ListaComFiltros key="bdrs" dados={dados} linhas={linhas} aoEscolher={aoEscolher} tipo="bdr" />
         : secao === 'etfs' && temEtfs
           ? <ListaComFiltros key="etfs" dados={dados} linhas={linhas} aoEscolher={aoEscolher} tipo="etf" />
           : <ListaComFiltros key="acoes" dados={dados} linhas={linhas} aoEscolher={aoEscolher} tipo="acao" />}
@@ -90,7 +94,7 @@ function ListaComFiltros({ dados, linhas, aoEscolher, tipo }) {
   return (
     <section aria-labelledby={`titulo-${tipo}`} className={`secao-mercado ${etf ? 'secao-etf' : ''}`}>
       <h2 id={`titulo-${tipo}`} className="secao-titulo">
-        {etf ? <Termo id="etf">ETFs</Termo> : 'Ações do Ibovespa'}
+        {etf ? <Termo id="etf">ETFs</Termo> : tipo === 'bdr' ? <Termo id="bdr">BDRs</Termo> : 'Ações do Ibovespa'}
       </h2>
       {etf && (
         <p className="suave intro-etf">
@@ -98,10 +102,16 @@ function ListaComFiltros({ dados, linhas, aoEscolher, tipo }) {
           Mesmas regras das ações: corretagem de {reais(dados.config.corretagem)} e lote de 1 cota.
         </p>
       )}
+      {tipo === 'bdr' && (
+        <p className="suave intro-etf">
+          Recibos de ações de empresas listadas fora do Brasil, negociados na B3 em reais. O preço acompanha a ação lá fora
+          e também o dólar. Mesmas regras das ações: corretagem de {reais(dados.config.corretagem)} e lote de 1 BDR.
+        </p>
+      )}
       <div className="filtros">
         <label className="busca">
           <Icone nome="busca" tamanho={20} />
-          <input type="search" placeholder={etf ? 'Buscar ETF, código ou assunto' : 'Buscar empresa ou código'}
+          <input type="search" placeholder={etf ? 'Buscar ETF, código ou assunto' : tipo === 'bdr' ? 'Buscar empresa, código ou assunto' : 'Buscar empresa ou código'}
                  aria-label={etf ? 'Buscar ETF' : 'Buscar empresa ou código'}
                  value={busca} onChange={(e) => setBusca(e.target.value)} />
         </label>

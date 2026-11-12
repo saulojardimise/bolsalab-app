@@ -11,6 +11,7 @@ import Icone from '../componentes/Icone.jsx';
 import Logo from '../componentes/Logo.jsx';
 import Boleta from './Boleta.jsx';
 import Termo from '../componentes/Termo.jsx';
+import { unidade } from '../lib/etf.js';
 import DiscussoesDoAtivo from '../componentes/DiscussoesDoAtivo.jsx';
 
 // Página de uma ação: preço, gráfico, informações do dia, últimos fechamentos e boleta.
@@ -78,6 +79,13 @@ export default function Acao({ ticker, operacaoInicial, dados, aoVoltar, aoExecu
             : <span className="etiqueta-info">Fechamento de {diaMes(empresa.data)}</span>}
         </div>
 
+        {empresa.tipo === 'bdr' && (
+          <div className="descricao-etf">
+            <p className="descricao-etf-titulo"><Termo id="bdr">BDR</Termo> · {empresa.setor}{empresa.resumo ? ` · ${empresa.resumo}` : ''}</p>
+            {empresa.descricao && <p>{empresa.descricao}</p>}
+            <p className="suave">O preço acompanha a ação lá fora e também o dólar.</p>
+          </div>
+        )}
         {empresa.tipo === 'etf' && (
           <div className="descricao-etf">
             <p className="descricao-etf-titulo">
@@ -151,13 +159,13 @@ export default function Acao({ ticker, operacaoInicial, dados, aoVoltar, aoExecu
         <section className="cartao posicao-resumo" aria-label="Sua posição">
           {comprada && (
             <p>
-              Você tem <strong>{numero(comprada.quantidade)}</strong> {empresa.tipo === 'etf' ? 'cotas' : 'ações'}, <Termo id="preco_medio">preço médio</Termo> {reais(comprada.preco_medio)}.{' '}
+              Você tem <strong>{numero(comprada.quantidade)}</strong> {unidade(empresa.tipo === 'etf', 2, ticker)}, <Termo id="preco_medio">preço médio</Termo> {reais(comprada.preco_medio)}.{' '}
               <span className={tendencia(comprada.resultado)}>{reaisComSinal(comprada.resultado)} ({pct(comprada.resultado_pct)})</span>
             </p>
           )}
           {vendida && (
             <p>
-              Você está <Termo id="venda_descoberto">vendido</Termo> em <strong>{numero(vendida.quantidade)}</strong> {empresa.tipo === 'etf' ? 'cotas' : 'ações'} a {reais(vendida.preco_venda)}.{' '}
+              Você está <Termo id="venda_descoberto">vendido</Termo> em <strong>{numero(vendida.quantidade)}</strong> {unidade(empresa.tipo === 'etf', 2, ticker)} a {reais(vendida.preco_venda)}.{' '}
               <span className={tendencia(vendida.resultado)}>
                 {reaisComSinal(vendida.resultado)} ({pct(resultadoPct(vendida))})
               </span>

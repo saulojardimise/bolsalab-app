@@ -1,3 +1,4 @@
+import { ehBdr, unidade } from './etf.js';
 // Cálculos da boleta e da carteira. Servem para MOSTRAR a prévia ao aluno;
 // quem decide de verdade é o banco (executar_ordem), que aplica as mesmas regras.
 
@@ -24,9 +25,9 @@ const r2 = (v) => Math.round(v * 100) / 100;
  * @param {boolean} p.etf          ETF: a unidade é a cota
  * @returns {{ linhas: {rotulo:string, valor:number, destaque?:boolean}[], maximo:number, erro:string|null, efeitoSaldo:number }}
  */
-export function previa({ tipo, quantidade, preco, saldo, config, qtdComprada = 0, vendida = null, exposicao = 0, etf = false }) {
-  const un = etf ? 'cotas' : 'ações';
-  const deste = etf ? 'deste ETF' : 'desta empresa';
+export function previa({ tipo, quantidade, preco, saldo, config, qtdComprada = 0, vendida = null, exposicao = 0, etf = false, ticker = '' }) {
+  const un = unidade(etf, 2, ticker);
+  const deste = etf ? 'deste ETF' : ehBdr(ticker) ? 'deste BDR' : 'desta empresa';
   const q = Math.floor(Number(quantidade) || 0);
   const corretagem = Number(config.corretagem);
   const bruto = r2(q * preco);
@@ -39,7 +40,7 @@ export function previa({ tipo, quantidade, preco, saldo, config, qtdComprada = 0
     maximo = Math.max(0, Math.floor((saldo - corretagem) / preco));
     efeitoSaldo = -(bruto + corretagem);
     linhas = [
-      { rotulo: `Valor das ${un}`, valor: bruto },
+      { rotulo: `Valor ${un.startsWith("BDR") ? "dos" : "das"} ${un}`, valor: bruto },
       { rotulo: 'Corretagem', valor: corretagem },
       { rotulo: 'Sai do seu saldo', valor: bruto + corretagem, destaque: true },
     ];
@@ -48,7 +49,7 @@ export function previa({ tipo, quantidade, preco, saldo, config, qtdComprada = 0
     maximo = qtdComprada;
     efeitoSaldo = bruto - corretagem;
     linhas = [
-      { rotulo: `Valor das ${un}`, valor: bruto },
+      { rotulo: `Valor ${un.startsWith("BDR") ? "dos" : "das"} ${un}`, valor: bruto },
       { rotulo: 'Corretagem', valor: -corretagem },
       { rotulo: 'Entra no seu saldo', valor: bruto - corretagem, destaque: true },
     ];

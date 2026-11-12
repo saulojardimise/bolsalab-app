@@ -2,6 +2,13 @@
 // Linguagem simples; quando ajuda, um exemplo com números redondos.
 
 export const GLOSSARIO = {
+  bdr: {
+    titulo: 'BDR',
+    texto: 'Brazilian Depositary Receipt: um recibo, negociado na B3 em reais, que representa ações de uma empresa listada em outra bolsa, '
+      + 'como Apple ou Nvidia. Cada BDR equivale a uma fração da ação lá fora, por isso o preço não é igual ao da ação convertido em reais. '
+      + 'Ele sobe e desce com a empresa e também com o dólar.',
+    exemplo: 'Se a ação da Apple fica igual em Nova York e o dólar sobe 5%, o AAPL34 sobe cerca de 5%.',
+  },
   selic: {
     titulo: 'Selic',
     texto: 'A taxa básica de juros da economia, definida pelo Copom a cada 45 dias. Ela serve de piso para os juros do país: '

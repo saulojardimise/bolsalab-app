@@ -8,7 +8,7 @@ import { numero, pct, reais, reaisComSinal, tendencia } from '../lib/formato.js'
 import Logo from '../componentes/Logo.jsx';
 import Icone from '../componentes/Icone.jsx';
 import Termo from '../componentes/Termo.jsx';
-import { precoAtivo, quantidadeAtivo, setorExibido, tickersEtf, unidade } from '../lib/etf.js';
+import { ehBdr, precoAtivo, quantidadeAtivo, setorExibido, tickersEtf, unidade } from '../lib/etf.js';
 import { ehTesouro } from '../lib/tesouro.js';
 
 // Cores das fatias por setor (na ordem do maior para o menor)
@@ -31,15 +31,17 @@ export default function Carteira({ uid, dados, resumo, versao, aoEscolher, irPar
 
   const etfs = tickersEtf(dados.mercado);
   const ehEtf = (t) => etfs.has(t);
-  const compradasAcoes = carteira.filter((p) => !ehEtf(p.ticker) && !ehTesouro(p.ticker));
+  const compradasAcoes = carteira.filter((p) => !ehEtf(p.ticker) && !ehTesouro(p.ticker) && !ehBdr(p.ticker));
+  const compradasBdrs = carteira.filter((p) => ehBdr(p.ticker));
+  const totalBdrs = compradasBdrs.reduce((s, p) => s + Number(p.valor_atual || 0), 0);
   const compradasEtfs = carteira.filter((p) => ehEtf(p.ticker));
   const compradasTesouro = carteira.filter((p) => ehTesouro(p.ticker));
   const totalEtfs = compradasEtfs.reduce((s, p) => s + Number(p.valor_atual || 0), 0);
   const totalTesouro = compradasTesouro.reduce((s, p) => s + Number(p.valor_atual || 0), 0);
-  const totalAcoes = resumo.acoes - totalEtfs - totalTesouro;
+  const totalAcoes = resumo.acoes - totalEtfs - totalTesouro - totalBdrs;
 
   const porSetor = Object.entries(carteira.reduce((s, p) => {
-    const k = setorExibido(p.setor, ehEtf(p.ticker));
+    const k = setorExibido(p.setor, ehEtf(p.ticker), p.ticker);
     s[k] = (s[k] ?? 0) + Number(p.valor_atual);
     return s;
   }, {})).sort((a, b) => b[1] - a[1]);
@@ -61,8 +63,9 @@ export default function Carteira({ uid, dados, resumo, versao, aoEscolher, irPar
         <NotaEstimado resumo={resumo} />
         <dl className="resumo-linhas">
           <div><dt><Termo id="saldo">Saldo disponível</Termo></dt><dd className="num">{reais(resumo.saldo)}</dd></div>
-          {(totalAcoes > 0 || (compradasEtfs.length === 0 && compradasTesouro.length === 0)) && <div><dt>Ações compradas</dt><dd className="num">{reais(totalAcoes)}</dd></div>}
+          {(totalAcoes > 0 || (compradasEtfs.length === 0 && compradasTesouro.length === 0 && compradasBdrs.length === 0)) && <div><dt>Ações compradas</dt><dd className="num">{reais(totalAcoes)}</dd></div>}
           {compradasEtfs.length > 0 && <div><dt><Termo id="etf">ETFs</Termo></dt><dd className="num">{reais(totalEtfs)}</dd></div>}
+          {compradasBdrs.length > 0 && <div><dt><Termo id="bdr">BDRs</Termo></dt><dd className="num">{reais(totalBdrs)}</dd></div>}
           {compradasTesouro.length > 0 && <div><dt><Termo id="tesouro_direto">Tesouro Direto</Termo></dt><dd className="num">{reais(totalTesouro)}</dd></div>}
           {vendidas.length > 0 && (
             <div><dt><Termo id="venda_descoberto">Vendas a descoberto</Termo></dt><dd className={`num ${tendencia(resumo.vendido)}`}>{reaisComSinal(resumo.vendido)}</dd></div>
@@ -126,6 +129,9 @@ export default function Carteira({ uid, dados, resumo, versao, aoEscolher, irPar
       {compradasEtfs.length > 0 && (
         <ListaPosicoes id="titulo-etfs" titulo="ETFs" posicoes={compradasEtfs} etf aoEscolher={aoEscolher} />
       )}
+      {compradasBdrs.length > 0 && (
+        <ListaPosicoes id="titulo-bdrs" titulo="BDRs" posicoes={compradasBdrs} aoEscolher={aoEscolher} />
+      )}
       {compradasTesouro.length > 0 && (
         <ListaPosicoes id="titulo-tesouro" titulo="Tesouro Direto" posicoes={compradasTesouro} aoEscolher={aoEscolher} />
       )}
@@ -142,7 +148,7 @@ export default function Carteira({ uid, dados, resumo, versao, aoEscolher, irPar
                     <Logo ticker={v.ticker} url={v.logo_url} />
                     <span className="posicao-id">
                       <strong>{v.ticker}</strong>
-                      <span>{numero(v.quantidade)} {unidade(ehEtf(v.ticker), Number(v.quantidade))} vendidas a {reais(v.preco_venda)}, hoje {reais(v.preco_atual)}</span>
+                      <span>{numero(v.quantidade)} {unidade(ehEtf(v.ticker), Number(v.quantidade), v.ticker)} vendidas a {reais(v.preco_venda)}, hoje {reais(v.preco_atual)}</span>
                     </span>
                     <span className="posicao-valor">
                       <strong className="num">{reais(v.custo_recompra)}</strong>

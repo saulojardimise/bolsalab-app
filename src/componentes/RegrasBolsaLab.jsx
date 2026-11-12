@@ -116,6 +116,13 @@ export default function RegrasBolsaLab({ config = {}, mercado = [], aoFechar }) 
           </p>
         </div>
         <div className="regras-ativo">
+          <p className="regras-ativo-topo"><strong>BDRs</strong><span>empresas listadas lá fora</span></p>
+          <p>
+            Recibos de ações de empresas como Apple, Nvidia e Nubank, negociados na B3 em reais. Funcionam como ações
+            (mesma corretagem e horário), mas o preço acompanha a ação lá fora e também o dólar.
+          </p>
+        </div>
+        <div className="regras-ativo">
           <p className="regras-ativo-topo"><strong>Tesouro Direto</strong><span>Selic, Prefixado e IPCA+</span></p>
           <p>
             Títulos públicos: você empresta dinheiro ao governo e recebe juros. O <strong>Selic</strong> rende os juros básicos,
