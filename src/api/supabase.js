@@ -448,6 +448,9 @@ export function criarApi(supabase, { urlRetorno } = {}) {
     async alertas() {
       return checar(await supabase.rpc('alertas_abertos'));
     },
+    async refazerColeta(chave) {
+      return checar(await supabase.rpc('gestor_refazer_coleta', { p_chave: chave }));
+    },
     async resolverAlerta(id) {
       return checar(await supabase.rpc('resolver_alerta', { p_id: id }));
     },

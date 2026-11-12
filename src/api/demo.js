@@ -210,6 +210,9 @@ function criarGestao() {
       aluno('Igor Nunes', null, 10120.5, 3, 'gmail.com', 'moderado', 'moderado', 0, 50),
     ],
     alertas: [
+      { id: 3, tipo: 'coleta', ticker: 'cotacao_do_dia', criado_em: horasAtras(1), alunos: null,
+        mensagem: 'Cotação do dia de hoje: funcionaram 1 de 3 consultas previstas até agora (11h00, 12h30, 14h00). Sem elas, o patrimônio estimado durante o pregão fica parado.',
+        detalhes: { rotulo: 'Cotação do dia', modo: 'intradia' } },
       { id: 2, tipo: 'variacao_brusca', ticker: 'BBDC4', criado_em: horasAtras(3), alunos: 2,
         mensagem: 'BBDC4 foi de R$ 32,42 para R$ 16,21 no último pregão (−50%). Pode ser um desdobramento de 1 para 2.',
         detalhes: { de: 1, para: 2 } },
@@ -674,6 +677,7 @@ export function criarApiDemo() {
     },
     async definirPausa(p) { gestao.pausada = p; return p; },
     async alertas() { await atraso(); return gestao.alertas.map((a) => ({ ...a })); },
+    async refazerColeta() { await atraso(); return 'Coleta pedida. Em cerca de 1 minuto ela aparece em Sistema.'; },
     async resolverAlerta(id) { gestao.alertas = gestao.alertas.filter((a) => a.id !== id); },
     async eventos() { await atraso(); return gestao.eventos.map((e) => ({ ...e })); },
     async impactoAcao(ticker) {
