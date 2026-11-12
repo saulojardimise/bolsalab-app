@@ -4,7 +4,7 @@ import { diaMes, reais } from '../lib/formato.js';
 // Gráfico de área com eixo de preços à direita e datas embaixo.
 // Toque/arraste para ver o valor de cada dia.
 // pontos: [{ data: 'AAAA-MM-DD', valor: number }]
-export default function Grafico({ pontos, altura = 180, eixos = true, rotulo = 'Gráfico', formatar = reais, casasEixo = 2, extras = [], formatarData = diaMes }) {
+export default function Grafico({ pontos, altura = 180, eixos = true, rotulo = 'Gráfico', formatar = reais, casasEixo = 2, extras = [], formatarData = diaMes, formatarEixo = formatarData, marcasData = 5 }) {
   const caixa = useRef(null);
   const [largura, setLargura] = useState(320);
   const [foco, setFoco] = useState(null);   // índice do ponto em destaque
@@ -54,7 +54,7 @@ export default function Grafico({ pontos, altura = 180, eixos = true, rotulo = '
   for (let v = Math.ceil(min / passo) * passo; v <= max; v += passo) marcas.push(v);
 
   // até 5 datas embaixo
-  const nDatas = Math.min(5, pontos.length);
+  const nDatas = Math.min(marcasData, pontos.length);
   const idxDatas = [...new Set(Array.from({ length: nDatas }, (_, k) => Math.round((k / (nDatas - 1)) * (pontos.length - 1))))];
 
   const subiu = valores.at(-1) >= valores[0];
@@ -104,7 +104,7 @@ export default function Grafico({ pontos, altura = 180, eixos = true, rotulo = '
         {eixos && idxDatas.map((i, k) => (
           <text key={i} x={x(i)} y={altura - 4} className="grafico-texto"
                 textAnchor={k === 0 ? 'start' : k === idxDatas.length - 1 ? 'end' : 'middle'}>
-            {formatarData(pontos[i].data)}
+            {formatarEixo(pontos[i].data)}
           </text>
         ))}
       </svg>

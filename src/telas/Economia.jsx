@@ -7,6 +7,9 @@ const dec = (v, casas = 2) => (v == null ? '–' : Number(v).toLocaleString('pt-
 const taxa = (v, casas = 2) => (v == null ? '–' : `${dec(v, casas)}%`);
 const MESES = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
 const mesAno = (iso) => (iso ? `${MESES[Number(iso.slice(5, 7)) - 1]}/${iso.slice(0, 4)}` : '');
+// eixo curto: "set/26" e "2T26"
+const mesCurto = (iso) => (iso ? `${MESES[Number(iso.slice(5, 7)) - 1]}/${iso.slice(2, 4)}` : '');
+const triCurto = (iso) => (iso ? `${Math.floor((Number(iso.slice(5, 7)) - 1) / 3) + 1}T${iso.slice(2, 4)}` : '');
 const trimestre = (iso) => (iso ? `${Math.floor((Number(iso.slice(5, 7)) - 1) / 3) + 1}º tri/${iso.slice(0, 4)}` : '');
 const dataBR = (iso) => (iso ? iso.split('-').reverse().join('/') : '');
 
@@ -60,7 +63,7 @@ export default function Economia({ macro, erro }) {
             </p>
             {selic.historico?.length > 2 && (
               <Grafico pontos={selic.historico.map((h) => ({ data: h.data, valor: Number(h.valor) }))} altura={130}
-                       rotulo="Selic nos últimos anos" formatar={(v) => taxa(v)} formatarData={mesAno} />
+                       rotulo="Selic nos últimos anos" formatar={(v) => taxa(v)} formatarData={mesAno} formatarEixo={mesCurto} marcasData={4} />
             )}
             <dl className="economia-linhas">
               {cdi && <div><dt><Termo id="cdi">CDI</Termo></dt><dd className="num">{taxa(cdi.ao_ano)} ao ano</dd></div>}
@@ -81,7 +84,7 @@ export default function Economia({ macro, erro }) {
             </p>
             {ipca.historico_12m?.length > 2 && (
               <Grafico pontos={ipca.historico_12m.map((h) => ({ data: h.data, valor: Number(h.valor) }))} altura={130}
-                       rotulo="IPCA acumulado em 12 meses, com o teto da meta" formatar={(v) => taxa(v)} formatarData={mesAno}
+                       rotulo="IPCA acumulado em 12 meses, com o teto da meta" formatar={(v) => taxa(v)} formatarData={mesAno} formatarEixo={mesCurto} marcasData={4}
                        extras={[{ id: 'teto', classe: 'serie-cdi', valores: ipca.historico_12m.map(() => meta.centro + meta.tolerancia) }]} />
             )}
             <p className="nota">A linha tracejada é o teto da meta. Inflação alta corrói o dinheiro parado. Títulos como o Tesouro IPCA+ protegem o poder de compra.</p>
@@ -98,7 +101,7 @@ export default function Economia({ macro, erro }) {
             </p>
             {dolar.historico?.length > 2 && (
               <Grafico pontos={dolar.historico.map((h) => ({ data: h.data, valor: Number(h.valor) }))} altura={130}
-                       rotulo="Dólar no último ano" casasEixo={2} />
+                       rotulo="Dólar no último ano" casasEixo={2} marcasData={4} />
             )}
             <p className="nota">Dólar em alta encarece importados e ajuda exportadoras, como Vale, Suzano e frigoríficos.</p>
           </section>
@@ -114,7 +117,7 @@ export default function Economia({ macro, erro }) {
             </p>
             {pib.historico?.length > 2 && (
               <Grafico pontos={pib.historico.map((h) => ({ data: h.data, valor: Number(h.valor) }))} altura={130}
-                       rotulo="PIB contra o mesmo trimestre do ano anterior" formatar={(v) => taxa(v)} formatarData={trimestre} />
+                       rotulo="PIB contra o mesmo trimestre do ano anterior" formatar={(v) => taxa(v)} formatarData={trimestre} formatarEixo={triCurto} marcasData={4} />
             )}
             <p className="nota">Economia crescendo: as empresas vendem mais e os lucros tendem a subir.</p>
           </section>
