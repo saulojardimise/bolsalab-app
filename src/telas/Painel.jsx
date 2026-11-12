@@ -15,6 +15,7 @@ import Inicio from './Inicio.jsx';
 import Mercado from './Mercado.jsx';
 import Acao from './Acao.jsx';
 import Tesouro from './Tesouro.jsx';
+import Economia from './Economia.jsx';
 import { ehTesouro } from '../lib/tesouro.js';
 import Carteira from './Carteira.jsx';
 import Turma from './Turma.jsx';
@@ -59,6 +60,14 @@ export default function Painel({ uid }) {
   const [perfilAberto, setPerfilAberto] = useState(false);
   const [dados, setDados] = useState(null);
   const feriadosRef = useRef([]);
+  // painel de economia (Banco Central): carregado à parte; sem o SQL 045, fica vazio
+  const [macro, setMacro] = useState(null);
+  const [erroMacro, setErroMacro] = useState('');
+  useEffect(() => {
+    let vivo = true;
+    api.painelMacro?.().then((m) => vivo && setMacro(m)).catch((e) => vivo && setErroMacro(e.message));
+    return () => { vivo = false; };
+  }, []);
   const [linhas, setLinhas] = useState({});              // ticker -> fechamentos do último mês
   const [erro, setErro] = useState('');
   const [semConexao, setSemConexao] = useState(false);
@@ -262,7 +271,7 @@ export default function Painel({ uid }) {
   if (sobreposta?.tipo === 'acao' && ehTesouro(sobreposta.ticker)) {
     conteudo = (
       <Tesouro key={sobreposta.ticker} ticker={sobreposta.ticker} operacaoInicial={sobreposta.operacao}
-               dados={dados} aoVoltar={fechar} aoExecutar={aoExecutar} discussoes={discussoes} />
+               dados={dados} aoVoltar={fechar} aoExecutar={aoExecutar} discussoes={discussoes} macro={macro} />
     );
   } else if (sobreposta?.tipo === 'acao') {
     conteudo = (
@@ -296,6 +305,7 @@ export default function Painel({ uid }) {
     conteudo = <Extrato uid={uid} dados={dados} resumo={resumo} versao={versao} aoVoltar={fechar} />;
   } else if (aba === 'inicio') {
     conteudo = <Inicio uid={uid} dados={aoVivo?.dados ?? dados} resumo={aoVivo?.resumo ?? resumo} linhas={linhas} versao={versao}
+                       macro={macro} aoAbrirEconomia={() => trocarAba('economia')}
                        aoEscolher={abrirAcao} irPara={trocarAba} aoAbrirExtrato={abrirExtrato} />;
   } else if (aba === 'mercado') {
     conteudo = <Mercado dados={dados} linhas={linhas} aoEscolher={abrirAcao} aoAbrirFuturo={abrirFuturo} />;
@@ -305,6 +315,8 @@ export default function Painel({ uid }) {
   } else if (aba === 'discussoes') {
     conteudo = <Discussoes key={discussoesBusca} buscaInicial={discussoesBusca} versao={versao}
                            aoAbrirTopico={(id) => abrirTopico(id)} aoNovoTopico={novoTopico} />;
+  } else if (aba === 'economia') {
+    conteudo = <Economia macro={macro} erro={macro ? '' : erroMacro && 'Os dados de economia ainda não estão disponíveis.'} />;
   } else if (aba === 'noticias') {
     conteudo = <Noticias dados={dados} aoEscolher={abrirAcao}
                          aoDiscutir={(n) => novoTopico({ noticia: { id: n.id, titulo: n.titulo, link: n.link } })} />;

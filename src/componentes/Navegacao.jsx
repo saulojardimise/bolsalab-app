@@ -14,6 +14,7 @@ const ABAS = [
 const EXTRAS = [
   ['discussoes', 'Discussões', 'Tópicos sobre ações, minicontratos e notícias'],
   ['noticias', 'Notícias', 'Manchetes do dia e fatos relevantes'],
+  ['economia', 'Economia', 'Selic, inflação, dólar, PIB e o que o mercado espera'],
   ['turma', 'Grupos', 'Ranking, entrar ou sair de grupos'],
 ];
 

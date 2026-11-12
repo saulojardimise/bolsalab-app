@@ -4,7 +4,7 @@ import { diaMes, reais } from '../lib/formato.js';
 // Gráfico de área com eixo de preços à direita e datas embaixo.
 // Toque/arraste para ver o valor de cada dia.
 // pontos: [{ data: 'AAAA-MM-DD', valor: number }]
-export default function Grafico({ pontos, altura = 180, eixos = true, rotulo = 'Gráfico', formatar = reais, casasEixo = 2, extras = [] }) {
+export default function Grafico({ pontos, altura = 180, eixos = true, rotulo = 'Gráfico', formatar = reais, casasEixo = 2, extras = [], formatarData = diaMes }) {
   const caixa = useRef(null);
   const [largura, setLargura] = useState(320);
   const [foco, setFoco] = useState(null);   // índice do ponto em destaque
@@ -73,11 +73,11 @@ export default function Grafico({ pontos, altura = 180, eixos = true, rotulo = '
          onPointerMove={aoMover} onPointerDown={aoMover} onPointerLeave={() => setFoco(null)}>
       {foco !== null && (
         <p className="grafico-leitura" style={{ left: Math.min(Math.max(x(iFoco) - 60, 0), w - 120) }}>
-          <strong className="num">{formatar(pFoco.valor)}</strong> <span>{diaMes(pFoco.data)}</span>
+          <strong className="num">{formatar(pFoco.valor)}</strong> <span>{formatarData(pFoco.data)}</span>
         </p>
       )}
       <svg width={largura} height={altura} role="img"
-           aria-label={`${rotulo}: de ${formatar(valores[0])} em ${diaMes(pontos[0].data)} a ${formatar(valores.at(-1))} em ${diaMes(pontos.at(-1).data)}`}>
+           aria-label={`${rotulo}: de ${formatar(valores[0])} em ${formatarData(pontos[0].data)} a ${formatar(valores.at(-1))} em ${formatarData(pontos.at(-1).data)}`}>
         <defs>
           <linearGradient id={idGradiente} x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%" className="grafico-grad-topo" />
@@ -104,7 +104,7 @@ export default function Grafico({ pontos, altura = 180, eixos = true, rotulo = '
         {eixos && idxDatas.map((i, k) => (
           <text key={i} x={x(i)} y={altura - 4} className="grafico-texto"
                 textAnchor={k === 0 ? 'start' : k === idxDatas.length - 1 ? 'end' : 'middle'}>
-            {diaMes(pontos[i].data)}
+            {formatarData(pontos[i].data)}
           </text>
         ))}
       </svg>

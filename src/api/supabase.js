@@ -281,6 +281,9 @@ export function criarApi(supabase, { urlRetorno } = {}) {
     async errosApp(limite = 20) {
       return checar(await supabase.rpc('gestor_erros', { p_limite: limite }));
     },
+    async painelMacro() {
+      return checar(await supabase.rpc('painel_macro'));
+    },
     async intradia() {
       return checar(await supabase.from('intradia').select('*'));
     },

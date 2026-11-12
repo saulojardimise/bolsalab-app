@@ -2,6 +2,43 @@
 // Linguagem simples; quando ajuda, um exemplo com números redondos.
 
 export const GLOSSARIO = {
+  selic: {
+    titulo: 'Selic',
+    texto: 'A taxa básica de juros da economia, definida pelo Copom a cada 45 dias. Ela serve de piso para os juros do país: '
+      + 'empréstimos, financiamentos e o rendimento da renda fixa. O Banco Central sobe a Selic para frear a inflação e corta para estimular a economia.',
+  },
+  copom: {
+    titulo: 'Copom',
+    texto: 'O Comitê de Política Monetária do Banco Central. Reúne-se oito vezes por ano e decide se a Selic sobe, cai ou fica igual, '
+      + 'olhando principalmente para a inflação.',
+  },
+  ipca: {
+    titulo: 'IPCA',
+    texto: 'O índice oficial de inflação do Brasil, medido pelo IBGE todo mês. Mostra quanto subiram os preços de uma cesta de produtos '
+      + 'e serviços que as famílias consomem.',
+    exemplo: 'IPCA de 4,5% em 12 meses: o que custava R$ 100 há um ano custa, em média, R$ 104,50 hoje.',
+  },
+  meta_inflacao: {
+    titulo: 'Meta de inflação',
+    texto: 'O objetivo de inflação definido pelo Conselho Monetário Nacional: 3% ao ano, com tolerância de 1,5 ponto para cima ou para baixo. '
+      + 'Quando a inflação foge do intervalo, o Banco Central precisa explicar por quê e como vai trazê-la de volta.',
+  },
+  juro_real: {
+    titulo: 'Juro real',
+    texto: 'Quanto os juros rendem acima da inflação, ou seja, o ganho de poder de compra. Aqui é calculado com a Selic de hoje e o IPCA dos '
+      + 'últimos 12 meses. Juro real alto atrai investidores para a renda fixa.',
+    exemplo: 'Selic de 14% e inflação de 4,5%: juro real de cerca de 9% ao ano.',
+  },
+  pib: {
+    titulo: 'PIB',
+    texto: 'O Produto Interno Bruto: tudo o que o país produz de bens e serviços. A variação do PIB mostra se a economia está crescendo ou encolhendo. '
+      + 'O IBGE divulga o PIB de cada trimestre cerca de dois meses depois.',
+  },
+  focus: {
+    titulo: 'Boletim Focus',
+    texto: 'Pesquisa do Banco Central com mais de cem bancos e consultorias sobre o que eles esperam para a inflação, a Selic, o PIB e o dólar. '
+      + 'Sai toda segunda-feira e mostra a mediana das projeções: o "palpite do mercado".',
+  },
   tesouro_direto: {
     titulo: 'Tesouro Direto',
     texto: 'Programa do governo federal para vender títulos públicos a pessoas físicas. Ao comprar um título, você empresta dinheiro '

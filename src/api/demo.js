@@ -571,6 +571,33 @@ export function criarApiDemo() {
       if (p.erro) throw new Error(p.erro);
       return executar(estado, ticker, tipo, quantidade, preco);
     },
+    async painelMacro() {
+      await atraso();
+      const hoje = hojeISO();
+      const ano = Number(hoje.slice(0, 4));
+      const mesesAtras = (n) => { const d = new Date(`${hoje.slice(0, 7)}-01T12:00:00Z`); d.setUTCMonth(d.getUTCMonth() - n); return d.toISOString().slice(0, 10); };
+      const selicHist = Array.from({ length: 36 }, (_, i) => ({ data: mesesAtras(35 - i), valor: i < 10 ? 10.5 + i * 0.4 : i < 28 ? 15 : 15 - (i - 27) * 0.25 }));
+      const ipca12 = Array.from({ length: 48 }, (_, i) => ({ data: mesesAtras(49 - i), valor: r2(4.6 + Math.sin(i / 6) * 0.9) }));
+      const dolar = diasUteis(365).map((data, i) => ({ data, valor: r2(5.9 - i * 0.0016 + Math.sin(i / 17) * 0.08) }));
+      return {
+        meta_inflacao: { centro: 3, tolerancia: 1.5 },
+        selic: { valor: 13.75, data: hoje, desde: mesesAtras(1).slice(0, 8) + '05',
+          decisoes: [{ data: mesesAtras(1), de: 14.25, para: 13.75 }, { data: mesesAtras(3), de: 14.75, para: 14.25 }], historico: selicHist },
+        cdi: { data: hoje, ao_ano: 13.65 },
+        ipca: { mes: mesesAtras(2), valor_mes: 0.82, acumulado_12m: 4.58, mes_12m: mesesAtras(2),
+          meses: [], historico_12m: ipca12 },
+        juro_real: 8.77,
+        dolar: { valor: dolar.at(-1).valor, data: dolar.at(-1).data, variacao_30d: -1.2, historico: dolar },
+        pib: { trimestre: `${ano}-04-01`, variacao_trimestre: 0.48, variacao_ano: 2.1,
+          historico: Array.from({ length: 12 }, (_, i) => ({ data: mesesAtras(36 - i * 3), valor: r2(2 + Math.sin(i / 2)) })) },
+        focus: { data: hoje, data_anterior: mesesAtras(1), itens: [
+          { indicador: 'CAMBIO', ano, mediana: 5.35, anterior: 5.4 }, { indicador: 'CAMBIO', ano: ano + 1, mediana: 5.4, anterior: 5.45 },
+          { indicador: 'IPCA', ano, mediana: 5.22, anterior: 5.1 }, { indicador: 'IPCA', ano: ano + 1, mediana: 4.9, anterior: 4.9 },
+          { indicador: 'PIB', ano, mediana: 1.75, anterior: 1.8 }, { indicador: 'PIB', ano: ano + 1, mediana: 1.15, anterior: 1.2 },
+          { indicador: 'SELIC', ano, mediana: 13.75, anterior: 14 }, { indicador: 'SELIC', ano: ano + 1, mediana: 12.5, anterior: 12.25 },
+        ] },
+      };
+    },
     async registrarErro() {},
     async errosApp() { return []; },
     async coletas() {

@@ -13,7 +13,7 @@ import DiscussoesDoAtivo from '../componentes/DiscussoesDoAtivo.jsx';
 const dataBR = (iso) => (iso ? new Date(`${iso}T12:00:00Z`).toLocaleDateString('pt-BR', { timeZone: 'UTC' }) : '');
 
 // Página de um título do Tesouro Direto: taxa, preço de compra e de venda, gráfico e boleta por valor.
-export default function Tesouro({ ticker, operacaoInicial, dados, aoVoltar, aoExecutar, discussoes = {} }) {
+export default function Tesouro({ ticker, operacaoInicial, dados, aoVoltar, aoExecutar, discussoes = {}, macro = null }) {
   const t = dados.mercado.find((e) => e.ticker === ticker);
   const posicao = dados.carteira.find((p) => p.ticker === ticker);
   const [historico, setHistorico] = useState(null);
@@ -56,6 +56,13 @@ export default function Tesouro({ ticker, operacaoInicial, dados, aoVoltar, aoEx
             <p className="descricao-etf-titulo"><Termo id="tesouro_direto">Tesouro Direto</Termo> · {info?.titulo}</p>
             <p>{info?.texto}</p>
             {info?.risco && <p className="risco-etf risco-baixo"><strong>Risco:</strong> {info.risco}</p>}
+            {t.indexador === 'selic' && macro?.selic && (
+              <p className="suave">Selic hoje: <strong className="num">{Number(macro.selic.valor).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}% ao ano</strong>.</p>
+            )}
+            {t.indexador === 'ipca' && macro?.ipca && (
+              <p className="suave">Inflação (IPCA) em 12 meses: <strong className="num">{Number(macro.ipca.acumulado_12m).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}%</strong>.
+                {' '}Somada à taxa, dá uma ideia do rendimento total.</p>
+            )}
           </div>
 
           <dl className="tesouro-taxas">

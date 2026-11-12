@@ -1296,3 +1296,24 @@ fieldset.campo > legend { padding: 0; margin-bottom: 6px; font-weight: 650; font
 .tesouro-taxas dd { margin: 0; font-weight: 700; color: var(--marinho); overflow-wrap: anywhere; }
 .tesouro-taxas dd small { font-weight: 400; }
 .campo-valor input { grid-column: 1 / -1; }
+
+/* Economia */
+.faixa-economia { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px; width: 100%; padding: 12px 14px;
+  background: var(--cartao); border: 1px solid var(--linha); border-radius: var(--raio); cursor: pointer; text-align: left; font: inherit; color: inherit; }
+.faixa-economia span { display: grid; gap: 1px; min-width: 0; }
+.faixa-economia small { font-size: 0.76rem; color: var(--suave); }
+.faixa-economia strong { font-size: 1rem; color: var(--marinho); }
+.economia-grade { display: grid; gap: 14px; }
+@media (min-width: 900px) { .economia-grade { grid-template-columns: 1fr 1fr; } }
+.economia-cartao { display: grid; gap: 8px; align-content: start; }
+.economia-cartao h2 { margin: 0; }
+.economia-cartao .valor-grande small { font-size: 0.9rem; font-weight: 400; }
+.economia-linhas { display: grid; gap: 4px; margin: 0; }
+.economia-linhas > div { display: flex; justify-content: space-between; gap: 8px; }
+.economia-linhas dt { color: var(--suave); }
+.economia-linhas dd { margin: 0; font-weight: 600; }
+.tabela-focus { width: 100%; border-collapse: collapse; margin-top: 6px; }
+.tabela-focus th, .tabela-focus td { padding: 8px 4px; border-bottom: 1px solid var(--linha); text-align: right; }
+.tabela-focus th:first-child, .tabela-focus thead th:first-child { text-align: left; }
+.tabela-focus thead th { font-size: 0.8rem; color: var(--suave); font-weight: 600; }
+.faixa-economia .faixa-economia-titulo { grid-column: 1 / -1; display: flex; align-items: center; justify-content: space-between; font-weight: 700; color: var(--marinho); font-size: 0.92rem; }

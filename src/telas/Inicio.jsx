@@ -9,6 +9,7 @@ import Icone from '../componentes/Icone.jsx';
 import StatusPregao from '../componentes/StatusPregao.jsx';
 import ListaAtivos, { detalheQuantidade } from '../componentes/ListaAtivos.jsx';
 import Termo from '../componentes/Termo.jsx';
+import { FaixaEconomia } from './Economia.jsx';
 import { montarCapa, quando } from '../lib/noticias.js';
 import { comparar } from '../lib/comparacao.js';
 import { diaBR, mercadoAgora, oscilacaoHoje } from '../lib/intradia.js';
@@ -20,7 +21,7 @@ import { fraseOperacao, nomeCurto, resumoReacoes } from '../lib/comunidade.js';
 
 // Tela inicial: patrimônio (com Ibovespa e CDI no mesmo gráfico), saldo e extrato,
 // meus ativos, últimas da comunidade, destaques do dia e dica de hoje
-export default function Inicio({ uid, dados, resumo, linhas, versao, aoEscolher, irPara, aoAbrirExtrato }) {
+export default function Inicio({ uid, dados, resumo, linhas, versao, aoEscolher, irPara, aoAbrirExtrato, macro, aoAbrirEconomia }) {
   const [serie, setSerie] = useState(null);
   const [periodo, setPeriodo] = useState('1M');
   const [dica, setDica] = useState(dicaDoDia);
@@ -117,6 +118,8 @@ export default function Inicio({ uid, dados, resumo, linhas, versao, aoEscolher,
           <Icone nome="seta" tamanho={18} />
         </button>
       </section>
+
+      <FaixaEconomia macro={macro} aoAbrir={aoAbrirEconomia} />
 
       <section aria-labelledby="titulo-meus">
         <div className="secao-topo">
