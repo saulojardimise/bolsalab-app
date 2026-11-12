@@ -12,6 +12,9 @@ const CONFIG = {
 };
 
 // Preços fictícios, só para demonstração
+// logos só na build usada para gravar vídeos (VITE_LOGOS_DEMO=1, com os SVGs em dist-previa/logos)
+const logoDemo = (t) => (import.meta.env.VITE_LOGOS_DEMO ? `logos/${t}.svg` : null);
+
 const EMPRESAS = [
   ['ABEV3', 'Ambev', 'Bebidas', 13.42, 13.31], ['ASAI3', 'Assaí', 'Varejo', 9.87, 10.12],
   ['B3SA3', 'B3', 'Serviços Financeiros', 13.05, 12.88], ['BBAS3', 'Banco do Brasil', 'Bancos', 27.64, 27.9],
@@ -283,7 +286,7 @@ export function criarApiDemo() {
   const carteira = () => Object.entries(estado.posicoes).map(([ticker, p]) => {
     const atual = precoDe(ticker);
     return {
-      user_id: estado.uid, ticker, nome: EMPRESAS.find((e) => e[0] === ticker)[1], setor: EMPRESAS.find((e) => e[0] === ticker)[2], logo_url: null,
+      user_id: estado.uid, ticker, nome: EMPRESAS.find((e) => e[0] === ticker)[1], setor: EMPRESAS.find((e) => e[0] === ticker)[2], logo_url: logoDemo(ticker),
       quantidade: p.quantidade, preco_medio: p.preco_medio, preco_atual: atual,
       valor_atual: r2(p.quantidade * atual), resultado: r2(p.quantidade * (atual - p.preco_medio)),
       resultado_pct: r2((atual / p.preco_medio - 1) * 100),
@@ -293,7 +296,7 @@ export function criarApiDemo() {
     const atual = precoDe(ticker);
     const custo = r2(v.quantidade * atual);
     return {
-      user_id: estado.uid, ticker, nome: EMPRESAS.find((e) => e[0] === ticker)[1], logo_url: null,
+      user_id: estado.uid, ticker, nome: EMPRESAS.find((e) => e[0] === ticker)[1], logo_url: logoDemo(ticker),
       quantidade: v.quantidade, preco_venda: v.preco_medio, preco_atual: atual, garantia: v.garantia,
       custo_recompra: custo, resultado: r2(v.garantia - custo), aluguel_pago: v.aluguel_pago,
       aberta_em: v.aberta_em, corretagem_paga: v.corretagem_paga,
@@ -406,7 +409,7 @@ export function criarApiDemo() {
         const { preco, anterior } = estado.precos[ticker];
         const ultimo = historicoDe(ticker, preco, anterior).at(-1);
         return { ticker, nome, setor, preco, data: ultimo.data, preco_anterior: anterior,
-          variacao_pct: r2((preco / anterior - 1) * 100), logo_url: null,
+          variacao_pct: r2((preco / anterior - 1) * 100), logo_url: logoDemo(ticker),
           abertura: ultimo.abertura, maxima: ultimo.maxima, minima: ultimo.minima, volume: ultimo.volume, situacao: 'ativa',
           tipo, descricao, resumo, risco,
           ...(TESOURO_DEMO[ticker] ? { vencimento: TESOURO_DEMO[ticker].vencimento, indexador: TESOURO_DEMO[ticker].indexador,

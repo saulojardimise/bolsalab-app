@@ -76,7 +76,7 @@ export default function Turma({ grupos, versao, aoMudarGrupos, avisar }) {
         </div>
       </div>
 
-      <div className="chips" role="group" aria-label="Ranking">
+      <div className="chips chips-quebram" role="group" aria-label="Ranking">
         {grupos.map((g) => (
           <button key={g.id} aria-pressed={selecionado === g.id} onClick={() => setSelecionado(g.id)}>{g.nome}</button>
         ))}
