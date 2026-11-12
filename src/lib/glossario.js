@@ -155,8 +155,8 @@ export const GLOSSARIO = {
   },
   cotacao_do_dia: {
     titulo: 'Cotação do dia',
-    texto: 'Durante o pregão, o simulador atualiza os preços a cada 1h30 (11h, 12h30, 14h, 15h30 e 17h), com cerca de '
-      + '30 minutos de atraso. Com eles, o app estima o seu patrimônio e a sua carteira ao longo do dia. As ordens continuam '
+    texto: 'Durante o pregão, o simulador atualiza três vezes (11h, 14h e 17h), com cerca de 30 minutos de atraso, os preços '
+      + 'dos ativos que estão na carteira de alguém, além do Ibovespa e do dólar. Os outros ficam com o preço de fechamento. Com eles, o app estima o seu patrimônio e a sua carteira ao longo do dia. As ordens continuam '
       + 'sendo feitas à noite e no fim de semana, pelo preço de fechamento, e o ranking só muda com o fechamento.',
   },
   fechamento: {
