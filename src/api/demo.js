@@ -147,6 +147,8 @@ function criarEstado() {
     proximoId: 1,
     grupos: [1],   // ids dos grupos em que está
   };
+  // conta recém-criada (só na build usada para gravar vídeos): sem histórico
+  if (import.meta.env.VITE_DEMO_CONTA_NOVA) { s.perfil.criado_em = horasAtras(0); return s; }
   // histórico inicial da Ana
   const ordem = (ticker, tipo, qtd, preco, h) => executar(s, ticker, tipo, qtd, preco, horasAtras(h));
   ordem('ITUB4', 'compra', 60, 37.2, 150);

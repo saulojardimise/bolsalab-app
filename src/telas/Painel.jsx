@@ -95,7 +95,10 @@ export default function Painel({ uid }) {
         api.meusGrupos().catch(() => null),
       ]);
       const grupos = gruposBanco ?? (perfil.turma_id ? [{ id: perfil.turma_id, nome: perfil.turma }] : []);
-      setDados((antes) => ({ perfil, config, mercado, carteira, vendidas, liberada, futurosMercado, futuros, intradia, naoLidas, grupos, feriados: antes?.feriados ?? feriadosRef.current }));
+      // conta de apresentação (feiras): negocia a qualquer hora e sem corretagem; o guia de regras mostra os valores reais
+      const livre = !!perfil.conta_livre;
+      const configTela = livre ? { ...config, corretagem: 0, corretagem_futuros: 0, negociacao_pausada: false } : config;
+      setDados((antes) => ({ perfil, config: configTela, configReal: config, livre, mercado, carteira, vendidas, liberada, futurosMercado, futuros, intradia, naoLidas, grupos, feriados: antes?.feriados ?? feriadosRef.current }));
       setErro(''); setSemConexao(false);
       return mercado;
     } catch (e) {
@@ -354,10 +357,10 @@ export default function Painel({ uid }) {
         />
       )}
       {mostrarAviso && (
-        <RegrasBolsaLab config={dados.config} mercado={dados.mercado} aoFechar={fecharAvisoIrInicio} />
+        <RegrasBolsaLab config={dados.configReal ?? dados.config} mercado={dados.mercado} aoFechar={fecharAvisoIrInicio} />
       )}
       {regrasAbertas && !mostrarAviso && (
-        <RegrasBolsaLab config={dados.config} mercado={dados.mercado} aoFechar={() => setRegrasAbertas(false)} />
+        <RegrasBolsaLab config={dados.configReal ?? dados.config} mercado={dados.mercado} aoFechar={() => setRegrasAbertas(false)} />
       )}
       {mostrarInstalar && !mostrarAviso && <InstalarApp aoFechar={fecharInstalar} avisar={setRecado} />}
       {pessoaAberta && <PerfilPessoa id={pessoaAberta} aoFechar={() => setPessoaAberta(null)} aoAbrirAtivo={abrirAtivo} />}

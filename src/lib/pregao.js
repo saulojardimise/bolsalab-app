@@ -7,7 +7,9 @@ const iso = (d) => d.toISOString().slice(0, 10);
 // Texto da faixa de status: se o aluno pode negociar agora e até quando.
 // Quem decide de verdade é o banco (negociacao_liberada); aqui só explicamos.
 // feriados: datas ('2026-11-20') sem pregão na B3; horas: quando a negociação abre e fecha nos dias úteis.
-export function textoStatus({ liberada, pausada, demo = false, agora = new Date(), feriados = [], abre = 19, fecha = 9 }) {
+export function textoStatus({ liberada, livre = false, pausada, demo = false, agora = new Date(), feriados = [], abre = 19, fecha = 9 }) {
+  // conta de apresentação: o banco libera a qualquer hora
+  if (livre && liberada) return { aberto: true, titulo: 'Negociação aberta', detalhe: 'Pode enviar suas ordens agora.' };
   if (pausada) return { aberto: false, titulo: 'Negociação pausada', detalhe: 'O professor pausou as ordens por enquanto.' };
   if (demo && liberada) return { aberto: true, titulo: 'Negociação aberta', detalhe: 'Na demonstração, as ordens funcionam a qualquer hora.' };
 
