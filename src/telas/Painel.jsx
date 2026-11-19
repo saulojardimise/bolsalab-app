@@ -80,7 +80,13 @@ export default function Painel({ uid }) {
   const [instalarAberto, setInstalarAberto] = useState(false);   // aberto pelo menu
   const [instalarVisto, setInstalarVisto] = useState(false);     // já apareceu sozinho nesta visita
   const [, setTiqueInstalar] = useState(0);
-  useEffect(() => ouvirInstalacao(() => setTiqueInstalar((n) => n + 1)), []);   // já mostrou o convite da foto nesta visita
+  useEffect(() => ouvirInstalacao(() => setTiqueInstalar((n) => n + 1)), []);
+  // convite por link ou QR code (?grupo=TOKEN) com a pessoa já logada: abre Grupos com o token preenchido
+  useEffect(() => {
+    if (!lerConvite()) return;
+    setAbaEstado('turma');
+  }, []);   // eslint-disable-line react-hooks/exhaustive-deps
+   // já mostrou o convite da foto nesta visita
 
   const carregar = useCallback(async () => {
     try {
@@ -238,11 +244,6 @@ export default function Painel({ uid }) {
   const discussoes = { aoAbrirTopico: (id) => abrirTopico(id), aoNovoTopico: novoTopico, aoVerTodas: verDiscussoes };
   const abrirNotificacoes = () => abrir({ tipo: 'notificacoes' });
   const zerarNaoLidas = () => setDados((d) => ({ ...d, naoLidas: 0 }));
-  // convite por link ou QR code (?grupo=TOKEN) com a pessoa já logada: abre Grupos com o token preenchido
-  useEffect(() => {
-    if (!lerConvite()) return;
-    setAba('turma');
-  }, []);   // eslint-disable-line react-hooks/exhaustive-deps
   const trocarAba = (id) => {
     // fecha todas as telas empilhadas (ex.: Notificações > Publicação) antes de trocar de aba
     const n = nivelAtual();
