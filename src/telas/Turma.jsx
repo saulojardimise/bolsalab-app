@@ -3,6 +3,7 @@ import { api } from '../api/index.js';
 import { pct, reais, tendencia } from '../lib/formato.js';
 import Avatar from '../componentes/Avatar.jsx';
 import BotaoPessoa from '../componentes/BotaoPessoa.jsx';
+import { esquecerConvite, lerConvite } from '../lib/convite.js';
 import Icone from '../componentes/Icone.jsx';
 
 // busca sem diferenciar maiúsculas nem acentos
@@ -13,6 +14,7 @@ const SEM_GRUPO = '__sem__';
 // Grupos: ranking de cada grupo da pessoa e o ranking geral (todo mundo que simula),
 // entrar num grupo com o token e sair de um grupo.
 export default function Turma({ grupos, versao, aoMudarGrupos, avisar }) {
+  const [convite] = useState(lerConvite);
   const [selecionado, setSelecionado] = useState(() => grupos[0]?.id ?? null);   // null = geral
   const [lista, setLista] = useState(null);
   const [erro, setErro] = useState('');
@@ -155,13 +157,13 @@ export default function Turma({ grupos, versao, aoMudarGrupos, avisar }) {
         </div>
       )}
 
-      <EntrarNoGrupo aoEntrar={async (g) => { avisar?.(`Você entrou no grupo ${g.nome}.`); await aoMudarGrupos?.(); setSelecionado(g.id); }} />
+      <EntrarNoGrupo inicial={convite} aoEntrar={async (g) => { esquecerConvite(); avisar?.(`Você entrou no grupo ${g.nome}.`); await aoMudarGrupos?.(); setSelecionado(g.id); }} />
     </div>
   );
 }
 
-function EntrarNoGrupo({ aoEntrar }) {
-  const [token, setToken] = useState('');
+function EntrarNoGrupo({ inicial = '', aoEntrar }) {
+  const [token, setToken] = useState(inicial);
   const [erro, setErro] = useState('');
   const [enviando, setEnviando] = useState(false);
 

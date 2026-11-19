@@ -35,6 +35,7 @@ import Futuro from './Futuro.jsx';
 import InstalarApp from '../componentes/InstalarApp.jsx';
 import { deveSugerirInstalar, ouvirInstalacao } from '../lib/instalar.js';
 import RegrasBolsaLab, { AVISO_REGRAS, deveMostrarRegras, lembrarRegrasLocal } from '../componentes/RegrasBolsaLab.jsx';
+import { lerConvite } from '../lib/convite.js';
 import CompletarFoto, { fotoAdiada } from './CompletarFoto.jsx';
 
 // Área logada: carrega os dados da conta e controla a navegação.
@@ -237,6 +238,11 @@ export default function Painel({ uid }) {
   const discussoes = { aoAbrirTopico: (id) => abrirTopico(id), aoNovoTopico: novoTopico, aoVerTodas: verDiscussoes };
   const abrirNotificacoes = () => abrir({ tipo: 'notificacoes' });
   const zerarNaoLidas = () => setDados((d) => ({ ...d, naoLidas: 0 }));
+  // convite por link ou QR code (?grupo=TOKEN) com a pessoa já logada: abre Grupos com o token preenchido
+  useEffect(() => {
+    if (!lerConvite()) return;
+    setAba('turma');
+  }, []);   // eslint-disable-line react-hooks/exhaustive-deps
   const trocarAba = (id) => {
     // fecha todas as telas empilhadas (ex.: Notificações > Publicação) antes de trocar de aba
     const n = nivelAtual();

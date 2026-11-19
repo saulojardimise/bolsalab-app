@@ -8,12 +8,15 @@ import { deveSugerirInstalar, ouvirInstalacao } from '../lib/instalar.js';
 import { api } from '../api/index.js';
 import { emailAceito } from '../api/supabase.js';
 import Marca from '../componentes/Marca.jsx';
+import { esquecerConvite, lerConvite } from '../lib/convite.js';
 
 // Entrar, criar conta (com ou sem token de grupo) e recuperar senha
 export default function Entrada() {
-  const [modo, setModo] = useState('entrar');   // entrar | cadastrar | recuperar
-  const [campos, setCampos] = useState({ email: '', senha: '', nome: '', token: '' });
-  const [temToken, setTemToken] = useState(false);
+  // convite por link ou QR code (?grupo=TOKEN): abre em "Criar conta" com o token preenchido
+  const [convite] = useState(lerConvite);
+  const [modo, setModo] = useState(convite ? 'cadastrar' : 'entrar');   // entrar | cadastrar | recuperar
+  const [campos, setCampos] = useState({ email: '', senha: '', nome: '', token: convite });
+  const [temToken, setTemToken] = useState(Boolean(convite));
   const [esc, setEsc] = useState({ escolaridade: '', situacao: '', curso: '', universidade: '' });
   const [aceite, setAceite] = useState(false);
   const [lendoTermos, setLendoTermos] = useState(false);
@@ -77,6 +80,7 @@ export default function Entrada() {
           return;
         }
         const r = await api.cadastrar({ ...campos, token: temToken ? campos.token : '', ...esc, termosVersao: TERMOS_VERSAO });
+        esquecerConvite();
         if (r.precisaConfirmar) {
           setAviso(`Conta criada${r.turma ? ` no grupo ${r.turma}` : ''}. Enviamos um link para ${campos.email.trim()}: abra-o para ativar e depois entre aqui.`);
           setModo('entrar');
