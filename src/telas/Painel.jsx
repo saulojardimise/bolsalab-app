@@ -325,7 +325,8 @@ export default function Painel({ uid }) {
                          aoDiscutir={(n) => novoTopico({ noticia: { id: n.id, titulo: n.titulo, link: n.link } })} />;
   } else if (aba === 'carteira') {
     conteudo = <Carteira uid={uid} dados={aoVivo?.dados ?? dados} resumo={aoVivo?.resumo ?? resumo} versao={versao}
-                         aoEscolher={abrirAcao} irPara={trocarAba} aoAbrirExtrato={abrirExtrato} aoAbrirFuturo={abrirFuturo} />;
+                         aoEscolher={abrirAcao} irPara={trocarAba} aoAbrirExtrato={abrirExtrato} aoAbrirFuturo={abrirFuturo}
+                         aoRecomecar={dados.livre ? async () => { await api.recomecarConta(); await carregar(); setRecado('Conta zerada: R$ 10.000,00 para começar de novo.'); } : null} />;
   } else {
     conteudo = <Turma grupos={dados.grupos} versao={versao} aoMudarGrupos={carregar} avisar={setRecado} />;
   }

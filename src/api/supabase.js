@@ -205,6 +205,11 @@ export function criarApi(supabase, { urlRetorno } = {}) {
     async sairDoGrupo(id) {
       return checar(await supabase.rpc('sair_do_grupo', { p_turma_id: id }));
     },
+    /** só a conta de apresentação: zera ordens, posições e extrato e volta ao saldo inicial */
+    async recomecarConta() {
+      return checar(await supabase.rpc('recomecar_conta'));
+    },
+
     async ranking(turmaId = null) {
       return checar(await supabase.rpc('ranking', { p_turma_id: turmaId }));
     },

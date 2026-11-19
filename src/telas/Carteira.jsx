@@ -15,7 +15,7 @@ import { ehTesouro } from '../lib/tesouro.js';
 const CORES_SETOR = ['var(--verde)', 'var(--azul)', 'var(--ambar)', 'var(--verde-claro-forte)', 'var(--azul-claro)', 'var(--suave)'];
 
 // Patrimônio, distribuição por setor, posições e atalho para o extrato
-export default function Carteira({ uid, dados, resumo, versao, aoEscolher, irPara, aoAbrirExtrato, aoAbrirFuturo }) {
+export default function Carteira({ uid, dados, resumo, versao, aoEscolher, irPara, aoAbrirExtrato, aoAbrirFuturo, aoRecomecar }) {
   const { carteira, vendidas, config } = dados;
   const [corretagens, setCorretagens] = useState(null);
 
@@ -212,8 +212,34 @@ export default function Carteira({ uid, dados, resumo, versao, aoEscolher, irPar
           </p>
         </section>
       )}
+      {aoRecomecar && <Recomecar aoRecomecar={aoRecomecar} />}
       </div>
     </div>
+  );
+}
+
+// Só na conta de apresentação: volta ao saldo inicial, sem ordens nem posições. Pede confirmação com um segundo toque.
+function Recomecar({ aoRecomecar }) {
+  const [confirmar, setConfirmar] = useState(false);
+  const [enviando, setEnviando] = useState(false);
+  const [erro, setErro] = useState('');
+  async function recomecar() {
+    if (!confirmar) { setConfirmar(true); return; }
+    setEnviando(true); setErro('');
+    try { await aoRecomecar(); setConfirmar(false); } catch (e) { setErro(e.message); } finally { setEnviando(false); }
+  }
+  return (
+    <section className="cartao recomecar" aria-labelledby="titulo-recomecar">
+      <h2 id="titulo-recomecar" className="secao-titulo">Recomeçar</h2>
+      <p className="suave">Apaga ordens, posições e extrato desta conta e volta para R$ 10.000,00.</p>
+      {erro && <p className="aviso aviso-erro" role="alert">{erro}</p>}
+      <div className="aviso-botoes">
+        {confirmar && <button className="botao" onClick={() => setConfirmar(false)} disabled={enviando}>Cancelar</button>}
+        <button className={`botao ${confirmar ? 'botao-venda' : ''}`} onClick={recomecar} disabled={enviando}>
+          {enviando ? 'Zerando…' : confirmar ? 'Sim, zerar tudo' : 'Zerar conta'}
+        </button>
+      </div>
+    </section>
   );
 }
 

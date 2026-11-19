@@ -614,6 +614,7 @@ export function criarApiDemo() {
     },
     async registrarErro() {},
     async errosApp() { return []; },
+    async recomecarConta() { throw new Error('Indisponível nesta versão.'); },
     async coletas() {
       return [0, 1, 24, 25, 72].map((h, i) => ({
         id: 20 - i, executada_em: horasAtras(h + 2.5), origem: i % 2 ? 'agendada 18h35' : 'agendada 18h50',
