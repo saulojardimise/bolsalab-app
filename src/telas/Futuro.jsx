@@ -121,7 +121,7 @@ export default function Futuro({ ativo, dados, aoVoltar, aoExecutar, discussoes 
           : pontosGrafico?.length > 1
           ? <Grafico pontos={pontosGrafico} altura={170} rotulo={contrato.contrato} formatar={(v) => `${pontos(v, ativo)} pt`} casasEixo={0} />
           : <div className="grafico" style={{ height: 170 }} />}
-        <Periodos valor={periodo} aoTrocar={setPeriodo} />
+        <Periodos valor={periodo} aoTrocar={setPeriodo} desde={indices?.find((i) => i.serie === ATIVOS[ativo]?.serie)?.data} />
       </section>
 
       <section className="cartao" aria-labelledby="titulo-contrato">

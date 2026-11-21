@@ -102,7 +102,7 @@ export default function Inicio({ uid, dados, resumo, linhas, versao, aoEscolher,
         )}
         {pontos ? <Grafico pontos={pontos} altura={170} eixos={false} rotulo="Patrimônio" extras={extras} />
           : <div className="grafico" style={{ height: 170 }} />}
-        <Periodos valor={periodo} aoTrocar={setPeriodo} />
+        <Periodos valor={periodo} aoTrocar={setPeriodo} desde={serie?.[0]?.data ?? dados.perfil.criado_em?.slice(0, 10)} />
         {temIndices && <Comparativo comparacao={comparacao} />}
         <div className="linha-saldo">
           <Icone nome="saldo" />

@@ -118,7 +118,7 @@ export default function Acao({ ticker, operacaoInicial, dados, aoVoltar, aoExecu
           : tipoGrafico === 'candles'
             ? <Candles velas={velas} altura={220} rotulo={`Candles de ${ticker}`} />
             : <Grafico pontos={pontos} altura={200} rotulo={`Fechamentos de ${ticker}`} />}
-        <Periodos valor={periodo} aoTrocar={setPeriodo} />
+        <Periodos valor={periodo} aoTrocar={setPeriodo} desde={historico?.[0]?.data} />
 
         <dl className="estatisticas">
           <div><dt><Termo id="abertura">Abertura</Termo></dt><dd className="num">{empresa.abertura ? reais(empresa.abertura) : '–'}</dd></div>

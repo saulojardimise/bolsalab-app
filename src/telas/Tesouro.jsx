@@ -94,7 +94,7 @@ export default function Tesouro({ ticker, operacaoInicial, dados, aoVoltar, aoEx
           {erro && <p className="aviso aviso-erro" role="alert">{erro}</p>}
           {!pontos ? <div className="grafico" style={{ height: 200 }} aria-busy="true" />
             : <Grafico pontos={pontos} altura={200} rotulo={`Preço do ${t.nome}`} />}
-          <Periodos valor={periodo} aoTrocar={setPeriodo} />
+          <Periodos valor={periodo} aoTrocar={setPeriodo} desde={historico?.[0]?.data} />
         </section>
         <div className="ordem-fim">
           <DiscussoesDoAtivo ativo={ticker} {...discussoes} />

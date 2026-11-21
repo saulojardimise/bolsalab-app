@@ -191,7 +191,7 @@ export function criarApi(supabase, { urlRetorno } = {}) {
     // Ibovespa e CDI para comparar com o patrimônio
     async indices(desde) {
       return checar(await supabase.from('indices').select('*').gte('data', desde)
-        .order('data').limit(1000));
+        .order('data', { ascending: false }).limit(1000)).reverse();
     },
 
     // grupos da pessoa: [{ id, nome, entrou_em, pessoas, principal }]
@@ -229,10 +229,11 @@ export function criarApi(supabase, { urlRetorno } = {}) {
 
     // Histórico diário de uma ação (desde = 'AAAA-MM-DD' ou null para tudo)
     async historico(ticker, desde = null) {
+      // o Supabase devolve no máximo 1.000 linhas: pede das mais recentes para trás e reordena
       let q = supabase.from('cotacoes').select('data, preco, abertura, maxima, minima, volume')
-        .eq('ticker', ticker).order('data');
+        .eq('ticker', ticker).order('data', { ascending: false }).limit(1000);
       if (desde) q = q.gte('data', desde);
-      return checar(await q);
+      return checar(await q).reverse();
     },
 
     // Minigráficos das listas: { PETR4: [31.2, 31.5, ...], ... } desde a data
@@ -244,7 +245,7 @@ export function criarApi(supabase, { urlRetorno } = {}) {
     // Patrimônio do aluno dia a dia (gráfico da tela Início)
     async patrimonioDiario(uid) {
       return checar(await supabase.from('patrimonio_diario').select('data, patrimonio')
-        .eq('user_id', uid).order('data'));
+        .eq('user_id', uid).order('data', { ascending: false }).limit(1000)).reverse();
     },
 
     // Foto de perfil: vai para o Storage (avatares/<id>/foto.jpg) e o endereço fica no perfil
