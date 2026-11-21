@@ -56,6 +56,7 @@ const r2 = (v) => Math.round(v * 100) / 100;
 // BDRs (demonstração)
 for (const [t, nome, setor, preco, ant, resumo] of [
   ['NVDC34', 'Nvidia', 'Tecnologia', 17.86, 17.4, 'Chips para inteligência artificial'],
+  ['ANTH34', 'Anthropic', 'Tecnologia', 58.4, 54.1, 'Inteligência artificial (Claude)'],
   ['AAPL34', 'Apple', 'Tecnologia', 100.01, 99.2, 'iPhone, Mac e serviços'],
   ['ROXO34', 'Nubank', 'Bancos', 11.28, 11.5, 'Banco digital, listado em Nova York'],
   ['MELI34', 'Mercado Livre', 'Comércio', 69.55, 68.1, 'Comércio eletrônico e Mercado Pago'],

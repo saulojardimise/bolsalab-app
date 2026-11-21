@@ -859,6 +859,11 @@ input:focus-visible, select:focus-visible { outline: none; border-color: var(--f
 
 #aviso-titulo:focus { outline: none; }
 
+/* confete (aviso de novidade): por cima de tudo, sem capturar toques */
+.confete { position: fixed; inset: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 10; }
+.aviso-novidade:has(.confete) { overflow: visible; }
+.aviso-novidade:has(.confete) .aviso-conteudo { max-height: 92dvh; overflow-y: auto; }
+
 .ativo-id-futuro span { white-space: normal; }
 
 /* cotação do dia */

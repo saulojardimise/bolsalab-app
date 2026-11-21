@@ -35,6 +35,7 @@ import Futuro from './Futuro.jsx';
 import InstalarApp from '../componentes/InstalarApp.jsx';
 import { deveSugerirInstalar, ouvirInstalacao } from '../lib/instalar.js';
 import RegrasBolsaLab, { AVISO_REGRAS, deveMostrarRegras, lembrarRegrasLocal } from '../componentes/RegrasBolsaLab.jsx';
+import AvisoAnthropic, { AVISO_ANTH, deveMostrarAvisoAnth, lembrarAvisoAnthLocal } from '../componentes/AvisoAnthropic.jsx';
 import { lerConvite } from '../lib/convite.js';
 import CompletarFoto, { fotoAdiada } from './CompletarFoto.jsx';
 
@@ -76,6 +77,7 @@ export default function Painel({ uid }) {
   const [versao, setVersao] = useState(0);
   const [fotoVista, setFotoVista] = useState(false);
   const [avisoFechado, setAvisoFechado] = useState(false);
+  const [avisoAnthFechado, setAvisoAnthFechado] = useState(false);
   const [pessoaAberta, setPessoaAberta] = useState(null);       // perfil de outra pessoa
   const [instalarAberto, setInstalarAberto] = useState(false);   // aberto pelo menu
   const [instalarVisto, setInstalarVisto] = useState(false);     // já apareceu sozinho nesta visita
@@ -260,9 +262,17 @@ export default function Painel({ uid }) {
     api.marcarAvisoVisto(AVISO_REGRAS).catch(() => {});
     setDados((d) => ({ ...d, perfil: { ...d.perfil, avisos_vistos: [...(d.perfil.avisos_vistos ?? []), AVISO_REGRAS] } }));
   };
+  // Novidade do BDR da Anthropic: só para contas criadas antes da atualização
+  const mostrarAvisoAnth = !mostrarAviso && !avisoAnthFechado && !sobreposta && !perfilAberto && deveMostrarAvisoAnth(dados.perfil, dados.mercado);
+  const fecharAvisoAnth = () => {
+    setAvisoAnthFechado(true);
+    lembrarAvisoAnthLocal(uid);
+    api.marcarAvisoVisto(AVISO_ANTH).catch(() => {});
+    setDados((d) => ({ ...d, perfil: { ...d.perfil, avisos_vistos: [...(d.perfil.avisos_vistos ?? []), AVISO_ANTH] } }));
+  };
   // fechar o aviso leva sempre para a página inicial
   // Instalar o app: aparece sozinho depois do aviso de novidade (celular, fora do app instalado)
-  const mostrarInstalarSozinho = !instalarVisto && !mostrarAviso && !sobreposta && !perfilAberto && deveSugerirInstalar();
+  const mostrarInstalarSozinho = !instalarVisto && !mostrarAviso && !mostrarAvisoAnth && !sobreposta && !perfilAberto && deveSugerirInstalar();
   const mostrarInstalar = instalarAberto || mostrarInstalarSozinho;
   const fecharInstalar = () => { setInstalarAberto(false); setInstalarVisto(true); };
 
@@ -366,6 +376,10 @@ export default function Painel({ uid }) {
       )}
       {mostrarAviso && (
         <RegrasBolsaLab config={dados.configReal ?? dados.config} mercado={dados.mercado} aoFechar={fecharAvisoIrInicio} />
+      )}
+      {mostrarAvisoAnth && (
+        <AvisoAnthropic ativo={dados.mercado.find((e) => e.ticker === 'ANTH34')}
+                        aoVer={() => { fecharAvisoAnth(); abrirAcao('ANTH34'); }} aoFechar={fecharAvisoAnth} />
       )}
       {regrasAbertas && !mostrarAviso && (
         <RegrasBolsaLab config={dados.configReal ?? dados.config} mercado={dados.mercado} aoFechar={() => setRegrasAbertas(false)} />
