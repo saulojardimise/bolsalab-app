@@ -46,10 +46,16 @@ export default function Notificacoes({ versao, etfs, aoVoltar, aoLer, aoAbrirPub
         <ul className="cartao cartao-lista notificacoes">
           {lista.map((n) => (
             <li key={n.id} className={n.lida ? '' : 'nao-lida'}>
-              <button onClick={() => (n.tipo === 'sistema' ? null : n.tipo === 'automatica' ? aoAbrirExtrato()
+              <button onClick={() => (n.tipo.startsWith('desafio') ? window.open(n.operacao?.link, '_blank', 'noopener')
+                : n.tipo === 'sistema' ? null : n.tipo === 'automatica' ? aoAbrirExtrato()
                 : n.tipo.startsWith('topico') ? aoAbrirTopico(n.operacao?.topico_id, Number(n.id.replace('topico-resposta-', '')))
                   : aoAbrirPublicacao(n.publicacao_id, n.id.startsWith('comentario-') ? Number(n.id.slice(11)) : null))}>
-                {n.tipo === 'sistema'
+                {n.tipo.startsWith('desafio')
+                  ? <span className="notificacao-foto">
+                      <Avatar foto={n.foto_url} tamanho={40} />
+                      <span className="notificacao-selo" aria-hidden="true">🏆</span>
+                    </span>
+                  : n.tipo === 'sistema'
                   ? <span className={`notificacao-icone notificacao-sistema ${n.operacao?.professor ? 'notificacao-professor' : ''}`}>
                       <Icone nome={n.operacao?.professor ? 'comunidade' : 'sino'} tamanho={20} />
                     </span>
@@ -95,6 +101,14 @@ function frase(n) {
   if (n.tipo === 'resposta_comentario') return <><strong>{quem}</strong> respondeu seu comentário.</>;
   if (n.tipo === 'resposta') {
     return <><strong>{quem}</strong> também comentou na operação de {nomeCurto(n.operacao?.autor)} que você comentou.</>;
+  }
+  if (n.tipo === 'desafio_convite') {
+    const sit = n.operacao?.situacao;
+    return <><strong>{quem}</strong> convidou você para a equipe <strong>{n.titulo}</strong> no Desafio 2027.
+      {sit === 'pendente' ? ' Toque para responder.' : sit === 'aceito' ? ' Você aceitou.' : sit === 'recusado' ? ' Você recusou.' : ' O convite não vale mais.'}</>;
+  }
+  if (n.tipo === 'desafio_resposta') {
+    return <><strong>{quem}</strong> {n.operacao?.situacao === 'aceito' ? 'aceitou' : 'recusou'} o convite para a equipe <strong>{n.titulo}</strong> no Desafio 2027.</>;
   }
   if (n.tipo === 'sistema' && n.operacao?.professor) {
     return (
