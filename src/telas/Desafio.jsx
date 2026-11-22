@@ -10,8 +10,7 @@ const FECHA = Date.parse('2027-03-19T23:59:00-03:00');
 
 const DATAS = [
   ['Inscrições das equipes', '01/02/2027 a 19/03/2027'],
-  ['Envio da carteira inicial', '22/03/2027 a 25/03/2027'],
-  ['Desafio, com rebalanceamento mensal', '29/03/2027 a 31/08/2027'],
+  ['Carteiras mensais (abril a agosto)', '01/04/2027 a 31/08/2027'],
   ['Final com as 8 melhores equipes', '17/09/2027'],
 ];
 
@@ -44,8 +43,8 @@ export default function Desafio({ aoVoltar }) {
         <span className="desafio-selo">CAMPOS DOS GOYTACAZES · 2027</span>
         <h2 id="titulo-desafio">Desafio Carteira <em>Recomendada</em> 2027</h2>
         <p>
-          Equipes de 3 a 5 universitários de Campos dos Goytacazes montam uma carteira recomendada,
-          defendem cada escolha por escrito e disputam com os preços reais da B3.
+          Equipes de 3 a 5 universitários de Campos dos Goytacazes recomendam uma carteira nova
+          a cada mês, defendem cada escolha por escrito e disputam com os preços reais da B3.
         </p>
         <p className="desafio-contagem" role="status">{falta(agora)}</p>
       </section>
@@ -74,7 +73,7 @@ export default function Desafio({ aoVoltar }) {
             <li>Equipes de <strong>3 a 5 alunos da mesma instituição</strong>, com um líder. Cada integrante envia o comprovante de matrícula.</li>
             <li>A carteira tem de <strong>3 a 7 ativos</strong>, em percentuais: ações, ETFs, BDRs, Tesouro, minicontratos e venda a descoberto.</li>
             <li>Cada ativo vem com uma tese, e a equipe escreve sobre o cenário econômico e como ele afeta a carteira.</li>
-            <li>Todo mês há uma janela para rebalancear.</li>
+            <li>A carteira é <strong>mensal</strong>: vale do 1º ao último dia útil do mês. Nos últimos dias úteis de cada mês, a equipe envia a carteira do mês seguinte, podendo trocar todos os ativos.</li>
             <li>As <strong>8 equipes com maior rentabilidade</strong> vão para a final e apresentam a carteira a uma banca de 3 avaliadores.</li>
           </ul>
         </div>
