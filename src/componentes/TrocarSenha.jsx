@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { api } from '../api/index.js';
+import CampoSenha from './CampoSenha.jsx';
 
 // Troca de senha dentro do app: confere a senha atual antes de gravar a nova.
 export default function TrocarSenha({ email, aoConcluir, aoCancelar }) {
@@ -30,16 +31,16 @@ export default function TrocarSenha({ email, aoConcluir, aoCancelar }) {
     <form className="trocar-senha" onSubmit={enviar} noValidate aria-label="Trocar senha">
       <label className="campo">
         <span>Senha atual</span>
-        <input type="password" autoComplete="current-password" value={atual} onChange={(e) => setAtual(e.target.value)} />
+        <CampoSenha autoComplete="current-password" value={atual} onChange={(e) => setAtual(e.target.value)} />
       </label>
       <label className="campo">
         <span>Nova senha</span>
-        <input type="password" autoComplete="new-password" value={nova} onChange={(e) => setNova(e.target.value)} />
+        <CampoSenha autoComplete="new-password" value={nova} onChange={(e) => setNova(e.target.value)} />
         <small>Pelo menos 6 caracteres.</small>
       </label>
       <label className="campo">
         <span>Repita a nova senha</span>
-        <input type="password" autoComplete="new-password" value={repetir} onChange={(e) => setRepetir(e.target.value)} />
+        <CampoSenha autoComplete="new-password" value={repetir} onChange={(e) => setRepetir(e.target.value)} />
       </label>
       {erro && <p className="aviso aviso-erro" role="alert">{erro}</p>}
       <div className="botoes-linha">

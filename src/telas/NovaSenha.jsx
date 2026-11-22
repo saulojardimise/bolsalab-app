@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { api } from '../api/index.js';
+import CampoSenha from '../componentes/CampoSenha.jsx';
 
 // Aberta pelo link "recuperar senha" enviado por e-mail
 export default function NovaSenha({ aoConcluir }) {
@@ -27,7 +28,7 @@ export default function NovaSenha({ aoConcluir }) {
         <h1>Crie uma nova senha</h1>
         <label className="campo">
           <span>Nova senha</span>
-          <input type="password" autoComplete="new-password" value={senha}
+          <CampoSenha autoComplete="new-password" value={senha}
                  onChange={(e) => setSenha(e.target.value)} minLength={6} required autoFocus />
           <small>Pelo menos 6 caracteres.</small>
         </label>

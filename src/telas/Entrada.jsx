@@ -9,6 +9,7 @@ import { api } from '../api/index.js';
 import { emailAceito } from '../api/supabase.js';
 import Marca from '../componentes/Marca.jsx';
 import { esquecerConvite, lerConvite } from '../lib/convite.js';
+import CampoSenha from '../componentes/CampoSenha.jsx';
 
 // Entrar, criar conta (com ou sem token de grupo) e recuperar senha
 export default function Entrada() {
@@ -168,7 +169,7 @@ export default function Entrada() {
         {modo !== 'recuperar' && (
           <label className="campo">
             <span>Senha</span>
-            <input name="senha" type="password" required minLength={6}
+            <CampoSenha name="senha" required minLength={6}
                    autoComplete={modo === 'cadastrar' ? 'new-password' : 'current-password'}
                    value={campos.senha} onChange={mudar} />
             {modo === 'cadastrar' && <small>Pelo menos 6 caracteres.</small>}
