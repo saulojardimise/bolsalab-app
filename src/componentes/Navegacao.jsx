@@ -18,7 +18,7 @@ const EXTRAS = [
   ['turma', 'Grupos', 'Ranking, entrar ou sair de grupos'],
 ];
 
-export default function Navegacao({ aba, aoTrocar, aoAbrirExtrato, aoAbrirPerfil, aoAbrirNotificacoes, aoInstalar, aoAbrirSobre, aoAbrirRegras, naoLidas = 0 }) {
+export default function Navegacao({ aba, aoTrocar, aoAbrirExtrato, aoAbrirPerfil, aoAbrirNotificacoes, aoInstalar, aoAbrirSobre, aoAbrirDesafio, aoAbrirRegras, naoLidas = 0 }) {
   const [maisAberto, setMaisAberto] = useState(false);
   const instalar = aoInstalar && mostrarOpcaoInstalar();
   const noMais = EXTRAS.some(([id]) => id === aba);
@@ -49,6 +49,12 @@ export default function Navegacao({ aba, aoTrocar, aoAbrirExtrato, aoAbrirPerfil
           <Icone nome="usuario" tamanho={24} />
           <span>Meu perfil</span>
         </button>
+        {aoAbrirDesafio && (
+          <button className="nav-item nav-extra" aria-current={aba === 'desafio' ? 'page' : undefined} onClick={aoAbrirDesafio}>
+            <Icone nome="trofeu" tamanho={24} />
+            <span>Desafio 2027</span>
+          </button>
+        )}
         {aoAbrirRegras && (
           <button className="nav-item nav-extra" onClick={aoAbrirRegras}>
             <Icone nome="capelo" tamanho={24} />
@@ -82,6 +88,7 @@ export default function Navegacao({ aba, aoTrocar, aoAbrirExtrato, aoAbrirPerfil
                    itens={[
                      { id: 'notificacoes', icone: 'sino', rotulo: 'Notificações', contador: naoLidas,
                        detalhe: 'Reações, comentários e operações automáticas', acao: aoAbrirNotificacoes },
+                     ...(aoAbrirDesafio ? [{ id: 'desafio', icone: 'trofeu', rotulo: 'Desafio 2027', detalhe: 'Carteira Recomendada: datas, regras e inscrição', acao: aoAbrirDesafio, novo: true }] : []),
                      ...EXTRAS.map(([id, rotulo, detalhe]) => ({ id, icone: id, rotulo, detalhe, acao: () => aoTrocar(id) })),
                      { id: 'extrato', icone: 'extrato', rotulo: 'Extrato', detalhe: 'Todo o dinheiro que entrou e saiu', acao: aoAbrirExtrato },
                      { id: 'perfil', icone: 'usuario', rotulo: 'Meu perfil', detalhe: 'Foto, desempenho, perfil de investidor e senha', acao: aoAbrirPerfil },
@@ -116,7 +123,7 @@ function FolhaMais({ aba, itens, aoFechar, aoEscolher }) {
             <li key={i.id}>
               <button className="atalho" aria-current={aba === i.id ? 'page' : undefined} onClick={() => aoEscolher(i.acao)}>
                 <Icone nome={i.icone} />
-                <span><strong>{i.rotulo}{i.contador > 0 && <span className="contador-inline">{i.contador}</span>}</strong><small>{i.detalhe}</small></span>
+                <span><strong>{i.rotulo}{i.contador > 0 && <span className="contador-inline">{i.contador}</span>}{i.novo && <span className="selo-novo">Novo</span>}</strong><small>{i.detalhe}</small></span>
                 <Icone nome="seta" tamanho={18} />
               </button>
             </li>

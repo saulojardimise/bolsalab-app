@@ -1322,3 +1322,19 @@ fieldset.campo > legend { padding: 0; margin-bottom: 6px; font-weight: 650; font
 .tabela-focus th:first-child, .tabela-focus thead th:first-child { text-align: left; }
 .tabela-focus thead th { font-size: 0.8rem; color: var(--suave); font-weight: 600; }
 .faixa-economia .faixa-economia-titulo { grid-column: 1 / -1; display: flex; align-items: center; justify-content: space-between; font-weight: 700; color: var(--marinho); font-size: 0.92rem; }
+
+/* ---------------------------------------------------------------- Desafio 2027 (Mais > Desafio 2027) */
+.selo-novo { margin-left: 8px; padding: 1px 7px; border-radius: 999px; background: var(--verde-fundo); color: var(--verde-texto); font-size: 0.72rem; font-weight: 800; vertical-align: 2px; }
+.desafio-capa { background: linear-gradient(150deg, #062344 0%, #0B3A5C 60%, #0F6B52 130%); color: #fff; gap: 10px; }
+.desafio-capa h2 { margin: 0; font-size: 1.6rem; line-height: 1.1; letter-spacing: -0.02em; color: #fff; }
+.desafio-capa h2 em { font-style: normal; color: #3DDCAA; }
+.desafio-capa p { margin: 0; line-height: 1.5; color: #D5DEEC; }
+.desafio-selo { justify-self: start; font-size: 0.7rem; font-weight: 800; letter-spacing: 1.5px; color: #062344; background: #3DDCAA; padding: 4px 10px; border-radius: 999px; }
+.desafio-capa .desafio-contagem { font-size: 0.85rem; font-weight: 700; color: #8ED6BD; }
+.desafio-pronto { grid-template-columns: auto 1fr; align-items: start; background: var(--verde-fundo); color: var(--verde-texto); box-shadow: none; }
+.desafio-pronto strong { color: var(--verde-texto); }
+.desafio-pronto p { margin: 4px 0 0; color: var(--texto); line-height: 1.45; font-size: 0.92rem; }
+.desafio-datas li { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 12px 0; border-top: 1px solid var(--linha); font-size: 0.92rem; }
+.desafio-datas li:first-child { border-top: 0; }
+.desafio-datas strong { color: var(--verde-forte); text-align: right; white-space: nowrap; font-size: 0.88rem; }
+.desafio > a.botao-principal { text-decoration: none; }
