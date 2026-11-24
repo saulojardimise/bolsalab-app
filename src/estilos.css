@@ -1344,3 +1344,21 @@ fieldset.campo > legend { padding: 0; margin-bottom: 6px; font-weight: 650; font
 .campo-senha input { width: 100%; padding-right: 50px; }
 .campo-senha-olho { position: absolute; right: 4px; top: 50%; transform: translateY(-50%); width: 42px; height: 42px; display: grid; place-items: center; border: 0; background: transparent; color: var(--suave); border-radius: 10px; cursor: pointer; }
 .campo-senha-olho:hover, .campo-senha-olho[aria-pressed="true"] { color: var(--verde-forte); }
+
+/* gestor: relatório de desempenho */
+.relatorio-filtros { display: grid; gap: 14px; }
+.rotulo-periodo { display: block; font-weight: 600; margin-bottom: 6px; }
+.relatorio-datas { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.relatorio-nota { font-size: 0.82rem; margin: 0; }
+.relatorio-cabeca { display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; flex-wrap: wrap; margin-bottom: 10px; }
+.relatorio-cabeca p { margin: 4px 0 0; }
+.relatorio-acoes { display: flex; gap: 8px; }
+.relatorio-acoes .botao { display: inline-flex; gap: 6px; align-items: center; }
+.relatorio-lista small { display: block; }
+.carregando-leve { opacity: .55; }
+@media print {
+  .navegacao, .topo, .faixa-demo, .no-print, .recado, .aviso-offline { display: none !important; }
+  body, .painel, .conteudo { background: #fff !important; color: #000 !important; }
+  .relatorio .cartao { box-shadow: none; border: 1px solid #ccc; }
+  .relatorio-lista li { break-inside: avoid; }
+}

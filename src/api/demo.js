@@ -733,6 +733,13 @@ export function criarApiDemo() {
       return gestao.alunos.filter((a) => (id === 0 ? a.turma_id == null : a.turma_id === id)).sort((a, b) => b.patrimonio - a.patrimonio)
         .map((a, i) => ({ ...a, posicao: i + 1, rentabilidade_pct: r2((a.patrimonio / 10000 - 1) * 100) }));
     },
+    async relatorioGrupo(grupo) {
+      await atraso();
+      return gestao.alunos.filter((a) => grupo == null || (grupo === 0 ? a.turma_id == null : a.turma_id === grupo))
+        .map((a) => ({ ...a, patrimonio_inicio: 10000, patrimonio_fim: a.patrimonio, operacoes: a.ordens ?? 0,
+                       primeira_operacao: a.ultima_ordem ?? null, rentabilidade_pct: r2((a.patrimonio / 10000 - 1) * 100) }))
+        .sort((a, b) => b.rentabilidade_pct - a.rentabilidade_pct).map((a, i) => ({ ...a, posicao: i + 1 }));
+    },
     async excluirTurma(id, apagarAlunos = false) {
       await atraso();
       const t = gestao.turmas.find((x) => x.id === id);

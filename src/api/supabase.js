@@ -443,6 +443,10 @@ export function criarApi(supabase, { urlRetorno } = {}) {
     async alunosTurma(id) {
       return checar(await supabase.rpc('alunos_turma', { p_turma_id: id }));
     },
+    // grupo: id, 0 = sem grupo, null = todos; de null = desde o início da conta
+    async relatorioGrupo(grupo, de, ate) {
+      return checar(await supabase.rpc('gestor_relatorio_grupo', { p_turma_id: grupo, p_de: de, p_ate: ate }));
+    },
     // apagarAlunos = true apaga também as contas dos alunos da turma
     async excluirTurma(id, apagarAlunos = false) {
       return checar(await supabase.rpc('excluir_turma', { p_id: id, p_apagar_alunos: apagarAlunos }));

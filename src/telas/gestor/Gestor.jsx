@@ -8,12 +8,14 @@ import Alertas from './Alertas.jsx';
 import Eventos from './Eventos.jsx';
 import Sistema from './Sistema.jsx';
 import Moderacao from './Moderacao.jsx';
+import Relatorio from './Relatorio.jsx';
 import { AvisoOffline } from '../../componentes/SemConexao.jsx';
 import PerfilPessoa from '../../componentes/PerfilPessoa.jsx';
 import { AbrirPerfilContexto } from '../../lib/pessoa.js';
 
 const ABAS = [
   ['turmas', 'Grupos', 'turma'],
+  ['relatorio', 'Relatório', 'linhas'],
   ['alertas', 'Alertas', 'alerta'],
   ['eventos', 'Eventos', 'eventos'],
   ['comunidade', 'Comunidade', 'comunidade'],
@@ -68,6 +70,7 @@ export default function Gestor({ email }) {
   let conteudo;
   if (turmaAberta != null) conteudo = <TurmaDetalhe id={turmaAberta} aoVoltar={() => window.history.back()} avisar={avisar} />;
   else if (aba === 'turmas') conteudo = <Turmas aoAbrir={abrirTurma} avisar={avisar} />;
+  else if (aba === 'relatorio') conteudo = <Relatorio />;
   else if (aba === 'alertas') conteudo = <Alertas aoAgir={resolverComEvento} avisar={avisar} />;
   else if (aba === 'eventos') conteudo = <Eventos key={JSON.stringify(preenchido)} inicial={preenchido} avisar={avisar} />;
   else if (aba === 'comunidade') conteudo = <Moderacao avisar={avisar} />;
