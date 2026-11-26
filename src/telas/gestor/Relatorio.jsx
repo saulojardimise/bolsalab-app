@@ -26,6 +26,20 @@ function periodo(atalho, de, ate) {
   return [de || null, ate || hoje];
 }
 
+// ordem da lista (a posição mostrada é sempre a da rentabilidade)
+const ORDENS = {
+  'mais-rentavel': ['Mais rentável primeiro', (a, b) => num(b.rentabilidade_pct) - num(a.rentabilidade_pct)],
+  'menos-rentavel': ['Menos rentável primeiro', (a, b) => num(a.rentabilidade_pct) - num(b.rentabilidade_pct)],
+  'entrou-ultimo': ['Entrou por último', (a, b) => String(b.criado_em).localeCompare(String(a.criado_em))],
+  'entrou-primeiro': ['Entrou primeiro', (a, b) => String(a.criado_em).localeCompare(String(b.criado_em))],
+  'mais-operacoes': ['Mais operações', (a, b) => num(b.operacoes) - num(a.operacoes)],
+  'menos-operacoes': ['Menos operações', (a, b) => num(a.operacoes) - num(b.operacoes)],
+  nome: ['Nome (A a Z)', (a, b) => String(a.nome ?? '').localeCompare(String(b.nome ?? ''), 'pt-BR')],
+};
+const num = (v) => (Number.isFinite(Number(v)) ? Number(v) : -Infinity);
+const FILTROS = [['todos', 'Todos'], ['operou', 'Operou no período'], ['nao-operou', 'Não operou'], ['ganhou', 'No positivo'], ['perdeu', 'No negativo']];
+const sem = (t) => String(t ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+
 const ATALHOS = [['inicio', 'Desde o início'], ['mes', 'Este mês'], ['mes-passado', 'Mês passado'], ['30', 'Últimos 30 dias'], ['datas', 'Escolher datas']];
 
 export default function Relatorio() {
@@ -37,6 +51,9 @@ export default function Relatorio() {
   const [linhas, setLinhas] = useState(null);
   const [erro, setErro] = useState('');
   const [carregando, setCarregando] = useState(false);
+  const [ordem, setOrdem] = useState('mais-rentavel');
+  const [filtro, setFiltro] = useState('todos');
+  const [busca, setBusca] = useState('');
 
   useEffect(() => { api.turmas().then((t) => setGrupos(t ?? [])).catch(() => setGrupos([])); }, []);
 
@@ -54,6 +71,18 @@ export default function Relatorio() {
 
   const nomeGrupo = grupo === '' ? 'Todos os alunos' : grupo === '0' ? 'Sem grupo' : (grupos.find((g) => String(g.id) === grupo)?.nome ?? 'Grupo');
   const textoPeriodo = pDe ? `${dataBR(pDe)} a ${dataBR(pAte)}` : `desde o início até ${dataBR(pAte)}`;
+  // filtro, busca e ordem: tudo no aparelho, sem buscar de novo no banco
+  const visiveis = useMemo(() => {
+    if (!linhas) return null;
+    const b = sem(busca.trim());
+    return linhas
+      .filter((l) => filtro === 'todos'
+        || (filtro === 'operou' && Number(l.operacoes) > 0) || (filtro === 'nao-operou' && Number(l.operacoes) === 0)
+        || (filtro === 'ganhou' && Number(l.rentabilidade_pct) > 0) || (filtro === 'perdeu' && Number(l.rentabilidade_pct) < 0))
+      .filter((l) => !b || sem(l.nome).includes(b) || sem(l.email).includes(b))
+      .sort((x, y) => ORDENS[ordem][1](x, y) || String(x.nome ?? '').localeCompare(String(y.nome ?? ''), 'pt-BR'));
+  }, [linhas, filtro, busca, ordem]);
+
   const resumo = useMemo(() => {
     if (!linhas?.length) return null;
     const r = linhas.map((l) => Number(l.rentabilidade_pct)).filter(Number.isFinite);
@@ -68,7 +97,7 @@ export default function Relatorio() {
     const cab = ['Posição', 'Nome', 'E-mail', 'No app desde', 'Primeira operação', 'Operações no período', 'Patrimônio inicial', 'Patrimônio final', 'Rentabilidade (%)'];
     const num = (v) => String(v ?? '').replace('.', ',');
     const cel = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`;
-    const corpo = linhas.map((l) => [l.posicao, l.nome, l.email, dataBR(l.criado_em), l.primeira_operacao ? dataBR(l.primeira_operacao) : '',
+    const corpo = visiveis.map((l) => [l.posicao, l.nome, l.email, dataBR(l.criado_em), l.primeira_operacao ? dataBR(l.primeira_operacao) : '',
       l.operacoes, num(l.patrimonio_inicio), num(l.patrimonio_fim), num(l.rentabilidade_pct)].map(cel).join(';'));
     const titulo = [cel(`BolsaLab · ${nomeGrupo} · ${textoPeriodo}`)];
     const csv = '﻿' + [titulo, '', cab.map(cel).join(';'), ...corpo].join('\r\n');
@@ -130,9 +159,29 @@ export default function Relatorio() {
             )}
           </div>
 
-          {linhas.length === 0 ? <p className="cartao vazio">Ninguém neste grupo no período.</p> : (
+          {linhas.length > 0 && (
+            <div className="relatorio-ordem no-print">
+              <label className="campo">
+                <span>Ordenar por</span>
+                <select value={ordem} onChange={(e) => setOrdem(e.target.value)}>
+                  {Object.entries(ORDENS).map(([id, [nome]]) => <option key={id} value={id}>{nome}</option>)}
+                </select>
+              </label>
+              <label className="campo">
+                <span>Buscar aluno</span>
+                <input type="search" value={busca} onChange={(e) => setBusca(e.target.value)} placeholder="Nome ou e-mail" />
+              </label>
+              <div className="chips chips-quebram" role="group" aria-label="Mostrar">
+                {FILTROS.map(([id, nome]) => <button key={id} aria-pressed={filtro === id} onClick={() => setFiltro(id)}>{nome}</button>)}
+              </div>
+              {visiveis.length !== linhas.length && <p className="suave">Mostrando {visiveis.length} de {linhas.length}.</p>}
+            </div>
+          )}
+
+          {linhas.length === 0 ? <p className="cartao vazio">Ninguém neste grupo no período.</p>
+            : visiveis.length === 0 ? <p className="cartao vazio">Ninguém com esse filtro.</p> : (
             <ol className={`cartao cartao-lista ranking ranking-gestor relatorio-lista ${carregando ? 'carregando-leve' : ''}`}>
-              {linhas.map((l) => (
+              {visiveis.map((l) => (
                 <li key={l.user_id}>
                   <span className="ranking-pos num">{l.posicao}º</span>
                   <Avatar foto={l.foto_url} tamanho={40} />

@@ -1362,3 +1362,7 @@ fieldset.campo > legend { padding: 0; margin-bottom: 6px; font-weight: 650; font
   .relatorio .cartao { box-shadow: none; border: 1px solid #ccc; }
   .relatorio-lista li { break-inside: avoid; }
 }
+
+.relatorio-ordem { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 10px 12px; margin-bottom: 12px; }
+.relatorio-ordem .chips, .relatorio-ordem p { grid-column: 1 / -1; margin: 0; }
+@media (max-width: 560px) { .relatorio-ordem { grid-template-columns: 1fr; } }
