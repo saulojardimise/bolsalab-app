@@ -1366,3 +1366,10 @@ fieldset.campo > legend { padding: 0; margin-bottom: 6px; font-weight: 650; font
 .relatorio-ordem { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 10px 12px; margin-bottom: 12px; }
 .relatorio-ordem .chips, .relatorio-ordem p { grid-column: 1 / -1; margin: 0; }
 @media (max-width: 560px) { .relatorio-ordem { grid-template-columns: 1fr; } }
+/* o "olho" fica dentro de um <span>, e ".campo span" deixava a letra da senha menor (14,7px):
+   no iPhone, campo com letra menor que 16px faz a tela dar zoom ao tocar, e o zoom ficava depois de entrar */
+.campo .campo-senha { font-size: 1rem; font-weight: inherit; color: inherit; }
+/* garantia: nenhum campo de digitar com letra menor que 16px no celular */
+@media (max-width: 899px) {
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]), select, textarea { font-size: max(16px, 1em); }
+}
