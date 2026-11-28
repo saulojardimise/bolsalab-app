@@ -11,10 +11,11 @@ const NOMES_FUTURO = { WIN: 'Mini Ibovespa', WDO: 'Mini dólar' };
 
 // Cartão com o perfil de outra pessoa: foto, nome, tempo no app, desempenho,
 // posição no ranking geral, ativo favorito e grupos.
-export default function PerfilPessoa({ id, aoFechar, aoAbrirAtivo }) {
+export default function PerfilPessoa({ id, aoFechar, aoAbrirAtivo, gestor = false }) {
   const dialogo = useRef(null);
   const [p, setP] = useState(null);
   const [erro, setErro] = useState('');
+  const [versao, setVersao] = useState(0);
 
   useEffect(() => {
     const d = dialogo.current;
@@ -26,7 +27,7 @@ export default function PerfilPessoa({ id, aoFechar, aoAbrirAtivo }) {
     setP(null); setErro('');
     api.perfilPublico(id).then((x) => vivo && setP(x)).catch((e) => vivo && setErro(e.message));
     return () => { vivo = false; };
-  }, [id]);
+  }, [id, versao]);
 
   const desde = p?.criado_em ? new Date(p.criado_em).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' }) : '';
   const fav = p?.favorito;
@@ -87,9 +88,43 @@ export default function PerfilPessoa({ id, aoFechar, aoAbrirAtivo }) {
                 ? <p className="perfil-pessoa-grupos">{p.grupos.map((g) => <span key={g} className="chip-grupo">{g}</span>)}</p>
                 : <p className="suave">{p.professor ? 'Professor do BolsaLab' : 'Não faz parte de nenhum grupo.'}</p>}
             </section>
+
+            {gestor && !p.professor && !p.eu && <ZerarConta id={id} nome={p.nome} aoZerar={() => setVersao((v) => v + 1)} />}
           </>
         )}
       </div>
     </dialog>
+  );
+}
+
+// Só para o gestor: volta a conta do aluno para R$ 10.000 (apaga ordens, posições e histórico de patrimônio).
+function ZerarConta({ id, nome, aoZerar }) {
+  const [confirmar, setConfirmar] = useState(false);
+  const [enviando, setEnviando] = useState(false);
+  const [recado, setRecado] = useState(null);
+  async function zerar() {
+    if (!confirmar) { setConfirmar(true); setRecado(null); return; }
+    setEnviando(true);
+    try {
+      await api.zerarContaAluno(id);
+      setRecado({ ok: true, texto: `Conta de ${nome || 'aluno'} zerada: R$ 10.000,00 para começar de novo.` });
+      setConfirmar(false); aoZerar?.();
+    } catch (e) { setRecado({ ok: false, texto: e.message }); }
+    finally { setEnviando(false); }
+  }
+  return (
+    <section className="perfil-pessoa-bloco zerar-conta">
+      <h3>Zerar conta</h3>
+      <p className="suave">Apaga as ordens, as posições e o histórico de patrimônio e volta para R$ 10.000,00.
+        O perfil, os grupos e a Comunidade continuam. Não tem como desfazer.</p>
+      {recado && <p className={`aviso ${recado.ok ? 'aviso-ok' : 'aviso-erro'}`} role="alert">{recado.texto}</p>}
+      {confirmar && <p className="zerar-confirmar">Zerar a conta de <strong>{nome || 'este aluno'}</strong>?</p>}
+      <div className="aviso-botoes">
+        {confirmar && <button className="botao" onClick={() => setConfirmar(false)} disabled={enviando}>Cancelar</button>}
+        <button className={`botao ${confirmar ? 'botao-venda' : ''}`} onClick={zerar} disabled={enviando}>
+          {enviando ? 'Zerando…' : confirmar ? 'Sim, zerar a conta' : 'Zerar conta do aluno'}
+        </button>
+      </div>
+    </section>
   );
 }

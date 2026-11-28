@@ -206,6 +206,10 @@ export function criarApi(supabase, { urlRetorno } = {}) {
       return checar(await supabase.rpc('sair_do_grupo', { p_turma_id: id }));
     },
     /** só a conta de apresentação: zera ordens, posições e extrato e volta ao saldo inicial */
+    // só o gestor: volta a conta de um aluno para R$ 10.000
+    async zerarContaAluno(userId) {
+      return checar(await supabase.rpc('gestor_zerar_conta', { p_user_id: userId }));
+    },
     async recomecarConta() {
       return checar(await supabase.rpc('recomecar_conta'));
     },

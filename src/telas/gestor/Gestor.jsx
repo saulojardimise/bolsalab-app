@@ -104,7 +104,7 @@ export default function Gestor({ email }) {
           </button>
         ))}
       </nav>
-      {pessoaAberta && <PerfilPessoa id={pessoaAberta} aoFechar={() => setPessoaAberta(null)} />}
+      {pessoaAberta && <PerfilPessoa id={pessoaAberta} gestor aoFechar={() => setPessoaAberta(null)} />}
       {recado && <p className="recado" role="status">{recado}</p>}
     </div>
     </AbrirPerfilContexto.Provider>

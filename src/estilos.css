@@ -1373,3 +1373,6 @@ fieldset.campo > legend { padding: 0; margin-bottom: 6px; font-weight: 650; font
 @media (max-width: 899px) {
   input:not([type="checkbox"]):not([type="radio"]):not([type="range"]), select, textarea { font-size: max(16px, 1em); }
 }
+
+.zerar-conta { border-top: 1px solid var(--linha); padding-top: 14px; }
+.zerar-confirmar { margin: 0; color: var(--vermelho, #C53030); }

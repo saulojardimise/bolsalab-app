@@ -733,6 +733,7 @@ export function criarApiDemo() {
       return gestao.alunos.filter((a) => (id === 0 ? a.turma_id == null : a.turma_id === id)).sort((a, b) => b.patrimonio - a.patrimonio)
         .map((a, i) => ({ ...a, posicao: i + 1, rentabilidade_pct: r2((a.patrimonio / 10000 - 1) * 100) }));
     },
+    async zerarContaAluno() { await atraso(); return 10000; },
     async relatorioGrupo(grupo) {
       await atraso();
       return gestao.alunos.filter((a) => grupo == null || (grupo === 0 ? a.turma_id == null : a.turma_id === grupo))
