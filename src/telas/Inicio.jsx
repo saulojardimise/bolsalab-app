@@ -45,23 +45,14 @@ export default function Inicio({ uid, dados, resumo, linhas, versao, aoEscolher,
     if (!serie) return null;
     const base = serie.map((p) => ({ data: p.data, valor: Number(p.patrimonio) }));
     const hoje = dataSP();
-    let semHoje = base.filter((p) => p.data !== hoje);
-    // conta zerada pelo gestor: tudo começa de novo no dia do recomeço, com o saldo inicial.
-    // Ibovespa e CDI passam a contar desse dia, para a comparação ser justa.
-    const recomeco = dados.perfil.recomecou_em ? dataSP(new Date(dados.perfil.recomecou_em)) : null;
-    if (recomeco) {
-      semHoje = semHoje.filter((p) => p.data > recomeco);
-      const inicio = [{ data: recomeco, valor: Number(dados.config.saldo_inicial) }];
-      return noPeriodo([...inicio, ...semHoje, { data: hoje, valor: resumo.patrimonio }], periodo);
-    }
-    // ponto de partida: o saldo inicial na véspera da criação da conta. Sem ele, o primeiro
-    // ponto já viria com as corretagens do primeiro dia e a variação começaria do lugar errado.
-    const criada = dados.perfil.criado_em
-      ? dataSP(new Date(new Date(dados.perfil.criado_em).getTime() - 86400e3))
-      : null;
-    const inicio = criada && (!semHoje.length || semHoje[0].data > criada)
-      ? [{ data: criada, valor: Number(dados.config.saldo_inicial) }] : [];
-    return noPeriodo([...inicio, ...semHoje, { data: hoje, valor: resumo.patrimonio }], periodo);
+    // ponto de partida: o saldo inicial no dia em que a conta começou (criada ou zerada pelo gestor).
+    // Ibovespa e CDI contam desse mesmo dia, para a comparação ser justa. O ponto gravado nesse
+    // dia sai (as corretagens das primeiras compras aparecem a partir do dia seguinte).
+    const comeco = dados.perfil.recomecou_em ?? dados.perfil.criado_em;
+    if (!comeco) return noPeriodo([...base.filter((p) => p.data !== hoje), { data: hoje, valor: resumo.patrimonio }], periodo);
+    const dia0 = dataSP(new Date(comeco));
+    const meio = base.filter((p) => p.data > dia0 && p.data !== hoje);
+    return noPeriodo([{ data: dia0, valor: Number(dados.config.saldo_inicial) }, ...meio, { data: hoje, valor: resumo.patrimonio }], periodo);
   }, [serie, periodo, resumo.patrimonio, dados.perfil.criado_em, dados.perfil.recomecou_em, dados.config.saldo_inicial]);
 
   const variacao = pontos ? variacaoSerie(pontos) : 0;
