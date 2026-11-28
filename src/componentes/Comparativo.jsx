@@ -40,6 +40,7 @@ export function extrasComparacao(comparacao, base) {
 // "Você ficou à frente do CDI, mas atrás do Ibovespa." etc.
 function frase(visiveis, final) {
   const outros = visiveis.filter((s) => s.id !== 'aluno');
+  if (outros.every((s) => Math.abs((final[s.id] ?? 0) - final.aluno) < 0.005)) return 'Tudo empatado por enquanto: a comparação começa agora.';
   const atras = outros.filter((s) => final[s.id] > final.aluno).map((s) => s.rotulo);
   const frente = outros.filter((s) => final[s.id] <= final.aluno).map((s) => s.rotulo);
   const e = (l) => l.join(' e do ');

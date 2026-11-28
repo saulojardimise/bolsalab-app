@@ -45,7 +45,15 @@ export default function Inicio({ uid, dados, resumo, linhas, versao, aoEscolher,
     if (!serie) return null;
     const base = serie.map((p) => ({ data: p.data, valor: Number(p.patrimonio) }));
     const hoje = dataSP();
-    const semHoje = base.filter((p) => p.data !== hoje);
+    let semHoje = base.filter((p) => p.data !== hoje);
+    // conta zerada pelo gestor: tudo começa de novo no dia do recomeço, com o saldo inicial.
+    // Ibovespa e CDI passam a contar desse dia, para a comparação ser justa.
+    const recomeco = dados.perfil.recomecou_em ? dataSP(new Date(dados.perfil.recomecou_em)) : null;
+    if (recomeco) {
+      semHoje = semHoje.filter((p) => p.data > recomeco);
+      const inicio = [{ data: recomeco, valor: Number(dados.config.saldo_inicial) }];
+      return noPeriodo([...inicio, ...semHoje, { data: hoje, valor: resumo.patrimonio }], periodo);
+    }
     // ponto de partida: o saldo inicial na véspera da criação da conta. Sem ele, o primeiro
     // ponto já viria com as corretagens do primeiro dia e a variação começaria do lugar errado.
     const criada = dados.perfil.criado_em
@@ -54,7 +62,7 @@ export default function Inicio({ uid, dados, resumo, linhas, versao, aoEscolher,
     const inicio = criada && (!semHoje.length || semHoje[0].data > criada)
       ? [{ data: criada, valor: Number(dados.config.saldo_inicial) }] : [];
     return noPeriodo([...inicio, ...semHoje, { data: hoje, valor: resumo.patrimonio }], periodo);
-  }, [serie, periodo, resumo.patrimonio, dados.perfil.criado_em, dados.config.saldo_inicial]);
+  }, [serie, periodo, resumo.patrimonio, dados.perfil.criado_em, dados.perfil.recomecou_em, dados.config.saldo_inicial]);
 
   const variacao = pontos ? variacaoSerie(pontos) : 0;
   // com o patrimônio estimado, o Ibovespa de hoje também entra na comparação

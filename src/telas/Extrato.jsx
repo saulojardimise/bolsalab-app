@@ -25,8 +25,8 @@ export default function Extrato({ uid, dados, resumo, versao, aoVoltar }) {
   }, [uid, versao]);
 
   const fluxo = useMemo(() => mov && fluxoDeCaixa({
-    ...mov, saldoInicial: Number(dados.config.saldo_inicial), inicio: dados.perfil.criado_em ?? null,
-  }), [mov, dados.config.saldo_inicial, dados.perfil.criado_em]);
+    ...mov, saldoInicial: Number(dados.config.saldo_inicial), inicio: dados.perfil.recomecou_em ?? dados.perfil.criado_em ?? null,
+  }), [mov, dados.config.saldo_inicial, dados.perfil.criado_em, dados.perfil.recomecou_em]);
   const etfs = useMemo(() => tickersEtf(dados.mercado), [dados.mercado]);
 
   const lista = fluxo?.lancamentos.filter((l) => !grupo || l.grupo === grupo || (grupo === 'custos' && l.corretagem));
