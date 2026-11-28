@@ -435,6 +435,19 @@ export function criarApi(supabase, { urlRetorno } = {}) {
       return checar(await supabase.rpc('gestor_remover_do_grupo', { p_turma_id: grupoId, p_user: userId }));
     },
     // apaga a conta da pessoa do app (login, carteira, ordens, publicações)
+    // conquistas de várias pessoas: { user_id: ['lider', 'cdi', ...] }; sem o SQL 065, nenhuma
+    async conquistas(ids) {
+      if (!ids?.length) return {};
+      const { data, error } = await supabase.rpc('conquistas', { p_users: ids });
+      if (error) return {};
+      return Object.fromEntries((data ?? []).map((l) => [l.user_id, l.conquistas ?? []]));
+    },
+    async registrarAcesso() {
+      await supabase.rpc('registrar_acesso');
+    },
+    async gestorDefinirConquista(userId, codigo, ativa) {
+      return checar(await supabase.rpc('gestor_definir_conquista', { p_user: userId, p_codigo: codigo, p_ativa: ativa }));
+    },
     async perfilPublico(userId) {
       return checar(await supabase.rpc('perfil_publico', { p_user: userId }));
     },

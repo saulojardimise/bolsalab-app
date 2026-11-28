@@ -57,6 +57,13 @@ export default function Painel({ uid }) {
   const [regrasAbertas, setRegrasAbertas] = useState(false);
   const [sobreposta, setSobreposta] = useState(null);   // { tipo: 'acao', ticker, operacao }
   // tela atual, para o registro de erros (ProtecaoErro)
+  // conquista "Constante": marca o dia em que a pessoa abriu o app (e quando volta para ele)
+  useEffect(() => {
+    const marcar = () => { if (document.visibilityState === 'visible') api.registrarAcesso().catch(() => {}); };
+    marcar();
+    document.addEventListener('visibilitychange', marcar);
+    return () => document.removeEventListener('visibilitychange', marcar);
+  }, []);
   useEffect(() => {
     try { document.body.dataset.tela = sobreposta ? `${sobreposta.tipo}${sobreposta.ticker ? ` ${sobreposta.ticker}` : ''}` : aba; } catch { /* nada */ }
   }, [aba, sobreposta]);

@@ -687,6 +687,28 @@ export function criarApiDemo() {
       if (!a || a.turma_id !== grupoId) throw new Error('Essa pessoa não está no grupo.');
       a.turma_id = null;
     },
+    async conquistas(ids) {
+      await atraso();
+      const geral = await this.ranking(null);
+      return Object.fromEntries(ids.map((id) => {
+        const r = geral.find((x) => x.user_id === id);
+        const h = [...String(id)].reduce((s, c) => s + c.charCodeAt(0), 0);
+        const c = [];
+        if (r?.posicao === 1) c.push('lider');
+        if (gestao.natal?.has(id)) c.push('natal');
+        if (r && r.rentabilidade_pct > 1.2) c.push('cdi');
+        if (h % 3 === 0) c.push('arrojado');
+        if (h % 2 === 0 || r?.eu) c.push('constante');
+        if (h % 5 === 1) c.push('desafiante');
+        return [id, c];
+      }));
+    },
+    async registrarAcesso() {},
+    async gestorDefinirConquista(id, codigo, ativa) {
+      await atraso();
+      gestao.natal ??= new Set();
+      if (ativa) gestao.natal.add(id); else gestao.natal.delete(id);
+    },
     async perfilPublico(id) {
       await atraso();
       const geral = await this.ranking(null);

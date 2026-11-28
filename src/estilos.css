@@ -1376,3 +1376,19 @@ fieldset.campo > legend { padding: 0; margin-bottom: 6px; font-weight: 650; font
 
 .zerar-conta { border-top: 1px solid var(--linha); padding-top: 14px; }
 .zerar-confirmar { margin: 0; color: var(--vermelho, #C53030); }
+
+/* ------------------------------------------------------------ conquistas */
+.medalha { display: block; flex: none; }
+.medalha-apagada { filter: grayscale(1); opacity: .28; }
+.medalhas { display: inline-flex; align-items: center; gap: 3px; flex: none; }
+.medalhas-mais { font-size: 0.72rem; font-weight: 700; color: var(--suave); margin-left: 1px; }
+.ranking-nome-linha { display: flex; align-items: center; gap: 6px; min-width: 0; }
+.ranking-nome-linha strong { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.perfil-pessoa-topo .medalhas { justify-content: center; margin-top: 4px; }
+.conquistas { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 12px 8px; }
+.conquistas li { display: grid; justify-items: center; align-content: start; text-align: center; gap: 4px; }
+.conquistas strong { font-size: 0.82rem; color: var(--marinho); line-height: 1.2; }
+.conquistas small { font-size: 0.7rem; color: var(--suave); line-height: 1.3; }
+.conquistas li:not(.tem) strong { color: var(--suave); }
+.conquista-natal { display: flex; align-items: center; gap: 8px; margin-top: 14px; font-weight: 600; color: var(--marinho); }
+.conquista-natal input { width: 20px; height: 20px; accent-color: #D63C3C; }

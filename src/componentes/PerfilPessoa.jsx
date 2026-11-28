@@ -6,6 +6,7 @@ import { cursoEUniversidade } from '../lib/termos.js';
 import Avatar from './Avatar.jsx';
 import Icone from './Icone.jsx';
 import Logo from './Logo.jsx';
+import Medalha, { CONQUISTAS, Medalhas } from './Medalha.jsx';
 
 const NOMES_FUTURO = { WIN: 'Mini Ibovespa', WDO: 'Mini dólar' };
 
@@ -16,6 +17,7 @@ export default function PerfilPessoa({ id, aoFechar, aoAbrirAtivo, gestor = fals
   const [p, setP] = useState(null);
   const [erro, setErro] = useState('');
   const [versao, setVersao] = useState(0);
+  const [conq, setConq] = useState(null);
 
   useEffect(() => {
     const d = dialogo.current;
@@ -26,6 +28,7 @@ export default function PerfilPessoa({ id, aoFechar, aoAbrirAtivo, gestor = fals
     let vivo = true;
     setP(null); setErro('');
     api.perfilPublico(id).then((x) => vivo && setP(x)).catch((e) => vivo && setErro(e.message));
+    api.conquistas([id]).then((c) => vivo && setConq(c[id] ?? [])).catch(() => vivo && setConq([]));
     return () => { vivo = false; };
   }, [id, versao]);
 
@@ -45,6 +48,7 @@ export default function PerfilPessoa({ id, aoFechar, aoAbrirAtivo, gestor = fals
             <header className="perfil-pessoa-topo">
               <Avatar foto={p.foto_url} tamanho={88} />
               <h2 id="titulo-pessoa">{p.nome || 'Sem nome'}{p.eu && <small className="suave"> (você)</small>}</h2>
+              {!p.professor && <Medalhas lista={conq} tamanho={24} maximo={6} />}
               {p.professor && <span className="chip-professor">Professor</span>}
               {cursoEUniversidade(p) && (
                 <p className="perfil-pessoa-curso"><Icone nome="capelo" tamanho={16} />{cursoEUniversidade(p)}</p>
@@ -79,6 +83,36 @@ export default function PerfilPessoa({ id, aoFechar, aoAbrirAtivo, gestor = fals
                     <small className="suave">{fav.ordens} {fav.ordens === 1 ? 'operação' : 'operações'}</small>
                   </button>
                 ) : <p className="suave">Ainda não fez nenhuma operação.</p>}
+              </section>
+            )}
+
+            {!p.professor && conq && (
+              <section className="perfil-pessoa-bloco">
+                <h3>Conquistas <small className="suave">{conq.length} de {CONQUISTAS.length}</small></h3>
+                <ul className="conquistas">
+                  {CONQUISTAS.map((c) => {
+                    const tem = conq.includes(c.codigo);
+                    return (
+                      <li key={c.codigo} className={tem ? 'tem' : undefined}>
+                        <Medalha codigo={c.codigo} tamanho={52} apagada={!tem} rotulo={false} />
+                        <strong>{c.nome}</strong>
+                        <small>{c.regra}</small>
+                        <span className="sr-only">{tem ? 'Conquistada' : 'Ainda não conquistada'}</span>
+                      </li>
+                    );
+                  })}
+                </ul>
+                {gestor && !p.eu && (
+                  <label className="conquista-natal">
+                    <input type="checkbox" checked={conq.includes('natal')} onChange={async (e) => {
+                      const ativa = e.target.checked;
+                      setConq((l) => ativa ? [...l, 'natal'] : l.filter((x) => x !== 'natal'));
+                      try { await api.gestorDefinirConquista(id, 'natal', ativa); }
+                      catch (err) { setErro(err.message); setVersao((v) => v + 1); }
+                    }} />
+                    Participa do Desafio de Natal
+                  </label>
+                )}
               </section>
             )}
 

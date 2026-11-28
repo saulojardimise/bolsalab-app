@@ -5,6 +5,7 @@ import Avatar from '../componentes/Avatar.jsx';
 import BotaoPessoa from '../componentes/BotaoPessoa.jsx';
 import { esquecerConvite, lerConvite } from '../lib/convite.js';
 import Icone from '../componentes/Icone.jsx';
+import { Medalhas } from '../componentes/Medalha.jsx';
 
 // busca sem diferenciar maiúsculas nem acentos
 const simples = (t) => (t ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
@@ -21,6 +22,7 @@ export default function Turma({ grupos, versao, aoMudarGrupos, avisar }) {
   const [saindo, setSaindo] = useState(false);
   const [busca, setBusca] = useState('');
   const [filtroGrupo, setFiltroGrupo] = useState('');   // só no ranking geral
+  const [conquistas, setConquistas] = useState({});
 
   // se a pessoa sair do grupo que estava aberto, volta para o primeiro (ou geral)
   useEffect(() => {
@@ -31,7 +33,11 @@ export default function Turma({ grupos, versao, aoMudarGrupos, avisar }) {
     let vivo = true;
     setLista(null); setErro('');
     api.ranking(selecionado)
-      .then((r) => vivo && setLista(r))
+      .then((r) => {
+        if (!vivo) return;
+        setLista(r);
+        api.conquistas(r.map((x) => x.user_id).filter(Boolean)).then((c) => vivo && setConquistas(c)).catch(() => {});
+      })
       .catch((e) => vivo && setErro(e.message));
     return () => { vivo = false; };
   }, [selecionado, versao]);
@@ -131,7 +137,10 @@ export default function Turma({ grupos, versao, aoMudarGrupos, avisar }) {
               <BotaoPessoa id={r.user_id} nome={r.nome} className="ranking-pessoa">
                 <Avatar foto={r.foto_url} tamanho={40} />
                 <span className="ranking-nome">
-                  <strong>{r.nome || 'Sem nome'}</strong>
+                  <span className="ranking-nome-linha">
+                    <strong>{r.nome || 'Sem nome'}</strong>
+                    <Medalhas lista={conquistas[r.user_id]} />
+                  </span>
                   {!grupo && r.turma && <small>{r.turma}</small>}
                 </span>
               </BotaoPessoa>
