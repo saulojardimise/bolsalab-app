@@ -36,6 +36,7 @@ import Futuro from './Futuro.jsx';
 import InstalarApp from '../componentes/InstalarApp.jsx';
 import { deveSugerirInstalar, ouvirInstalacao } from '../lib/instalar.js';
 import RegrasBolsaLab, { AVISO_REGRAS, deveMostrarRegras, lembrarRegrasLocal } from '../componentes/RegrasBolsaLab.jsx';
+import AvisoNatal, { AVISO_NATAL, deveMostrarAvisoNatal, lembrarAvisoNatalLocal } from '../componentes/AvisoNatal.jsx';
 import AvisoAnthropic, { AVISO_ANTH, deveMostrarAvisoAnth, lembrarAvisoAnthLocal } from '../componentes/AvisoAnthropic.jsx';
 import { lerConvite } from '../lib/convite.js';
 import CompletarFoto, { fotoAdiada } from './CompletarFoto.jsx';
@@ -86,6 +87,12 @@ export default function Painel({ uid }) {
   const [fotoVista, setFotoVista] = useState(false);
   const [avisoFechado, setAvisoFechado] = useState(false);
   const [avisoAnthFechado, setAvisoAnthFechado] = useState(false);
+  const [avisoNatalFechado, setAvisoNatalFechado] = useState(false);
+  const [minhasConquistas, setMinhasConquistas] = useState(null);
+  useEffect(() => {
+    if (!uid) return;
+    api.conquistas([uid]).then((c) => setMinhasConquistas(c[uid] ?? [])).catch(() => {});
+  }, [uid]);
   const [pessoaAberta, setPessoaAberta] = useState(null);       // perfil de outra pessoa
   const [instalarAberto, setInstalarAberto] = useState(false);   // aberto pelo menu
   const [instalarVisto, setInstalarVisto] = useState(false);     // já apareceu sozinho nesta visita
@@ -272,7 +279,15 @@ export default function Painel({ uid }) {
     setDados((d) => ({ ...d, perfil: { ...d.perfil, avisos_vistos: [...(d.perfil.avisos_vistos ?? []), AVISO_REGRAS] } }));
   };
   // Novidade do BDR da Anthropic: só para contas criadas antes da atualização
-  const mostrarAvisoAnth = !mostrarAviso && !avisoAnthFechado && !sobreposta && !perfilAberto && deveMostrarAvisoAnth(dados.perfil, dados.mercado);
+  // Boas-vindas ao Desafio de Natal: uma vez, para quem o gestor marcou
+  const mostrarAvisoNatal = !mostrarAviso && !avisoNatalFechado && !sobreposta && !perfilAberto && deveMostrarAvisoNatal(dados.perfil, minhasConquistas);
+  const fecharAvisoNatal = () => {
+    setAvisoNatalFechado(true);
+    lembrarAvisoNatalLocal(uid);
+    api.marcarAvisoVisto(AVISO_NATAL).catch(() => {});
+    setDados((d) => ({ ...d, perfil: { ...d.perfil, avisos_vistos: [...(d.perfil.avisos_vistos ?? []), AVISO_NATAL] } }));
+  };
+  const mostrarAvisoAnth = !mostrarAviso && !mostrarAvisoNatal && !avisoAnthFechado && !sobreposta && !perfilAberto && deveMostrarAvisoAnth(dados.perfil, dados.mercado);
   const fecharAvisoAnth = () => {
     setAvisoAnthFechado(true);
     lembrarAvisoAnthLocal(uid);
@@ -281,7 +296,7 @@ export default function Painel({ uid }) {
   };
   // fechar o aviso leva sempre para a página inicial
   // Instalar o app: aparece sozinho depois do aviso de novidade (celular, fora do app instalado)
-  const mostrarInstalarSozinho = !instalarVisto && !mostrarAviso && !mostrarAvisoAnth && !sobreposta && !perfilAberto && deveSugerirInstalar();
+  const mostrarInstalarSozinho = !instalarVisto && !mostrarAviso && !mostrarAvisoNatal && !mostrarAvisoAnth && !sobreposta && !perfilAberto && deveSugerirInstalar();
   const mostrarInstalar = instalarAberto || mostrarInstalarSozinho;
   const fecharInstalar = () => { setInstalarAberto(false); setInstalarVisto(true); };
 
@@ -388,6 +403,7 @@ export default function Painel({ uid }) {
       {mostrarAviso && (
         <RegrasBolsaLab config={dados.configReal ?? dados.config} mercado={dados.mercado} aoFechar={fecharAvisoIrInicio} />
       )}
+      {mostrarAvisoNatal && <AvisoNatal nome={dados.perfil?.nome} aoFechar={fecharAvisoNatal} />}
       {mostrarAvisoAnth && (
         <AvisoAnthropic ativo={dados.mercado.find((e) => e.ticker === 'ANTH34')}
                         aoVer={() => { fecharAvisoAnth(); abrirAcao('ANTH34'); }} aoFechar={fecharAvisoAnth} />

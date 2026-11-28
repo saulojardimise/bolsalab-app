@@ -1392,3 +1392,43 @@ fieldset.campo > legend { padding: 0; margin-bottom: 6px; font-weight: 650; font
 .conquistas li:not(.tem) strong { color: var(--suave); }
 .conquista-natal { display: flex; align-items: center; gap: 8px; margin-top: 14px; font-weight: 600; color: var(--marinho); }
 .conquista-natal input { width: 20px; height: 20px; accent-color: #D63C3C; }
+
+/* ------------------------------------------------------- Desafio de Natal */
+.aviso-natal { overflow-x: hidden; }
+.aviso-natal .aviso-conteudo { padding-top: 6px; }
+.pisca-pisca { display: block; width: 100%; height: 34px; }
+.pisca-pisca .lampada { animation: piscar 1.35s ease-in-out infinite; }
+@keyframes piscar {
+  0%, 100% { opacity: 1; filter: drop-shadow(0 0 4px currentColor); }
+  50% { opacity: .25; filter: none; }
+}
+.noel-touro { display: block; width: min(100%, 300px); height: auto; margin: 0 auto -4px; overflow: visible; }
+.noel-touro .rodeio { transform-box: fill-box; transform-origin: 50% 100%; animation: rodeio 1.1s ease-in-out infinite; }
+.noel-touro .noel { transform-box: fill-box; transform-origin: 50% 100%; animation: noel-pula 1.1s ease-in-out infinite; }
+.noel-touro .braco { transform-box: fill-box; transform-origin: 0% 100%; animation: abanar .55s ease-in-out infinite alternate; }
+.noel-touro .bufada { animation: bufar 1.1s ease-out infinite; }
+.noel-touro .poeira { animation: poeira 1.1s ease-out infinite; }
+.noel-touro .sombra { transform-box: fill-box; transform-origin: center; animation: sombra 1.1s ease-in-out infinite; }
+@keyframes rodeio {
+  0%, 100% { transform: translateY(0) rotate(0); }
+  25% { transform: translateY(-22px) rotate(-7deg); }
+  50% { transform: translateY(0) rotate(0); }
+  75% { transform: translateY(-12px) rotate(5deg); }
+}
+@keyframes noel-pula {
+  0%, 100% { transform: translateY(0) rotate(0); }
+  30% { transform: translateY(-9px) rotate(4deg); }
+  55% { transform: translateY(0) rotate(0); }
+  80% { transform: translateY(-5px) rotate(-3deg); }
+}
+@keyframes abanar { from { transform: rotate(-12deg); } to { transform: rotate(14deg); } }
+@keyframes bufar { 0% { opacity: 0; transform: translateX(0); } 30% { opacity: .9; } 100% { opacity: 0; transform: translateX(14px) translateY(-6px); } }
+@keyframes poeira { 0%, 40% { opacity: 0; } 55% { opacity: .9; } 100% { opacity: 0; transform: translateY(-8px); } }
+@keyframes sombra { 0%, 50%, 100% { transform: scaleX(1); } 25% { transform: scaleX(.7); } 75% { transform: scaleX(.85); } }
+@media (prefers-reduced-motion: reduce) {
+  .pisca-pisca .lampada, .noel-touro * { animation: none !important; }
+}
+.chip-natal { background: #D63C3C; color: #fff; font-weight: 800; font-size: 0.75rem; padding: 2px 9px; border-radius: 999px; text-transform: uppercase; letter-spacing: 0.05em; }
+.aviso-natal h2 { color: #B3261E; }
+.natal-data { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; background: #FDECEC; color: #8E1E1E; border-radius: var(--raio); padding: 10px 14px; margin: 0; }
+.natal-data strong { font-size: 1.25rem; font-weight: 800; }
