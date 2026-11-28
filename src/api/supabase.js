@@ -439,7 +439,7 @@ export function criarApi(supabase, { urlRetorno } = {}) {
     async conquistas(ids) {
       if (!ids?.length) return {};
       const { data, error } = await supabase.rpc('conquistas', { p_users: ids });
-      if (error) return {};
+      if (error) { console.warn('[conquistas]', error.message); return {}; }
       return Object.fromEntries((data ?? []).map((l) => [l.user_id, l.conquistas ?? []]));
     },
     async registrarAcesso() {
