@@ -352,7 +352,8 @@ export default function Painel({ uid }) {
   } else if (aba === 'inicio') {
     conteudo = <Inicio uid={uid} dados={aoVivo?.dados ?? dados} resumo={aoVivo?.resumo ?? resumo} linhas={linhas} versao={versao}
                        macro={macro} aoAbrirEconomia={() => trocarAba('economia')}
-                       aoEscolher={abrirAcao} irPara={trocarAba} aoAbrirExtrato={abrirExtrato} />;
+                       aoEscolher={abrirAcao} irPara={trocarAba} aoAbrirExtrato={abrirExtrato}
+                       conquistas={minhasConquistas} aoAbrirConquistas={() => setPessoaAberta(uid)} />;
   } else if (aba === 'mercado') {
     conteudo = <Mercado dados={dados} linhas={linhas} aoEscolher={abrirAcao} aoAbrirFuturo={abrirFuturo} />;
   } else if (aba === 'comunidade') {

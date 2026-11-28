@@ -1432,3 +1432,9 @@ fieldset.campo > legend { padding: 0; margin-bottom: 6px; font-weight: 650; font
 .aviso-natal h2 { color: #B3261E; }
 .natal-data { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; background: #FDECEC; color: #8E1E1E; border-radius: var(--raio); padding: 10px 14px; margin: 0; }
 .natal-data strong { font-size: 1.25rem; font-weight: 800; }
+
+.saudacao-linha { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.saudacao-medalhas { background: none; border: 0; padding: 4px; margin: -4px; border-radius: 999px; cursor: pointer; display: inline-flex; }
+.saudacao-medalhas .medalhas { gap: 6px; }
+.saudacao-medalhas:hover .medalha { transform: translateY(-2px); }
+.saudacao-medalhas .medalha { transition: transform .15s; }

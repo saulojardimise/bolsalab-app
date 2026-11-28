@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { Medalhas } from '../componentes/Medalha.jsx';
 import { api } from '../api/index.js';
 import { DICAS, dicaDoDia } from '../lib/dicas.js';
 import { noPeriodo, variacaoSerie } from '../lib/periodos.js';
@@ -21,7 +22,7 @@ import { fraseOperacao, nomeCurto, resumoReacoes } from '../lib/comunidade.js';
 
 // Tela inicial: patrimônio (com Ibovespa e CDI no mesmo gráfico), saldo e extrato,
 // meus ativos, últimas da comunidade, destaques do dia e dica de hoje
-export default function Inicio({ uid, dados, resumo, linhas, versao, aoEscolher, irPara, aoAbrirExtrato, macro, aoAbrirEconomia }) {
+export default function Inicio({ uid, dados, resumo, linhas, versao, aoEscolher, irPara, aoAbrirExtrato, macro, aoAbrirEconomia, conquistas, aoAbrirConquistas }) {
   const [serie, setSerie] = useState(null);
   const [periodo, setPeriodo] = useState('1M');
   const [dica, setDica] = useState(dicaDoDia);
@@ -78,7 +79,14 @@ export default function Inicio({ uid, dados, resumo, linhas, versao, aoEscolher,
   return (
     <div className="pilha pilha-dupla">
       <section className="saudacao">
-        <h1>Olá, {nome}!</h1>
+        <div className="saudacao-linha">
+          <h1>Olá, {nome}!</h1>
+          {conquistas?.length > 0 && (
+            <button className="saudacao-medalhas" onClick={aoAbrirConquistas} aria-label="Ver minhas conquistas">
+              <Medalhas lista={conquistas} tamanho={30} maximo={6} />
+            </button>
+          )}
+        </div>
         <StatusPregao liberada={dados.liberada} livre={dados.livre} pausada={dados.config.negociacao_pausada} demo={api.modoDemo}
                       feriados={dados.feriados} abre={dados.config.hora_abre ?? 19} fecha={dados.config.hora_fecha ?? 9} />
       </section>

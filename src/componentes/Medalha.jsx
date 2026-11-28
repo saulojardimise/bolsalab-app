@@ -87,7 +87,7 @@ export function Medalhas({ lista, tamanho = 18, maximo = 3 }) {
   if (!todas.length) return null;
   const vistas = todas.slice(0, maximo);
   return (
-    <span className="medalhas" aria-label={`Conquistas: ${todas.map((c) => POR_CODIGO[c].nome).join(', ')}`}>
+    <span className="medalhas" title={todas.map((c) => POR_CODIGO[c].nome).join(' · ')} aria-label={`Conquistas: ${todas.map((c) => POR_CODIGO[c].nome).join(', ')}`}>
       {vistas.map((c) => <Medalha key={c} codigo={c} tamanho={tamanho} rotulo={false} />)}
       {todas.length > maximo && <small className="medalhas-mais">+{todas.length - maximo}</small>}
     </span>
